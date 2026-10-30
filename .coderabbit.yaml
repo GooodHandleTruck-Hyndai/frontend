@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit AI 리뷰 설정 (https://docs.coderabbit.ai)
+
+language: ko-KR # 리뷰를 한국어로
+
+reviews:
+  profile: chill # 사소한 지적은 줄이고 중요한 것 위주로
+  request_changes_workflow: false
+  high_level_summary: true # PR 설명에 변경 요약 자동 추가
+  poem: false
+  review_status: true
+  auto_review:
+    enabled: true
+    drafts: false # Draft PR 은 리뷰 안 함
+  path_instructions:
+    - path: "app/src/main/java/**/*.kt"
+      instructions: |
+        팀원 대부분이 Kotlin/Android 가 처음이고 React(JS/TS) 경험이 있어요.
+        - Kotlin 다운 표현(null 안전성, scope 함수, data class 등)을 제안할 때는 이유를 짧게 설명해 주세요.
+        - 코루틴/Flow 사용 시 생명주기 누수(viewModelScope, collectAsStateWithLifecycle 미사용 등)를 확인해 주세요.
+        - 차량 앱이므로 주행 중 화면은 글자 크기, 터치 영역, 정보량이 운전자 주의분산을 늘리지 않는지 봐 주세요.
+        - 공개 저장소이므로 API 키, 토큰, Client Secret 이 코드에 하드코딩되지 않았는지 꼭 확인해 주세요.
+    - path: "**/*.gradle.kts"
+      instructions: |
+        의존성 버전은 gradle/libs.versions.toml 에서만 관리하는지 확인해 주세요.
+
+chat:
+  auto_reply: true # PR 코멘트에서 @coderabbitai 로 질문 가능

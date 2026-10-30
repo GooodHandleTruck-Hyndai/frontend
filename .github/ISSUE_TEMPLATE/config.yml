@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 📚 플레오스 개발 문서
+    url: https://document.pleos.ai/en/docs/pleos-only/getting-started
+    about: SDK 사용법은 여기서 먼저 찾아보세요.

@@ -1,0 +1,3 @@
+<resources>
+    <style name="Theme.Sidong" parent="android:Theme.Material.NoActionBar" />
+</resources>
