@@ -21,8 +21,11 @@ data class HealthResponse(val status: String)
 object ApiClient {
     val api: BackendApi by lazy {
         val logging = HttpLoggingInterceptor().apply {
-            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
-            else HttpLoggingInterceptor.Level.NONE
+            level = if (BuildConfig.DEBUG) {
+                HttpLoggingInterceptor.Level.BODY
+            } else {
+                HttpLoggingInterceptor.Level.NONE
+            }
         }
         Retrofit.Builder()
             .baseUrl(BuildConfig.API_BASE_URL)

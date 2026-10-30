@@ -43,13 +43,13 @@ fun DriveContent(state: DriveUiState, onRetryBackend: () -> Unit) {
         Column(
             modifier = Modifier.padding(48.dp),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
                     text = state.speedKmh?.let { "%.0f".format(it) } ?: "--",
                     fontSize = 120.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.width(12.dp))
                 Text("km/h", fontSize = 32.sp, modifier = Modifier.padding(bottom = 24.dp))
@@ -79,7 +79,7 @@ private fun DriveContentPreview() {
     DriveTheme {
         DriveContent(
             state = DriveUiState(speedKmh = 62f, gear = "D", backendStatus = "연결됨 (ok)"),
-            onRetryBackend = {},
+            onRetryBackend = {}
         )
     }
 }

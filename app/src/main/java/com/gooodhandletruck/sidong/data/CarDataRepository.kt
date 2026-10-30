@@ -30,9 +30,8 @@ class CarDataRepository(context: Context) {
             .map { it * 3.6f }
 
     /** 현재 기어 (P/R/N/D) */
-    fun gear(): Flow<String> =
-        observe<Int>(VehiclePropertyIds.GEAR_SELECTION, CarPropertyManager.SENSOR_RATE_ONCHANGE)
-            .map { gearLabel(it) }
+    fun gear(): Flow<String> = observe<Int>(VehiclePropertyIds.GEAR_SELECTION, CarPropertyManager.SENSOR_RATE_ONCHANGE)
+        .map { gearLabel(it) }
 
     fun release() = car.disconnect()
 
