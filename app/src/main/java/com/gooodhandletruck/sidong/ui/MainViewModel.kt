@@ -17,7 +17,7 @@ data class DriveUiState(
     val speedKmh: Float? = null,
     val gear: String = "-",
     val backendStatus: String = "확인 중…",
-    val carError: String? = null,
+    val carError: String? = null
 )
 
 /**
@@ -62,7 +62,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 it.copy(
                     backendStatus = result.fold(
                         onSuccess = { res -> "연결됨 (${res.status})" },
-                        onFailure = { e -> "연결 실패: ${e.message}" },
+                        onFailure = { e -> "연결 실패: ${e.message}" }
                     )
                 )
             }

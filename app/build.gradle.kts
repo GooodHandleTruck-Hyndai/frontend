@@ -14,8 +14,8 @@ android {
 
     defaultConfig {
         applicationId = "com.gooodhandletruck.sidong" // 앱마켓 출시 후에는 절대 변경 금지
-        minSdk = 28        // 플레오스 최소 요구사항
-        targetSdk = 34     // 플레오스 에뮬레이터 = API 34
+        minSdk = 28 // 플레오스 최소 요구사항
+        targetSdk = 34 // 플레오스 에뮬레이터 = API 34
         versionCode = 1
         versionName = "0.1.0"
 
@@ -28,7 +28,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
+                "proguard-rules.pro"
             )
             // TODO: 실제 서버 주소로 교체
             buildConfigField("String", "API_BASE_URL", "\"https://api.example.com/\"")
