@@ -16,6 +16,15 @@
     <!-- 플레오스 Vehicle SDK 권한: 실제로 쓰는 도메인만 남기세요 (심사 대상) -->
     <uses-permission android:name="pleos.car.permission.CAR_INFO" />
 
+    <!-- 플레오스 위치: 현재 위치·근접 알림. 런타임에 요청해야 해요 (S-01) -->
+    <uses-permission android:name="pleos.car.permission.FUSED_LOCATION" />
+    <!-- 플레오스 내비: 길 안내 요청, 경로 검색, 지도 표시 -->
+    <uses-permission android:name="pleos.car.permission.NAVI_ROUTE" />
+    <uses-permission android:name="pleos.car.permission.NAVI_ROUTE_SEARCH" />
+    <uses-permission android:name="pleos.car.permission.NAVI_CUSTOM_MAP" />
+    <!-- 플레오스 음성 안내: 주행 중 단지 가격을 말할 때 -->
+    <uses-permission android:name="pleos.car.permission.TTS_SERVICE" />
+
     <application
         android:allowBackup="true"
         android:label="@string/app_name"

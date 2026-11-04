@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.gooodhandletruck.sidong"
-    compileSdk = 35
+    compileSdk = 34 // 에뮬레이터(Pleos Connect v2.1 = Android 14)에 맞춘다
 
     // 차량 API(android.car.*)를 쓰기 위한 설정. AAOS 앱에는 필수예요.
     useLibrary("android.car")
@@ -67,6 +67,11 @@ dependencies {
 
     // 플레오스 Vehicle SDK (도어, 공조, 배터리 등 차량 도메인 API)
     implementation(libs.pleos.vehicle)
+
+    // 플레오스 내비(길 안내·도착), 위치(근접 알림), 음성 안내
+    implementation(libs.pleos.navihelper)
+    implementation(libs.pleos.fusedlocation)
+    implementation(libs.pleos.texttospeech)
 
     debugImplementation(libs.androidx.ui.tooling)
 }

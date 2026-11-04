@@ -1,3 +1,65 @@
 <resources>
+    <!-- 앱 이름을 바꿀지는 보류(화면 설계서 '정할 것' 5번) -->
     <string name="app_name">시동</string>
+
+    <!-- 왼쪽 탭 -->
+    <string name="tab_nearby">주변</string>
+    <string name="tab_saved">저장</string>
+    <string name="tab_history">기록</string>
+    <string name="tab_settings">설정</string>
+
+    <!-- 화면 이름: 화면 설계서 '화면 목록' (S-01은 실제 화면이라 아래 문구를 쓴다) -->
+    <string name="screen_alert_setup">알림 조건</string>
+    <string name="screen_nearby">주변 단지</string>
+    <string name="screen_complex_detail">단지 상세</string>
+    <string name="screen_saved">저장한 단지</string>
+    <string name="screen_history">오늘 들은 단지</string>
+    <string name="screen_settings">설정</string>
+    <string name="screen_driving_idle">주행 중 · 대기</string>
+    <string name="screen_driving_alert">주행 중 · 단지 알림</string>
+
+    <!-- S-01 시작하기 -->
+    <string name="welcome_title">지나가는 아파트, 얼마인지 알려 드려요</string>
+    <string name="welcome_body_driving">주행 중에는 소리로 알려 드려요</string>
+    <string name="welcome_body_parked">정차하면 주변 단지 가격을 화면으로 보여 드려요</string>
+
+    <!-- 상태 상자: 한 줄 안내 (S-03 '상태별 문구') -->
+    <string name="status_location_denied">내 위치를 알아야 주변 단지를 보여 드릴 수 있어요</string>
+
+    <!-- 빈 화면 설명: 나중에 들어올 내용을 한 줄로 적는다 -->
+    <string name="placeholder_alert_setup_onboarding">첫 실행 2단계예요. 주행 중에 알려 드릴 단지 조건을 골라요</string>
+    <string name="placeholder_alert_setup_settings">주행 중에 알려 드릴 단지 조건을 바꿔요</string>
+    <string name="placeholder_nearby">정차하면 가장 먼저 보이는 홈이에요. 주변 단지를 약도와 목록으로 보여 줘요</string>
+    <string name="placeholder_complex_detail">평형별 가격, 최근 거래 3건, 저장·길 안내 버튼이 들어와요 (단지 id: %1$s)</string>
+    <string name="placeholder_saved">저장한 단지 목록이에요. 카드를 누르면 단지 상세가 열려요</string>
+    <string name="placeholder_history">오늘 주행 중에 소리로 들은 단지를 최근 것부터 보여 줘요</string>
+    <string name="placeholder_settings">주행 중 음성 알림, 알림 조건, 주변 범위 기본값, 앱 정보가 들어와요</string>
+    <string name="placeholder_driving_idle">주행 중에 말할 단지가 없을 때 보여요</string>
+    <string name="placeholder_driving_alert">단지를 말한 뒤 2분 동안 보여요 (단지 id: %1$s)</string>
+
+    <!-- 첫 실행을 끝내기 전에 주행을 시작했을 때 S-08에 보이는 한 줄 -->
+    <string name="driving_onboarding_pending">정차하면 설정을 이어서 할 수 있어요</string>
+
+    <!-- 빈 화면에 보이는 창 크기 -->
+    <string name="window_size">창 %1$d×%2$ddp · %3$s</string>
+    <string name="window_wide">넓은 창(1:2)</string>
+    <string name="window_narrow">좁은 창(1:1:1)</string>
+
+    <!-- 버튼 -->
+    <string name="action_back">뒤로</string>
+    <string name="action_start">위치 권한 허용하고 시작하기</string>
+    <string name="action_allow_location">위치 권한 허용</string>
+    <string name="action_alert_accept">이 조건으로 알림 받기</string>
+    <string name="action_alert_later">나중에 할게요</string>
+    <string name="action_save">저장</string>
+    <string name="action_open_detail">단지 상세 보기</string>
+    <string name="action_go_nearby">주변 단지 보기</string>
+    <string name="action_set_alert">알림 조건 정하기</string>
+    <string name="action_edit_alert">알림 조건 바꾸기</string>
+    <string name="action_listen_nearby">주변 단지 듣기</string>
+    <string name="action_view">보기</string>
+    <string name="action_close">닫기</string>
+
+    <!-- 정차하면 맨 위에 띄우는 띠 -->
+    <string name="banner_heard">방금 들은 단지 · %1$s</string>
 </resources>

@@ -3,7 +3,8 @@
 > GooodHandleTruck · 주행 중 운전자를 돕는 차량용 서비스
 
 Kotlin과 Jetpack Compose로 만든 플레오스 커넥트(Android Automotive) 앱이에요.
-지금은 **속도, 기어, 서버 연결 상태**를 보여주는 기본 뼈대 상태예요.
+지금은 S-01 시작하기만 실제 화면이고, 나머지 8개(S-02~S-09)는 **제목과 이동 버튼만 있는 빈 화면**으로 이어져 있어요.
+화면 구성과 이동 규칙은 [화면 설계서](https://claude.ai/artifact/UgMDDBgkDfK7rZVFKAaoQt)에 있어요.
 
 - 협업 규칙(브랜치, 커밋, PR): [CONTRIBUTING.md](CONTRIBUTING.md)
 - 패키지: `com.gooodhandletruck.sidong`
@@ -38,21 +39,28 @@ git clone https://github.com/GooodHandleTruck/<저장소이름>.git
 ```
 1. Android Studio → **Open** → 클론한 폴더를 선택하고, Gradle Sync 가 끝날 때까지 기다려요.
 2. 기기 목록에서 플레오스 AVD 를 고르고 ▶ **Run** 을 눌러요.
-3. 속도 권한 팝업이 뜨면 **허용** 을 눌러요.
-4. 에뮬레이터의 **⋯ (Extended controls) → Car data** 에서 기어나 속도를 바꾸면 화면 숫자가 바뀌어요.
+3. 첫 화면(S-01 시작하기)에서 [위치 권한 허용하고 시작하기]를 누르면 위치 권한 창이 떠요. 허용하든 거부하든 S-02 알림 조건을 거쳐 S-03 주변 단지로 가고, 그다음부터는 S-03에서 시작해요.
+   - 첫 실행부터 다시 보려면 `adb shell pm clear --user 10 com.gooodhandletruck.sidong` 을 실행해요. 플레오스 에뮬레이터에서는 앱이 사용자 10으로 돌아요.
+4. 에뮬레이터의 **⋯ (Extended controls) → Car data** 에서 기어를 D로 바꾸면 주행 화면(S-08)이 덮고, P로 돌리면 보던 화면으로 돌아와요.
 
 ## 📁 폴더 구조
 
 ```
 app/src/main/java/com/gooodhandletruck/sidong/
-├── MainActivity.kt          앱 진입점, 권한 요청
+├── MainActivity.kt              앱 진입점 (Activity 하나)
 ├── ui/
-│   ├── DriveScreen.kt       화면 (Compose)
-│   └── MainViewModel.kt     화면 상태 + 로직
+│   ├── AppRoot.kt               창 크기 판단, 주행·정차에 따라 화면 그리기
+│   ├── AppViewModel.kt          화면 이동·주행 상태
+│   ├── navigation/              Screen(화면 9개), Navigator(이동 규칙)
+│   ├── component/               왼쪽 탭, 버튼, 상태 상자, 위치 권한 요청, 빈 화면 틀
+│   ├── onboarding/ nearby/ detail/ saved/ history/ settings/ driving/   화면별 파일
+│   └── theme/                   색·글자·간격 (화면 설계서 공통 규격)
 └── data/
-    ├── CarDataRepository.kt 속도/기어 구독 (표준 AAOS API)
-    ├── PleosVehicle.kt      플레오스 Vehicle SDK 예시 (주석 상태)
-    └── ApiClient.kt         서버 API
+    ├── DrivingStateRepository.kt 주행 중인지 (AAOS UX 제한)
+    ├── OnboardingStore.kt       첫 실행을 끝냈는지
+    ├── LocationPermission.kt    위치 권한(FUSED_LOCATION)이 있는지
+    ├── CarDataRepository.kt     속도/기어 구독 (표준 AAOS API, 지금은 안 씀)
+    └── ApiClient.kt             서버 API
 ```
 
 ## 📚 참고 문서
