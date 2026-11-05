@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -68,8 +71,34 @@ fun NearbyRoute(
 }
 
 /**
+ * 1:2 창에서 S-03 목록 옆 칸의 약도. 목록을 불러온 뒤에만 그리고, 카드나 말풍선을 누르면 이 자리에 S-04가 열린다.
+ */
+@Composable
+fun NearbyMapPane(window: WindowLayout, onOpenComplex: (String) -> Unit) {
+    val viewModel: NearbyViewModel = viewModel()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val content = state.content as? NearbyContent.Loaded ?: return
+    if (content.cards.isEmpty()) return
+    NearbyMap(
+        center = content.center,
+        cards = content.cards,
+        radius = state.radius,
+        selectedComplexId = null,
+        onOpenComplex = onOpenComplex,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(
+                end = window.contentPadding,
+                top = AppDimens.ContentPaddingVertical,
+                bottom = AppDimens.ContentPaddingVertical
+            )
+    )
+}
+
+/**
  * S-03 주변 단지. 정차 중 홈이다. 머리글, 범위 칩(500m·1km·3km), 단지 카드 최대 10개를 보여 준다.
- * 1:2 창에서는 왼쪽 640에 목록을 두고, 오른쪽 칸에는 카드를 누르면 단지 상세가 열린다(약도는 P1).
+ * 1:2 창에서는 왼쪽 640에 목록을 두고 오른쪽 칸에 약도를 둔다(카드를 누르면 약도 자리에 단지 상세가 열린다).
+ * 1:1:1 창에서는 목록 맨 위에 약도(높이 480)를 둔다.
  * 위치 권한이 없으면 목록 대신 상태 상자의 [위치 권한 허용]으로 권한 창을 다시 띄운다.
  * 위치를 받지 못하면 "지금 위치를 확인하지 못했어요 · [다시 시도]"를 보여 준다.
  * TODO: "허용하지 않고 다시 묻지 않음"을 고른 뒤에는 창이 뜨지 않아 버튼이 아무 일도 하지 않는다.
@@ -106,6 +135,7 @@ fun NearbyScreen(
             RangeChips(selected = state.radius, onSelect = onSelectRadius)
             NearbyContentArea(
                 state = state,
+                showMap = !window.isWide,
                 selectedComplexId = selectedComplexId,
                 onSelectRadius = onSelectRadius,
                 onRetry = onRetry,
@@ -155,6 +185,7 @@ private fun RangeChips(selected: NearbyRadius, onSelect: (NearbyRadius) -> Unit)
 @Composable
 private fun NearbyContentArea(
     state: NearbyUiState,
+    showMap: Boolean,
     selectedComplexId: String?,
     onSelectRadius: (NearbyRadius) -> Unit,
     onRetry: () -> Unit,
@@ -189,6 +220,20 @@ private fun NearbyContentArea(
                 verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceS),
                 contentPadding = PaddingValues(bottom = AppDimens.ContentPaddingVertical)
             ) {
+                if (showMap) {
+                    item(key = MAP_ITEM_KEY) {
+                        NearbyMap(
+                            center = content.center,
+                            cards = content.cards,
+                            radius = state.radius,
+                            selectedComplexId = selectedComplexId,
+                            onOpenComplex = onOpenComplex,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(AppDimens.NarrowMapHeight)
+                        )
+                    }
+                }
                 items(content.cards, key = { it.complex.complexId }) { card ->
                     ComplexCard(
                         model = card,
@@ -200,6 +245,8 @@ private fun NearbyContentArea(
         }
     }
 }
+
+private const val MAP_ITEM_KEY = "map"
 
 /** 범위 이름: "500m", "1km", "3km" */
 private val NearbyRadius.label: String

@@ -23,4 +23,15 @@ class PriceFormatTest {
 
     @Test
     fun voiceAddsWon() = assertEquals("12억 3,000만 원", formatPriceVoice(123000))
+
+    @Test
+    fun mapBubbleRoundsToTenthOfEok() {
+        // 화면 설계서 S-04 '가격 표시 규칙'의 약도 말풍선 예
+        assertEquals("12.3억", formatPriceShort(123456))
+        assertEquals("12억", formatPriceShort(120000))
+        assertEquals("9,500만", formatPriceShort(9500))
+    }
+
+    @Test
+    fun mapBubbleRoundsUpToNextEok() = assertEquals("10억", formatPriceShort(99_950))
 }

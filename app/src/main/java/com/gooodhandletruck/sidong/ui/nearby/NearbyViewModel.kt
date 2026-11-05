@@ -89,7 +89,8 @@ class NearbyViewModel(app: Application) : AndroidViewModel(app) {
                 val response = repository.nearby(location.lat, location.lon, radius.meters)
                 NearbyContent.Loaded(
                     totalCount = response.totalCount,
-                    cards = response.items.map { it.toCardModel(location) }
+                    cards = response.items.map { it.toCardModel(location) },
+                    center = location
                 )
             } catch (e: CancellationException) {
                 throw e

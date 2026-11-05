@@ -28,6 +28,9 @@ object AppDimens {
     val ThumbnailRadius = 16.dp // 카드 안 사진 모서리. 설계서에 따로 없어서 카드(28)보다 작게 둔다
     val SelectedBorder = 2.dp // 1:2 창에서 상세를 연 카드의 강조색 테두리
 
+    // S-03 약도: 좁은 창(1:1:1)에서는 목록 위 높이 480. 넓은 창(1:2)은 목록 옆 칸을 채운다
+    val NarrowMapHeight = 480.dp
+
     // S-04 단지 상세
     val DetailPhotoHeight = 320.dp // 좁은 창(1:1:1)의 사진 높이. 넓은 창(1:2)은 16:9
 

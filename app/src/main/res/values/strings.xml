@@ -31,6 +31,12 @@
     <string name="nearby_loading">주변 단지를 찾고 있어요</string>
     <string name="nearby_empty">%1$s 안에 단지가 없어요</string>
 
+    <!-- S-03 약도 -->
+    <string name="map_heading_up">위 = 차가 향한 쪽</string>
+    <string name="map_legend">말풍선 숫자 = 대표 평형의 최근 3개월 평균</string>
+    <string name="map_no_average">-</string>
+    <string name="map_bubble_description">%1$s, %2$s</string>
+
     <!-- S-05 저장한 단지 -->
     <string name="saved_header_count">저장한 단지 · %1$d곳</string>
     <string name="saved_empty">아직 저장한 단지가 없어요</string>

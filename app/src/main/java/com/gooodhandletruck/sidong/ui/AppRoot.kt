@@ -38,6 +38,7 @@ import com.gooodhandletruck.sidong.ui.history.HistoryRoute
 import com.gooodhandletruck.sidong.ui.navigation.NavState
 import com.gooodhandletruck.sidong.ui.navigation.Screen
 import com.gooodhandletruck.sidong.ui.navigation.Tab
+import com.gooodhandletruck.sidong.ui.nearby.NearbyMapPane
 import com.gooodhandletruck.sidong.ui.nearby.NearbyRoute
 import com.gooodhandletruck.sidong.ui.onboarding.AlertSetupRoute
 import com.gooodhandletruck.sidong.ui.onboarding.WelcomeScreen
@@ -206,8 +207,9 @@ private fun WidePanesContent(
                         onStartRoute = viewModel::startRoute
                     )
                 }
+            } else if (panes.list == Screen.Nearby) {
+                NearbyMapPane(window = window, onOpenComplex = { viewModel.open(Screen.ComplexDetail(it)) })
             } else if (panes.list == Screen.Saved || panes.list == Screen.History) {
-                // S-03은 이 자리에 약도(P1)가 들어온다
                 DetailPaneHint(window)
             }
         }

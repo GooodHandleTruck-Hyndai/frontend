@@ -1,5 +1,6 @@
 package com.gooodhandletruck.sidong.ui.nearby
 
+import com.gooodhandletruck.sidong.data.CarLocation
 import com.gooodhandletruck.sidong.ui.component.ComplexCardModel
 
 /** S-03 범위 칩. 기본은 1km다. */
@@ -27,8 +28,12 @@ sealed interface NearbyContent {
     /** 위치를 기다리거나 단지를 불러오는 중. 움직이지 않는 회색 자리 카드 3개를 보여 준다 */
     data object Loading : NearbyContent
 
-    /** [cards]는 가까운 순 최대 10개, [totalCount]는 반경 안 전체 수다 */
-    data class Loaded(val totalCount: Int, val cards: List<ComplexCardModel>) : NearbyContent
+    /** [cards]는 가까운 순 최대 10개, [totalCount]는 반경 안 전체 수다. [center]는 목록을 계산한 차 위치(약도 가운데)다 */
+    data class Loaded(
+        val totalCount: Int,
+        val cards: List<ComplexCardModel>,
+        val center: CarLocation
+    ) : NearbyContent
 
     /** 지금 위치를 받지 못했다. [다시 시도]는 위치를 다시 묻는다 */
     data object LocationFailed : NearbyContent
