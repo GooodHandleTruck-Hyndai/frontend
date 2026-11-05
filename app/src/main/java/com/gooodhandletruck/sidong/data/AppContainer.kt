@@ -23,6 +23,9 @@ class AppContainer(context: Context) {
     /** 주행 중 자동 알림 조건과 켜기·끄기(S-02·S-07) */
     val alertSettingsRepository = AlertSettingsRepository(context)
 
+    /** S-03 범위 칩의 기본값(S-07) */
+    val nearbyRangeStore = NearbyRangeStore(context)
+
     /** 주행 중 음성 안내(플레오스 TextToSpeech) */
     val speechRepository = SpeechRepository(context, appScope)
 }

@@ -28,7 +28,6 @@ import com.gooodhandletruck.sidong.ui.WindowLayout
 import com.gooodhandletruck.sidong.ui.component.PrimaryButton
 import com.gooodhandletruck.sidong.ui.component.SecondaryButton
 import com.gooodhandletruck.sidong.ui.component.ToggleChip
-import com.gooodhandletruck.sidong.ui.format.formatPrice
 import com.gooodhandletruck.sidong.ui.navigation.Screen
 import com.gooodhandletruck.sidong.ui.theme.AppColors
 import com.gooodhandletruck.sidong.ui.theme.AppDimens
@@ -177,41 +176,5 @@ private fun ChipSection(title: String, chips: @Composable () -> Unit) {
         ) {
             chips()
         }
-    }
-}
-
-@Composable
-private fun typeLabel(type: ComplexType): String {
-    val name = stringResource(
-        when (type) {
-            ComplexType.APT -> R.string.type_apartment
-            ComplexType.OFFICETEL -> R.string.type_officetel
-            ComplexType.ONE_ROOM -> R.string.type_one_room
-        }
-    )
-    return if (type.available) name else stringResource(R.string.chip_coming_soon, name)
-}
-
-/** "5억 이하" · "5억~10억" · "15억 넘게". 가격 숫자는 formatPrice로만 만든다 */
-@Composable
-private fun priceRangeLabel(range: PriceRange): String {
-    val min = range.minManwon
-    val max = range.maxManwon
-    return when {
-        min == null && max != null -> stringResource(R.string.range_up_to, formatPrice(max))
-        min != null && max == null -> stringResource(R.string.range_over, formatPrice(min))
-        else -> stringResource(R.string.range_between, formatPrice(min ?: 0), formatPrice(max ?: 0))
-    }
-}
-
-/** "60㎡ 이하" · "60~85㎡" · "85㎡ 넘게" */
-@Composable
-private fun areaRangeLabel(range: AreaRange): String {
-    val min = range.minM2
-    val max = range.maxM2
-    return when {
-        min == null && max != null -> stringResource(R.string.area_up_to, max)
-        min != null && max == null -> stringResource(R.string.area_over, min)
-        else -> stringResource(R.string.area_between, min ?: 0, max ?: 0)
     }
 }

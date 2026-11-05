@@ -42,7 +42,7 @@ import com.gooodhandletruck.sidong.ui.nearby.NearbyRoute
 import com.gooodhandletruck.sidong.ui.onboarding.AlertSetupRoute
 import com.gooodhandletruck.sidong.ui.onboarding.WelcomeScreen
 import com.gooodhandletruck.sidong.ui.saved.SavedRoute
-import com.gooodhandletruck.sidong.ui.settings.SettingsScreen
+import com.gooodhandletruck.sidong.ui.settings.SettingsRoute
 import com.gooodhandletruck.sidong.ui.theme.AppColors
 import com.gooodhandletruck.sidong.ui.theme.AppDimens
 import com.gooodhandletruck.sidong.ui.theme.AppType
@@ -320,7 +320,7 @@ private fun ParkedScreen(
             onOpenComplex = openComplex,
             onSetAlert = openAlertSetup
         )
-        Screen.Settings -> SettingsScreen(window = window, onEditAlert = openAlertSetup)
+        Screen.Settings -> SettingsRoute(window = window, onEditAlert = openAlertSetup)
     }
 }
 

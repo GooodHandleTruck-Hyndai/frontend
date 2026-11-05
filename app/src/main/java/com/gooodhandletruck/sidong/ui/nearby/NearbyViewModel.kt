@@ -26,6 +26,7 @@ class NearbyViewModel(app: Application) : AndroidViewModel(app) {
     private val container = (app as SidongApp).container
     private val repository = container.complexRepository
     private val locationRepository = container.locationRepository
+    private val rangeStore = container.nearbyRangeStore
 
     private val _state = MutableStateFlow(NearbyUiState())
     val state: StateFlow<NearbyUiState> = _state.asStateFlow()
@@ -34,6 +35,15 @@ class NearbyViewModel(app: Application) : AndroidViewModel(app) {
     private var anchor: CarLocation? = null
 
     private var loadJob: Job? = null
+
+    init {
+        // S-07 '주변 범위 기본값'이 처음 범위이고, 설정에서 바꾸면 S-03 범위도 바로 바뀐다
+        viewModelScope.launch {
+            rangeStore.defaultRadiusMeters.collect { meters ->
+                NearbyRadius.entries.firstOrNull { it.meters == meters }?.let(::selectRadius)
+            }
+        }
+    }
 
     /**
      * S-03이 화면에 보이는 동안 부른다. 부른 쪽이 취소할 때까지 위치를 따라간다.

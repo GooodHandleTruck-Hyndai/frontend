@@ -3,7 +3,7 @@
 > GooodHandleTruck · 주행 중 운전자를 돕는 차량용 서비스
 
 Kotlin과 Jetpack Compose로 만든 플레오스 커넥트(Android Automotive) 앱이에요.
-지금은 S-01 시작하기, S-02 알림 조건, S-03 주변 단지(실제 위치 + 목업 단지), S-04 단지 상세, S-05 저장한 단지, S-06 오늘 들은 단지, S-08·S-09 주행 중 화면이 실제 화면이에요. S-07 설정은 아직 **제목과 이동 버튼만 있는 빈 화면**이에요.
+화면 9개(S-01~S-09)가 모두 실제 화면이에요. 단지 데이터는 서버가 준비될 때까지 목업(가상 단지)을 쓰고, 위치·길 안내·음성은 플레오스 SDK를 실제로 불러요. S-03 약도와 주행 중 자동 알림(근접 알림)은 아직 없어요.
 화면 구성과 이동 규칙은 [화면 설계서](https://claude.ai/artifact/UgMDDBgkDfK7rZVFKAaoQt)에 있어요.
 
 - 협업 규칙(브랜치, 커밋, PR): [CONTRIBUTING.md](CONTRIBUTING.md)
@@ -63,7 +63,7 @@ app/src/main/java/com/gooodhandletruck/sidong/
 │   ├── AppRoot.kt               창 크기 판단, 주행·정차에 따라 화면 그리기, 1:2 창의 목록+상세 두 칸
 │   ├── AppViewModel.kt          화면 이동·주행 상태
 │   ├── navigation/              Screen(화면 9개), Navigator(이동 규칙)
-│   ├── component/               왼쪽 탭, 버튼, 칩, 단지 카드·사진 자리, 방향·거리 칩, 상태 상자, 위치 권한 요청, 빈 화면 틀
+│   ├── component/               왼쪽 탭, 버튼, 칩, 단지 카드·사진 자리, 방향·거리 칩, 상태 상자, 불러오는 중 카드, 위치 권한 요청
 │   ├── format/                  가격·거리·면적·방향 표기 (가격 문자열은 여기서만 만듦)
 │   ├── onboarding/ nearby/ detail/ saved/ history/ settings/ driving/   화면별 파일 (nearby/·detail/에 ViewModel)
 │   └── theme/                   색·글자·간격 (화면 설계서 공통 규격)
@@ -79,6 +79,7 @@ app/src/main/java/com/gooodhandletruck/sidong/
     ├── NavigationRepository.kt  길 안내 보내기와 도착 (플레오스 NaviHelper)
     ├── SpeechRepository.kt      주행 중 음성 안내와 오디오 포커스 (플레오스 TextToSpeech)
     ├── AlertSettingsRepository.kt 주행 중 자동 알림 조건과 켜기·끄기 (이 기기에 저장)
+    ├── NearbyRangeStore.kt      주변 범위 기본값 (S-07)
     ├── DrivingStateRepository.kt 주행 중인지 (AAOS UX 제한)
     ├── OnboardingStore.kt       첫 실행을 끝냈는지
     ├── LocationPermission.kt    위치 권한(FUSED_LOCATION)이 있는지

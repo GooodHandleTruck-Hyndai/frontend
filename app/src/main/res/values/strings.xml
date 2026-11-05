@@ -8,8 +8,7 @@
     <string name="tab_history">기록</string>
     <string name="tab_settings">설정</string>
 
-    <!-- 화면 이름: 화면 설계서 '화면 목록' (S-01은 실제 화면이라 아래 문구를 쓰고, S-04는 단지 이름을 제목으로 쓴다) -->
-    <string name="screen_alert_setup">알림 조건</string>
+    <!-- 목록·설정 화면의 제목 (S-01·S-02는 질문, S-04는 단지 이름을 제목으로 쓴다) -->
     <string name="screen_nearby">주변 단지</string>
     <string name="screen_saved">저장한 단지</string>
     <string name="screen_history">오늘 들은 단지</string>
@@ -82,8 +81,6 @@
     <string name="direction_left">왼쪽</string>
     <string name="direction_front_left">왼쪽 앞</string>
 
-    <!-- 빈 화면 설명: 나중에 들어올 내용을 한 줄로 적는다 -->
-    <string name="placeholder_settings">주행 중 음성 알림, 알림 조건, 주변 범위 기본값, 앱 정보가 들어와요</string>
 
     <!-- S-02 알림 조건 -->
     <string name="alert_title">어떤 단지를 알려 드릴까요?</string>
@@ -101,6 +98,17 @@
     <string name="area_between">%1$d~%2$d㎡</string>
     <string name="area_over">%1$d㎡ 넘게</string>
 
+    <!-- S-07 설정 -->
+    <string name="settings_alerts">주행 중 음성 알림</string>
+    <string name="settings_conditions">알림 조건</string>
+    <string name="settings_conditions_none">아직 정하지 않았어요</string>
+    <string name="settings_all_prices">모든 가격대</string>
+    <string name="settings_all_areas">모든 면적</string>
+    <string name="settings_default_radius">주변 범위 기본값</string>
+    <string name="settings_app_info">앱 정보</string>
+    <string name="settings_version">버전 %1$s</string>
+    <string name="settings_demo_data">단지 이름과 가격은 시연용 가상 데이터예요</string>
+
     <!-- S-08 주행 중 대기: 가운데 상태 한 줄 -->
     <string name="driving_status_alerts_on">단지를 지나면 소리로 알려 드릴게요</string>
     <string name="driving_status_alerts_off">정차하면 주변 단지 가격을 보여 드려요</string>
@@ -115,10 +123,6 @@
     <string name="voice_location_unavailable">지금 위치를 확인하지 못했어요.</string>
     <string name="voice_load_failed">가격 정보를 불러오지 못했어요.</string>
 
-    <!-- 빈 화면에 보이는 창 크기 -->
-    <string name="window_size">창 %1$d×%2$ddp · %3$s</string>
-    <string name="window_wide">넓은 창(1:2)</string>
-    <string name="window_narrow">좁은 창(1:1:1)</string>
 
     <!-- 버튼 -->
     <string name="action_back">뒤로</string>
@@ -133,7 +137,6 @@
     <string name="action_route">길 안내</string>
     <string name="action_go_nearby">주변 단지 보기</string>
     <string name="action_set_alert">알림 조건 정하기</string>
-    <string name="action_edit_alert">알림 조건 바꾸기</string>
     <string name="action_listen_nearby">주변 단지 듣기</string>
     <string name="action_replay">다시 듣기</string>
     <string name="action_view">보기</string>
