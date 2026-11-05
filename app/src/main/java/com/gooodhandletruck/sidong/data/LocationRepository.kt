@@ -44,6 +44,15 @@ sealed interface LocationState {
 /** 근접 알림을 걸 단지 하나. 이 둘레에 들어가면 주행 중에 소리로 알린다 */
 data class ProximityTarget(val complexId: String, val lat: Double, val lon: Double)
 
+/** 길 안내 목적지 둘레에 들어오거나 나갔다. 내비 도착 이벤트가 오지 않을 때 도착을 대신 판단하는 데 쓴다 */
+sealed interface DestinationEvent {
+    val complexId: String
+
+    data class Entered(override val complexId: String) : DestinationEvent
+
+    data class Exited(override val complexId: String) : DestinationEvent
+}
+
 /**
  * 차의 지금 위치와 향한 쪽을 알려 주는 곳. 플레오스 FusedLocation SDK를 감싼다(구글 Fused Location이 아니다).
  * 주행 중 자동 알림에 쓰는 근접 알림([watchProximity])도 같은 SDK 연결로 건다.
@@ -84,7 +93,19 @@ class LocationRepository(context: Context, scope: CoroutineScope) {
     private val proximityAlertIds = mutableMapOf<String, String>()
 
     // watchProximity를 부를 때마다 1씩 올라, 예전 목록에서 늦게 온 등록·이벤트를 버린다
+    @Volatile
     private var proximityGeneration = 0
+
+    // 길 안내 목적지의 근접 알림. proximityLock 안에서만 쓴다
+    private var destinationAlertId: String? = null
+
+    @Volatile
+    private var destinationGeneration = 0
+
+    private val _destinationEvents = MutableSharedFlow<DestinationEvent>(extraBufferCapacity = PROXIMITY_EVENT_BUFFER)
+
+    /** 길 안내 목적지 둘레에 들어오고 나간 것 */
+    val destinationEvents: SharedFlow<DestinationEvent> = _destinationEvents.asSharedFlow()
 
     private val _entered = MutableSharedFlow<String>(extraBufferCapacity = PROXIMITY_EVENT_BUFFER)
 
@@ -141,6 +162,56 @@ class LocationRepository(context: Context, scope: CoroutineScope) {
 
         override fun onError(exception: Exception) {
             Log.w(TAG, "근접 알림 오류($complexId)", exception)
+        }
+    }
+
+    /**
+     * 길 안내 목적지 둘레(반경 [radiusMeters])에 근접 알림(ENTER·EXIT)을 건다. null이면 지운다.
+     * 자동 알림의 근접 알림([watchProximity])과 따로 건다.
+     */
+    fun watchDestination(target: ProximityTarget?, radiusMeters: Float) {
+        synchronized(proximityLock) {
+            val generation = ++destinationGeneration
+            destinationAlertId?.let(::removeProximityAlert)
+            destinationAlertId = null
+            if (target == null || !fusedLocation.isSupported()) return
+            try {
+                if (initialized.compareAndSet(false, true)) fusedLocation.initialize()
+                val request = ProximityAlertRequest(
+                    latitude = target.lat,
+                    longitude = target.lon,
+                    radiusMeters = radiusMeters,
+                    transitionTypes = setOf(ProximityTransition.ENTER, ProximityTransition.EXIT)
+                )
+                fusedLocation.addProximityAlert(request, destinationListener(target.complexId, generation))
+            } catch (e: SecurityException) {
+                Log.w(TAG, "위치 권한이 없어 목적지 근접 알림을 걸지 못했어요", e)
+            }
+        }
+    }
+
+    private fun destinationListener(complexId: String, generation: Int) = object : ProximityAlertListener {
+        override fun onRegistered(alertId: String) {
+            synchronized(proximityLock) {
+                if (generation == destinationGeneration) {
+                    destinationAlertId = alertId
+                } else {
+                    removeProximityAlert(alertId)
+                }
+            }
+        }
+
+        override fun onTransition(event: ProximityAlertEvent) {
+            if (generation != destinationGeneration) return
+            val destinationEvent = when (event.transition) {
+                ProximityTransition.ENTER -> DestinationEvent.Entered(complexId)
+                ProximityTransition.EXIT -> DestinationEvent.Exited(complexId)
+            }
+            _destinationEvents.tryEmit(destinationEvent)
+        }
+
+        override fun onError(exception: Exception) {
+            Log.w(TAG, "목적지 근접 알림 오류($complexId)", exception)
         }
     }
 

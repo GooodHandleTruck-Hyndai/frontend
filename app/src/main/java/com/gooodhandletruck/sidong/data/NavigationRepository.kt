@@ -37,9 +37,13 @@ class NavigationRepository(context: Context) {
     private val naviHelper = NaviHelper(context.applicationContext)
     private val initialized = AtomicBoolean(false)
 
-    /** 마지막으로 길 안내를 보낸 단지. 도착하면 이 단지의 S-04를 연다 */
-    @Volatile
-    private var destination: RouteTarget? = null
+    private val _destination = MutableStateFlow<RouteTarget?>(null)
+
+    /**
+     * 길 안내를 보낸 단지. 도착하거나 안내를 취소하면 null이다.
+     * 내비 도착 이벤트가 오지 않을 때를 대비해 화면이 이 단지 둘레에 근접 알림을 건다.
+     */
+    val destination: StateFlow<RouteTarget?> = _destination.asStateFlow()
 
     private val _arrival = MutableStateFlow<String?>(null)
 
@@ -48,19 +52,19 @@ class NavigationRepository(context: Context) {
 
     private val listener = object : NaviHelperEventListener {
         override fun onDestinationArrived(destinationArrivedInfo: DestinationArrivedInfo) {
-            val target = destination ?: return
+            val target = _destination.value ?: return
             // 도착 정보에는 좌표가 없다. 내비에서 직접 다른 곳으로 간 도착을 잘못 받지 않게 이름이나 주소로 맞춰 본다
             if (!destinationArrivedInfo.matches(target)) {
                 Log.i(TAG, "보낸 단지가 아닌 곳에 도착: ${destinationArrivedInfo.name}")
                 return
             }
-            destination = null
+            _destination.value = null
             _arrival.value = target.complexId
         }
 
         // 내비에서 [안내 종료]를 누르면 onRouteEnded가 온다. 도착 직전에도 올 수 있어 목적지는 지우지 않는다
         override fun onRouteCancelled() {
-            destination = null
+            _destination.value = null
         }
 
         override fun onError(errorCode: NaviErrorCode) {
@@ -76,7 +80,7 @@ class NavigationRepository(context: Context) {
         }
         return try {
             naviHelper.requestRoute(target.toRouteInfo())
-            destination = target
+            _destination.value = target
             true
         } catch (e: SecurityException) {
             Log.w(TAG, "길 안내 권한(NAVI_ROUTE_SEARCH)이 없어요", e)
@@ -86,6 +90,11 @@ class NavigationRepository(context: Context) {
 
     fun consumeArrival() {
         _arrival.value = null
+    }
+
+    /** 근접 알림과 정차로 도착을 대신 판단했을 때. 뒤늦게 온 내비 도착 이벤트로 S-04를 또 열지 않는다 */
+    fun clearDestination() {
+        _destination.value = null
     }
 
     private companion object {

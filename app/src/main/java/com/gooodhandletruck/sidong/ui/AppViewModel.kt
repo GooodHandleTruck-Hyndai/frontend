@@ -10,6 +10,7 @@ import com.gooodhandletruck.sidong.R
 import com.gooodhandletruck.sidong.SidongApp
 import com.gooodhandletruck.sidong.data.AlertSettings
 import com.gooodhandletruck.sidong.data.CarLocation
+import com.gooodhandletruck.sidong.data.DestinationEvent
 import com.gooodhandletruck.sidong.data.DrivingStateRepository
 import com.gooodhandletruck.sidong.data.LocationPermission
 import com.gooodhandletruck.sidong.data.LocationState
@@ -101,10 +102,17 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     // 마지막 자동 알림 시각(SystemClock.elapsedRealtime). 알림 사이를 1분 이상 띄운다
     private var lastAutoAlertAt: Long? = null
 
+    // 길 안내 목적지 둘레에 들어와 있는 단지. 여기서 정차하면 도착으로 본다
+    private var nearDestinationId: String? = null
+
     init {
         // 주행이 시작되면 어느 화면에서든 S-08로 덮고, 정차하면 보던 화면으로 돌아간다
         viewModelScope.launch {
-            drivingState.isDriving().collect { navigator.onDrivingChanged(it) }
+            drivingState.isDriving().collect { driving ->
+                navigator.onDrivingChanged(driving)
+                // 내비 도착 이벤트가 오지 않아도 목적지 둘레에서 정차하면 도착으로 본다
+                if (!driving) nearDestinationId?.let(::arriveByProximity)
+            }
         }
         // 길 안내로 도착하면 정차하는 대로 그 단지의 S-04를 연다
         viewModelScope.launch {
@@ -125,6 +133,41 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             locationRepository.entered.collect(::onEnteredComplex)
         }
+        // 길 안내를 보낸 단지 둘레에 근접 알림을 건다. 도착하거나 안내를 취소하면 지운다
+        viewModelScope.launch {
+            combine(navigation.destination, locationGranted) { target, granted -> target.takeIf { granted } }
+                .collect { target ->
+                    if (target == null) nearDestinationId = null
+                    locationRepository.watchDestination(
+                        target?.let { ProximityTarget(it.complexId, it.lat, it.lon) },
+                        ARRIVAL_RADIUS_METERS
+                    )
+                }
+        }
+        viewModelScope.launch {
+            locationRepository.destinationEvents.collect(::onDestinationEvent)
+        }
+    }
+
+    private fun onDestinationEvent(event: DestinationEvent) {
+        when (event) {
+            is DestinationEvent.Entered -> {
+                nearDestinationId = event.complexId
+                // 이미 서 있는 채로 둘레에 들어왔으면 바로 도착이다
+                if (!nav.value.isDriving) arriveByProximity(event.complexId)
+            }
+            is DestinationEvent.Exited -> if (nearDestinationId == event.complexId) nearDestinationId = null
+        }
+    }
+
+    /**
+     * 내비 도착 이벤트(NaviHelper)가 오지 않을 때의 도착(화면 설계서 '주행·정차 전환 규칙': 근접 알림 + 정차).
+     * 그 단지의 S-04를 '도착했어요' 띠와 함께 열고, 뒤늦게 온 내비 도착 이벤트로 또 열지 않게 목적지를 지운다.
+     */
+    private fun arriveByProximity(complexId: String) {
+        nearDestinationId = null
+        navigation.clearDestination()
+        navigator.onArrived(complexId)
     }
 
     /**
@@ -322,5 +365,8 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         // 단지 반경 300m에 들어가면 말한다. 반경은 시연하며 조정한다(화면 설계서 '알림 규칙')
         const val ALERT_RADIUS_METERS = 300f
         const val MIN_ALERT_GAP_MS = 60_000L
+
+        // 목적지 둘레 반경. 단지 대표 좌표에서 이만큼 안에 서면 도착으로 본다(시연하며 조정한다)
+        const val ARRIVAL_RADIUS_METERS = 200f
     }
 }
