@@ -23,6 +23,7 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -40,7 +41,7 @@ import com.gooodhandletruck.sidong.ui.navigation.Tab
 import com.gooodhandletruck.sidong.ui.nearby.NearbyRoute
 import com.gooodhandletruck.sidong.ui.onboarding.AlertSetupScreen
 import com.gooodhandletruck.sidong.ui.onboarding.WelcomeScreen
-import com.gooodhandletruck.sidong.ui.saved.SavedScreen
+import com.gooodhandletruck.sidong.ui.saved.SavedRoute
 import com.gooodhandletruck.sidong.ui.settings.SettingsScreen
 import com.gooodhandletruck.sidong.ui.theme.AppColors
 import com.gooodhandletruck.sidong.ui.theme.AppDimens
@@ -152,7 +153,8 @@ private fun WidePanesContent(
                 .weight(1f)
                 .fillMaxHeight()
         ) {
-            panes.detail?.let { detail ->
+            val detail = panes.detail
+            if (detail != null) {
                 // 다른 단지를 열면 스크롤을 맨 위로 되돌린다
                 key(detail.complexId) {
                     ComplexDetailRoute(
@@ -163,8 +165,29 @@ private fun WidePanesContent(
                         onClose = viewModel::back
                     )
                 }
+            } else if (panes.list == Screen.Saved || panes.list == Screen.History) {
+                // S-03은 이 자리에 약도(P1)가 들어온다
+                DetailPaneHint(window)
             }
         }
+    }
+}
+
+/** 1:2 창에서 S-05·S-06 목록 옆 칸이 비어 있을 때의 안내 */
+@Composable
+private fun DetailPaneHint(window: WindowLayout) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(end = window.contentPadding),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = stringResource(R.string.detail_pane_hint),
+            style = AppType.BodyM,
+            color = AppColors.TextTertiary,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -238,8 +261,10 @@ private fun ParkedScreen(
                 onClose = viewModel::back
             )
         }
-        Screen.Saved -> SavedScreen(
+        Screen.Saved -> SavedRoute(
             window = window,
+            locationGranted = locationGranted,
+            selectedComplexId = selectedComplexId,
             onOpenComplex = openComplex,
             onGoNearby = { viewModel.selectTab(Tab.NEARBY) }
         )

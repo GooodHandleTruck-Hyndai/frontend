@@ -34,6 +34,14 @@
     <string name="nearby_loading">주변 단지를 찾고 있어요</string>
     <string name="nearby_empty">%1$s 안에 단지가 없어요</string>
 
+    <!-- S-05 저장한 단지 -->
+    <string name="saved_header_count">저장한 단지 · %1$d곳</string>
+    <string name="saved_empty">아직 저장한 단지가 없어요</string>
+    <string name="saved_empty_detail">주행 중에 들은 단지도 \'저장\'을 누르면 여기에 모여요</string>
+
+    <!-- 1:2 창에서 S-05·S-06 목록 옆 칸이 비어 있을 때 -->
+    <string name="detail_pane_hint">단지를 고르면 여기에 자세히 보여 드려요</string>
+
     <!-- 단지 카드: 면적 · 기간 · 기준일 -->
     <string name="card_meta">%1$s · 최근 %2$d개월 · %3$s 기준</string>
     <string name="card_meta_no_trade">%1$s · %2$s 기준</string>
@@ -68,7 +76,6 @@
     <!-- 빈 화면 설명: 나중에 들어올 내용을 한 줄로 적는다 -->
     <string name="placeholder_alert_setup_onboarding">첫 실행 2단계예요. 주행 중에 알려 드릴 단지 조건을 골라요</string>
     <string name="placeholder_alert_setup_settings">주행 중에 알려 드릴 단지 조건을 바꿔요</string>
-    <string name="placeholder_saved">저장한 단지 목록이에요. 카드를 누르면 단지 상세가 열려요</string>
     <string name="placeholder_history">오늘 주행 중에 소리로 들은 단지를 최근 것부터 보여 줘요</string>
     <string name="placeholder_settings">주행 중 음성 알림, 알림 조건, 주변 범위 기본값, 앱 정보가 들어와요</string>
     <string name="placeholder_driving_idle">주행 중에 말할 단지가 없을 때 보여요</string>

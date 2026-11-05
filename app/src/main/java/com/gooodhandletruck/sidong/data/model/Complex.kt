@@ -1,6 +1,7 @@
 package com.gooodhandletruck.sidong.data.model
 
 import java.time.LocalDate
+import java.time.OffsetDateTime
 import kotlinx.serialization.Serializable
 
 /*
@@ -105,6 +106,18 @@ data class AreaPrice(
     val tradeCount: Int,
     val officialPriceManwon: Int? = null,
     val recentTrades: List<Trade> = emptyList()
+)
+
+/** 저장 목록 응답(S-05). 최근에 저장한 것부터 온다 */
+@Serializable
+data class SavedResponse(val items: List<SavedComplex>)
+
+/** 저장한 단지 하나. [complex]는 주변 단지 응답의 items 하나와 같은 모양이라 같은 카드로 그린다 */
+@Serializable
+data class SavedComplex(
+    @Serializable(with = OffsetDateTimeSerializer::class)
+    val savedAt: OffsetDateTime,
+    val complex: ComplexSummary
 )
 
 /** S-04가 처음 고를 평형: 서버가 정한 대표 평형. 목록에 없으면 최근 거래가 가장 많은 평형이다 */

@@ -32,10 +32,13 @@ import com.gooodhandletruck.sidong.ui.theme.AppType
 private const val DEFAULT_PERIOD_DAYS = 90
 private const val DAYS_PER_MONTH = 30
 
-/** 단지 카드 한 장에 그릴 값. 방향과 거리는 지금 위치와 차의 방향으로 미리 계산해 둔다. */
+/**
+ * 단지 카드 한 장에 그릴 값. 방향과 거리는 지금 위치와 차의 방향으로 미리 계산해 둔다.
+ * 차 위치를 아직 못 받았으면 [place]가 null이고 방향·거리 칩을 숨긴다(S-05·S-06).
+ */
 data class ComplexCardModel(
     val complex: ComplexSummary,
-    val place: RelativePlace
+    val place: RelativePlace?
 )
 
 /** [car]에서 본 카드 값 */
@@ -85,7 +88,7 @@ fun ComplexCard(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            DirectionChip(place = model.place)
+            model.place?.let { DirectionChip(place = it) }
             PriceLines(price = model.complex.price)
         }
     }

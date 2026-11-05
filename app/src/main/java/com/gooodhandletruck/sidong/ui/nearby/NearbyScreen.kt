@@ -1,26 +1,20 @@
 package com.gooodhandletruck.sidong.ui.nearby
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -30,6 +24,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gooodhandletruck.sidong.R
 import com.gooodhandletruck.sidong.ui.WindowLayout
 import com.gooodhandletruck.sidong.ui.component.ComplexCard
+import com.gooodhandletruck.sidong.ui.component.LoadingCards
 import com.gooodhandletruck.sidong.ui.component.SelectChip
 import com.gooodhandletruck.sidong.ui.component.StatusBox
 import com.gooodhandletruck.sidong.ui.component.rememberLocationPermissionRequest
@@ -37,8 +32,6 @@ import com.gooodhandletruck.sidong.ui.format.formatDistance
 import com.gooodhandletruck.sidong.ui.theme.AppColors
 import com.gooodhandletruck.sidong.ui.theme.AppDimens
 import com.gooodhandletruck.sidong.ui.theme.AppType
-
-private const val LOADING_CARD_COUNT = 3
 
 /**
  * S-03을 ViewModel에 잇는다. 위치 권한이 있고 이 화면이 앞에 보이는 동안만 차 위치를 따라간다.
@@ -169,7 +162,10 @@ private fun NearbyContentArea(
     modifier: Modifier = Modifier
 ) {
     when (val content = state.content) {
-        NearbyContent.Idle, NearbyContent.Loading -> LoadingCards(modifier)
+        NearbyContent.Idle, NearbyContent.Loading -> LoadingCards(
+            modifier = modifier,
+            message = stringResource(R.string.nearby_loading)
+        )
         NearbyContent.LocationFailed -> StatusBox(
             message = stringResource(R.string.status_location_unavailable),
             actionLabel = stringResource(R.string.action_retry),
@@ -201,23 +197,6 @@ private fun NearbyContentArea(
                     )
                 }
             }
-        }
-    }
-}
-
-/** 불러오는 중: 움직이지 않는 회색 자리 카드 3개 (반복 애니메이션 금지) */
-@Composable
-private fun LoadingCards(modifier: Modifier = Modifier) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)) {
-        Text(text = stringResource(R.string.nearby_loading), style = AppType.BodyM, color = AppColors.TextSecondary)
-        repeat(LOADING_CARD_COUNT) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(AppDimens.CardPhotoSize + AppDimens.SpaceM * 2)
-                    .clip(RoundedCornerShape(AppDimens.CardRadius))
-                    .background(AppColors.ButtonSecondary)
-            )
         }
     }
 }

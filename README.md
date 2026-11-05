@@ -3,7 +3,7 @@
 > GooodHandleTruck · 주행 중 운전자를 돕는 차량용 서비스
 
 Kotlin과 Jetpack Compose로 만든 플레오스 커넥트(Android Automotive) 앱이에요.
-지금은 S-01 시작하기, S-03 주변 단지(실제 위치 + 목업 단지), S-04 단지 상세(목업)가 실제 화면이고, 나머지 6개는 **제목과 이동 버튼만 있는 빈 화면**으로 이어져 있어요.
+지금은 S-01 시작하기, S-03 주변 단지(실제 위치 + 목업 단지), S-04 단지 상세, S-05 저장한 단지(목업)가 실제 화면이고, 나머지 5개는 **제목과 이동 버튼만 있는 빈 화면**으로 이어져 있어요.
 화면 구성과 이동 규칙은 [화면 설계서](https://claude.ai/artifact/UgMDDBgkDfK7rZVFKAaoQt)에 있어요.
 
 - 협업 규칙(브랜치, 커밋, PR): [CONTRIBUTING.md](CONTRIBUTING.md)
@@ -43,7 +43,8 @@ git clone https://github.com/GooodHandleTruck/<저장소이름>.git
    - 첫 실행부터 다시 보려면 `adb shell pm clear --user 10 com.gooodhandletruck.sidong` 을 실행해요. 플레오스 에뮬레이터에서는 앱이 사용자 10으로 돌아요.
    - S-03은 차 위치(플레오스 FusedLocation)를 받아 `app/src/main/assets/mock/complexes_nearby.json` 의 가상 단지를 보여 줘요. 가상 단지는 강남역 둘레에 있으니 `adb emu geo fix 127.0276 37.4979` 로 에뮬레이터 위치를 옮겨요(경도가 먼저). 50m 넘게 옮기면 목록을 다시 불러와요.
    - 에뮬레이터는 차 방향(heading)을 늘 0(북쪽)으로 줘요. 그래서 방향 칩은 차가 북쪽을 본다고 보고 나와요.
-   - S-03 카드를 누르면 S-04 단지 상세가 열려요. 1:2 창에서는 목록 옆 칸에 열리고([닫기]), 1:1:1 창에서는 창 전체를 덮어요([뒤로]). 상세는 `app/src/main/assets/mock/complex_details.json` 을 읽어요. [저장]은 앱을 다시 켜기 전까지만 기억해요(서버 전 목업).
+   - S-03 카드를 누르면 S-04 단지 상세가 열려요. 1:2 창에서는 목록 옆 칸에 열리고([닫기]), 1:1:1 창에서는 창 전체를 덮어요([뒤로]). 상세는 `app/src/main/assets/mock/complex_details.json` 을 읽어요.
+   - S-04에서 [저장]한 단지는 저장 탭(S-05)에 최근에 저장한 것부터 모여요. 서버를 붙이기 전까지는 이 기기에 기억해서 앱을 다시 켜도 남고, `pm clear` 로 앱 데이터를 지우면 사라져요.
    - 1:1:1 창은 앱 창 오른쪽 끝의 ⋮ 손잡이를 왼쪽으로 끌면 나와요(앱 창 841×1210dp). 손잡이를 화면 끝까지 끌어 되돌리면 시스템 화면이 앱 아이콘 가림막에 멈출 수 있어요. 그때는 오른쪽 끝 손잡이를 왼쪽으로 조금(100px쯤)만 끌었다 놓으면 1:2 창으로 돌아와요.
    - 에뮬레이터를 오래 켜 두면 플레오스 위치 서비스가 멈춰서 "지금 위치를 확인하지 못했어요"가 뜨거나 옛 위치(미국)가 나올 수 있어요. 그때는 `adb shell am force-stop --user 10 ai.pleos.playground.service.location.fused` 로 위치 서비스를 다시 띄우고, 앱도 다시 실행해요.
 4. 에뮬레이터의 **⋯ (Extended controls) → Car data** 에서 기어를 D로 바꾸면 주행 화면(S-08)이 덮고, P로 돌리면 보던 화면으로 돌아와요.
