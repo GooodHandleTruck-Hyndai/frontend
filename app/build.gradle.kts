@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization) // @Serializable 데이터 클래스용
     alias(libs.plugins.ktlint) // ./gradlew ktlintCheck (검사) / ktlintFormat (자동 정리)
 }
 
@@ -59,6 +60,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.kotlinx.coroutines.android)
+    // JSON 읽기: 지금은 assets/mock 목업, 나중에 서버 응답도 같은 클래스로 읽는다
+    implementation(libs.kotlinx.serialization.json)
 
     // 백엔드 통신
     implementation(libs.retrofit)
@@ -74,4 +77,7 @@ dependencies {
     implementation(libs.pleos.texttospeech)
 
     debugImplementation(libs.androidx.ui.tooling)
+
+    // 단위 테스트: ./gradlew test
+    testImplementation(libs.junit)
 }
