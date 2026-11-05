@@ -31,6 +31,14 @@
     <string name="nearby_loading">주변 단지를 찾고 있어요</string>
     <string name="nearby_empty">%1$s 안에 단지가 없어요</string>
 
+    <!-- 정렬 칩(S-03·S-05) -->
+    <string name="sort_chip">%1$s ▾</string>
+    <string name="sort_nearest">가까운 순</string>
+    <string name="sort_price_low">가격 낮은 순</string>
+    <string name="sort_price_high">가격 높은 순</string>
+    <string name="sort_saved">저장한 순</string>
+    <string name="sort_price">가격 순</string>
+
     <!-- S-03 약도 -->
     <string name="map_heading_up">위 = 차가 향한 쪽</string>
     <string name="map_legend">말풍선 숫자 = 대표 평형의 최근 3개월 평균</string>

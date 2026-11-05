@@ -2,8 +2,14 @@ package com.gooodhandletruck.sidong.ui.saved
 
 import com.gooodhandletruck.sidong.ui.component.ComplexCardModel
 
+/** S-05 정렬(화면 설계서 S-05 '정렬·필터'). 기본은 저장한 순(최근에 저장한 것부터)이다 */
+enum class SavedSort { SAVED, NEAREST, PRICE }
+
 /** S-05 화면 상태 */
-data class SavedUiState(val content: SavedContent = SavedContent.Loading)
+data class SavedUiState(
+    val sort: SavedSort = SavedSort.SAVED,
+    val content: SavedContent = SavedContent.Loading
+)
 
 sealed interface SavedContent {
 

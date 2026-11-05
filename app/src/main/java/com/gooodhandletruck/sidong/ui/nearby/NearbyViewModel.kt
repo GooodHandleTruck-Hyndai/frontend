@@ -61,6 +61,9 @@ class NearbyViewModel(app: Application) : AndroidViewModel(app) {
         anchor?.let(::load)
     }
 
+    /** 정렬 칩. 받은 목록 안에서 순서만 바꾸고 서버는 다시 부르지 않는다 */
+    fun selectSort(sort: NearbySort) = _state.update { it.copy(sort = sort) }
+
     /** [다시 시도]. 위치를 못 받았으면 위치를, 가격을 못 받았으면 목록을 다시 부른다 */
     fun retry() {
         val location = anchor

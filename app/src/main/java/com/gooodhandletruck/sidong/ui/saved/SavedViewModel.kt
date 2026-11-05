@@ -57,6 +57,9 @@ class SavedViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /** 정렬 칩. 받은 목록 안에서 순서만 바꾼다 */
+    fun selectSort(sort: SavedSort) = _state.update { it.copy(sort = sort) }
+
     /** [다시 시도] */
     fun retry() {
         _state.update { it.copy(content = SavedContent.Loading) }

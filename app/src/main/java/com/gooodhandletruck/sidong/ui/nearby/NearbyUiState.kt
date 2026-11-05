@@ -14,9 +14,13 @@ enum class NearbyRadius(val meters: Int) {
         get() = entries.getOrNull(ordinal + 1)
 }
 
+/** S-03 정렬(화면 설계서 S-03 '정렬'). 기본은 가까운 순이다 */
+enum class NearbySort { NEAREST, PRICE_LOW, PRICE_HIGH }
+
 /** S-03 화면 상태 */
 data class NearbyUiState(
     val radius: NearbyRadius = NearbyRadius.KM1,
+    val sort: NearbySort = NearbySort.NEAREST,
     val content: NearbyContent = NearbyContent.Idle
 )
 

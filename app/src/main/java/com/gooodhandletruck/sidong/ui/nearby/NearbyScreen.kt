@@ -27,10 +27,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gooodhandletruck.sidong.R
 import com.gooodhandletruck.sidong.ui.WindowLayout
 import com.gooodhandletruck.sidong.ui.component.ComplexCard
+import com.gooodhandletruck.sidong.ui.component.ComplexCardModel
 import com.gooodhandletruck.sidong.ui.component.LoadingCards
 import com.gooodhandletruck.sidong.ui.component.SelectChip
+import com.gooodhandletruck.sidong.ui.component.SortChip
 import com.gooodhandletruck.sidong.ui.component.StatusBox
 import com.gooodhandletruck.sidong.ui.component.rememberLocationPermissionRequest
+import com.gooodhandletruck.sidong.ui.component.rememberSortedListState
+import com.gooodhandletruck.sidong.ui.component.sortedByDistance
+import com.gooodhandletruck.sidong.ui.component.sortedByPriceAscending
+import com.gooodhandletruck.sidong.ui.component.sortedByPriceDescending
 import com.gooodhandletruck.sidong.ui.format.formatDistance
 import com.gooodhandletruck.sidong.ui.theme.AppColors
 import com.gooodhandletruck.sidong.ui.theme.AppDimens
@@ -65,6 +71,7 @@ fun NearbyRoute(
         selectedComplexId = selectedComplexId,
         onRequestLocationPermission = requestPermission,
         onSelectRadius = viewModel::selectRadius,
+        onSelectSort = viewModel::selectSort,
         onRetry = viewModel::retry,
         onOpenComplex = onOpenComplex
     )
@@ -112,6 +119,7 @@ fun NearbyScreen(
     selectedComplexId: String?,
     onRequestLocationPermission: () -> Unit,
     onSelectRadius: (NearbyRadius) -> Unit,
+    onSelectSort: (NearbySort) -> Unit,
     onRetry: () -> Unit,
     onOpenComplex: (String) -> Unit
 ) {
@@ -132,7 +140,15 @@ fun NearbyScreen(
             showRange = locationGranted
         )
         if (locationGranted) {
-            RangeChips(selected = state.radius, onSelect = onSelectRadius)
+            Row(horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)) {
+                RangeChips(selected = state.radius, onSelect = onSelectRadius)
+                SortChip(
+                    selected = state.sort,
+                    options = NearbySort.entries,
+                    label = { sortLabel(it) },
+                    onSelect = onSelectSort
+                )
+            }
             NearbyContentArea(
                 state = state,
                 showMap = !window.isWide,
@@ -217,6 +233,7 @@ private fun NearbyContentArea(
         } else {
             LazyColumn(
                 modifier = modifier,
+                state = rememberSortedListState(state.sort.name),
                 verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceS),
                 contentPadding = PaddingValues(bottom = AppDimens.ContentPaddingVertical)
             ) {
@@ -234,7 +251,7 @@ private fun NearbyContentArea(
                         )
                     }
                 }
-                items(content.cards, key = { it.complex.complexId }) { card ->
+                items(content.cards.sortedBy(state.sort), key = { it.complex.complexId }) { card ->
                     ComplexCard(
                         model = card,
                         onClick = { onOpenComplex(card.complex.complexId) },
@@ -247,6 +264,21 @@ private fun NearbyContentArea(
 }
 
 private const val MAP_ITEM_KEY = "map"
+
+private fun List<ComplexCardModel>.sortedBy(sort: NearbySort): List<ComplexCardModel> = when (sort) {
+    NearbySort.NEAREST -> sortedByDistance()
+    NearbySort.PRICE_LOW -> sortedByPriceAscending()
+    NearbySort.PRICE_HIGH -> sortedByPriceDescending()
+}
+
+@Composable
+private fun sortLabel(sort: NearbySort): String = stringResource(
+    when (sort) {
+        NearbySort.NEAREST -> R.string.sort_nearest
+        NearbySort.PRICE_LOW -> R.string.sort_price_low
+        NearbySort.PRICE_HIGH -> R.string.sort_price_high
+    }
+)
 
 /** 범위 이름: "500m", "1km", "3km" */
 private val NearbyRadius.label: String

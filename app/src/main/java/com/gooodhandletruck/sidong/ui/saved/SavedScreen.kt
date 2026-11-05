@@ -24,9 +24,14 @@ import com.gooodhandletruck.sidong.data.RouteTarget
 import com.gooodhandletruck.sidong.data.toRouteTarget
 import com.gooodhandletruck.sidong.ui.WindowLayout
 import com.gooodhandletruck.sidong.ui.component.ComplexCard
+import com.gooodhandletruck.sidong.ui.component.ComplexCardModel
 import com.gooodhandletruck.sidong.ui.component.LoadingCards
 import com.gooodhandletruck.sidong.ui.component.SecondaryButton
+import com.gooodhandletruck.sidong.ui.component.SortChip
 import com.gooodhandletruck.sidong.ui.component.StatusBox
+import com.gooodhandletruck.sidong.ui.component.rememberSortedListState
+import com.gooodhandletruck.sidong.ui.component.sortedByDistance
+import com.gooodhandletruck.sidong.ui.component.sortedByPriceAscending
 import com.gooodhandletruck.sidong.ui.theme.AppColors
 import com.gooodhandletruck.sidong.ui.theme.AppDimens
 import com.gooodhandletruck.sidong.ui.theme.AppType
@@ -60,6 +65,7 @@ fun SavedRoute(
         onOpenComplex = onOpenComplex,
         onStartRoute = onStartRoute,
         onGoNearby = onGoNearby,
+        onSelectSort = viewModel::selectSort,
         onRetry = viewModel::retry
     )
 }
@@ -68,7 +74,8 @@ fun SavedRoute(
  * S-05 저장한 단지. 머리글 "저장한 단지 · 8곳"과 저장한 순 단지 카드 목록이다. 카드를 누르면 S-04가 열리고,
  * 카드 오른쪽 끝 [길 안내]는 S-04를 거치지 않고 바로 길 안내를 시작한다.
  * 1:2 창에서는 왼쪽 640에 목록을 두고 오른쪽 칸에 상세를 연다.
- * TODO: 정렬(저장한 순·가까운 순·가격 순)과 유형 필터는 P1이다
+ * 정렬은 저장한 순(기본)·가까운 순·가격 순이다.
+ * TODO: 유형 필터는 오피스텔·원룸 데이터가 생기면 더한다. 지금은 아파트만 있어 거를 것이 없다
  */
 @Composable
 fun SavedScreen(
@@ -78,6 +85,7 @@ fun SavedScreen(
     onOpenComplex: (String) -> Unit,
     onStartRoute: (RouteTarget) -> Unit,
     onGoNearby: () -> Unit,
+    onSelectSort: (SavedSort) -> Unit,
     onRetry: () -> Unit
 ) {
     val content = state.content
@@ -102,6 +110,14 @@ fun SavedScreen(
             style = AppType.TitleS,
             color = AppColors.TextPrimary
         )
+        if (content is SavedContent.Loaded && content.cards.size > 1) {
+            SortChip(
+                selected = state.sort,
+                options = SavedSort.entries,
+                label = { sortLabel(it) },
+                onSelect = onSelectSort
+            )
+        }
         when (content) {
             SavedContent.Loading -> LoadingCards(modifier = Modifier.weight(1f))
             SavedContent.Failed -> StatusBox(
@@ -119,10 +135,11 @@ fun SavedScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.weight(1f),
+                    state = rememberSortedListState(state.sort.name),
                     verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceS),
                     contentPadding = PaddingValues(bottom = AppDimens.ContentPaddingVertical)
                 ) {
-                    items(content.cards, key = { it.complex.complexId }) { card ->
+                    items(content.cards.sortedBy(state.sort), key = { it.complex.complexId }) { card ->
                         ComplexCard(
                             model = card,
                             onClick = { onOpenComplex(card.complex.complexId) },
@@ -142,3 +159,18 @@ fun SavedScreen(
         }
     }
 }
+
+private fun List<ComplexCardModel>.sortedBy(sort: SavedSort): List<ComplexCardModel> = when (sort) {
+    SavedSort.SAVED -> this // 서버가 최근에 저장한 것부터 준다
+    SavedSort.NEAREST -> sortedByDistance()
+    SavedSort.PRICE -> sortedByPriceAscending()
+}
+
+@Composable
+private fun sortLabel(sort: SavedSort): String = stringResource(
+    when (sort) {
+        SavedSort.SAVED -> R.string.sort_saved
+        SavedSort.NEAREST -> R.string.sort_nearest
+        SavedSort.PRICE -> R.string.sort_price
+    }
+)
