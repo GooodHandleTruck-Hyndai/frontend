@@ -1,6 +1,7 @@
 package com.gooodhandletruck.sidong.ui
 
 import android.app.Application
+import android.os.SystemClock
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
@@ -13,6 +14,7 @@ import com.gooodhandletruck.sidong.data.DrivingStateRepository
 import com.gooodhandletruck.sidong.data.LocationPermission
 import com.gooodhandletruck.sidong.data.LocationState
 import com.gooodhandletruck.sidong.data.OnboardingStore
+import com.gooodhandletruck.sidong.data.ProximityTarget
 import com.gooodhandletruck.sidong.data.RouteTarget
 import com.gooodhandletruck.sidong.data.model.ComplexSummary
 import com.gooodhandletruck.sidong.ui.component.label
@@ -31,9 +33,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
@@ -60,6 +66,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     private val locationRepository = container.locationRepository
     private val speech = container.speechRepository
     private val navigation = container.navigationRepository
+    private val announcedStore = container.announcedStore
     private val onboardingStore = OnboardingStore(app)
     private val drivingState = DrivingStateRepository(app)
     private val navigator = Navigator(viewModelScope, onboardingDone = onboardingStore.isDone)
@@ -88,6 +95,12 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
 
     private var listenJob: Job? = null
 
+    /** 근접 알림을 건 단지. 들어갔다는 이벤트가 오면 여기서 이름·가격을 찾는다 */
+    private var geofenceTargets: Map<String, ComplexSummary> = emptyMap()
+
+    // 마지막 자동 알림 시각(SystemClock.elapsedRealtime). 알림 사이를 1분 이상 띄운다
+    private var lastAutoAlertAt: Long? = null
+
     init {
         // 주행이 시작되면 어느 화면에서든 S-08로 덮고, 정차하면 보던 화면으로 돌아간다
         viewModelScope.launch {
@@ -99,6 +112,18 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
                 navigator.onArrived(complexId)
                 navigation.consumeArrival()
             }
+        }
+        // 주행 중 자동 알림: 알림 설정·위치 권한이 바뀌거나 주행을 시작하면 근접 알림을 다시 건다
+        viewModelScope.launch {
+            combine(
+                alertSettings,
+                nav.map { it.isDriving }.distinctUntilChanged(),
+                locationGranted
+            ) { settings, driving, granted -> Triple(settings, driving, granted) }
+                .collectLatest { (settings, driving, granted) -> refreshGeofences(settings, driving, granted) }
+        }
+        viewModelScope.launch {
+            locationRepository.entered.collect(::onEnteredComplex)
         }
     }
 
@@ -149,11 +174,69 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
                 return@launch say(R.string.voice_load_failed)
             }
             if (complex == null) return@launch say(R.string.voice_none_nearby)
+            announce(complex, car)
+        }
+    }
 
-            val text = speechFor(complex, car.placeOf(complex.lat, complex.lon))
-            _spoken.value = SpokenComplex(complex.complexId, complex.name, text, complex.saved)
-            navigator.showAlert(complex.complexId)
-            if (speech.speak(text)) recordHeard(complex.complexId)
+    /**
+     * 단지를 방향 → 이름 → 가격 순으로 말하고 S-09로 바꾼다. 말했으면 HEARD로 남기고 오늘 알린 단지로 기억한다.
+     * [주변 단지 듣기]와 자동 알림이 함께 쓴다. 말하지 못했으면(말하는 중, 오디오 포커스 실패) false다.
+     */
+    private fun announce(complex: ComplexSummary, car: CarLocation): Boolean {
+        val text = speechFor(complex, car.placeOf(complex.lat, complex.lon))
+        if (!speech.speak(text)) return false
+        _spoken.value = SpokenComplex(complex.complexId, complex.name, text, complex.saved)
+        navigator.showAlert(complex.complexId)
+        announcedStore.markAnnounced(complex.complexId)
+        recordHeard(complex.complexId)
+        return true
+    }
+
+    /**
+     * 자동 알림의 근접 알림을 다시 건다(화면 설계서 '알림 규칙'). 알림을 끄거나 위치 권한이 없으면 모두 지운다.
+     * 주행을 시작할 때 지금 위치 둘레에서 조건에 맞는 단지를 받아(geofences) 반경 300m로 건다.
+     * 정차 중에는 걸어 둔 것을 그대로 둔다. 정차 중에 들어간 단지는 말하지 않는다.
+     */
+    private suspend fun refreshGeofences(settings: AlertSettings, driving: Boolean, granted: Boolean) {
+        val conditions = settings.conditions
+        if (!settings.isOn || conditions == null || !granted) {
+            geofenceTargets = emptyMap()
+            locationRepository.watchProximity(emptyList(), ALERT_RADIUS_METERS)
+            return
+        }
+        if (!driving) return
+        val car = currentCar() ?: return
+        val targets = try {
+            repository.geofences(car.lat, car.lon, conditions)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.w(TAG, "근접 알림을 걸 단지를 불러오지 못했어요", e)
+            return
+        }
+        geofenceTargets = targets.associateBy { it.complexId }
+        locationRepository.watchProximity(
+            targets.map { ProximityTarget(it.complexId, it.lat, it.lon) },
+            ALERT_RADIUS_METERS
+        )
+    }
+
+    /**
+     * 근접 알림을 건 단지 둘레에 들어갔을 때. 주행 중이고, 말하는 중이 아니고, 오늘 처음이고,
+     * 마지막 알림에서 1분이 지났을 때만 말한다. 아니면 쌓지 않고 버린다.
+     */
+    private fun onEnteredComplex(complexId: String) {
+        val complex = geofenceTargets[complexId] ?: return
+        val state = nav.value
+        if (!state.isDriving || !state.onboardingDone || !alertSettings.value.isOn) return
+        if (speech.speaking.value || listenJob?.isActive == true) return
+        if (announcedStore.wasAnnouncedToday(complexId)) return
+        val now = SystemClock.elapsedRealtime()
+        val last = lastAutoAlertAt
+        if (last != null && now - last < MIN_ALERT_GAP_MS) return
+        listenJob = viewModelScope.launch {
+            val car = currentCar() ?: return@launch
+            if (announce(complex, car)) lastAutoAlertAt = now
         }
     }
 
@@ -235,5 +318,9 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         const val DAYS_PER_MONTH = 30
         val ROUTE_MESSAGE_DURATION = 3.seconds
         val LOCATION_TIMEOUT = 5.seconds
+
+        // 단지 반경 300m에 들어가면 말한다. 반경은 시연하며 조정한다(화면 설계서 '알림 규칙')
+        const val ALERT_RADIUS_METERS = 300f
+        const val MIN_ALERT_GAP_MS = 60_000L
     }
 }

@@ -3,7 +3,7 @@
 > GooodHandleTruck · 주행 중 운전자를 돕는 차량용 서비스
 
 Kotlin과 Jetpack Compose로 만든 플레오스 커넥트(Android Automotive) 앱이에요.
-화면 9개(S-01~S-09)가 모두 실제 화면이에요. 단지 데이터는 서버가 준비될 때까지 목업(가상 단지)을 쓰고, 위치·길 안내·음성은 플레오스 SDK를 실제로 불러요. S-03 약도와 주행 중 자동 알림(근접 알림)은 아직 없어요.
+화면 9개(S-01~S-09)가 모두 실제 화면이에요. 단지 데이터는 서버가 준비될 때까지 목업(가상 단지)을 쓰고, 위치·근접 알림·길 안내·음성은 플레오스 SDK를 실제로 불러요. S-03 약도는 아직 없어요.
 화면 구성과 이동 규칙은 [화면 설계서](https://claude.ai/artifact/UgMDDBgkDfK7rZVFKAaoQt)에 있어요.
 
 - 협업 규칙(브랜치, 커밋, PR): [CONTRIBUTING.md](CONTRIBUTING.md)
@@ -51,6 +51,7 @@ git clone https://github.com/GooodHandleTruck/<저장소이름>.git
 4. 에뮬레이터의 **⋯ (Extended controls) → Car data** 에서 기어를 D로 바꾸면 주행 화면(S-08)이 덮고, P로 돌리면 보던 화면으로 돌아와요.
    - 디버그 빌드에서는 `adb shell am start --user 10 -n com.gooodhandletruck.sidong/.MainActivity --ez debug_driving true` 로도 주행을 흉내 낼 수 있어요. 정차는 `false` 이고, 앱을 다시 켜면 차의 실제 값으로 돌아가요.
    - S-08의 [주변 단지 듣기]를 누르면 차 앞쪽 180도 안에서 가장 가까운 단지를 소리로 말하고(플레오스 TextToSpeech) S-09로 바뀌어요. 정차하면 맨 위에 '방금 들은 단지' 띠가 뜨고, 기록 탭(S-06)에 오늘 들은 단지가 남아요.
+   - 알림 조건(S-02)을 정하고 알림을 켜 두면, 주행 중에 조건에 맞는 단지 반경 300m로 들어갈 때 저절로 말해요. 같은 단지는 하루에 한 번, 알림 사이는 1분 이상이에요. 에뮬레이터에서는 단지에서 멀리 둔 채 주행을 시작한 뒤 `adb emu geo fix 127.0339 37.4976` (늘푸른 4단지 앞)으로 옮겨 보세요.
 5. 단위 테스트(가격 표기, 거리·방향 계산, 다시 불러오는 기준, 화면 쌓기 규칙, 목업 JSON)는 `./gradlew test` 로 돌려요.
 
 ## 📁 폴더 구조
@@ -75,11 +76,12 @@ app/src/main/java/com/gooodhandletruck/sidong/
     ├── AppJson.kt               JSON 읽기 설정
     ├── Geo.kt                   두 좌표 사이 거리·방위각
     ├── CarLocation.kt           차 위치·향한 쪽, 목록을 다시 불러올 만큼 움직였는지
-    ├── LocationRepository.kt    차 위치 받기 (플레오스 FusedLocation, 화면이 구독할 때만)
+    ├── LocationRepository.kt    차 위치 받기와 근접 알림 (플레오스 FusedLocation)
     ├── NavigationRepository.kt  길 안내 보내기와 도착 (플레오스 NaviHelper)
     ├── SpeechRepository.kt      주행 중 음성 안내와 오디오 포커스 (플레오스 TextToSpeech)
     ├── AlertSettingsRepository.kt 주행 중 자동 알림 조건과 켜기·끄기 (이 기기에 저장)
     ├── NearbyRangeStore.kt      주변 범위 기본값 (S-07)
+    ├── AnnouncedStore.kt        오늘 소리로 알린 단지 (하루에 한 번만 자동 알림)
     ├── DrivingStateRepository.kt 주행 중인지 (AAOS UX 제한)
     ├── OnboardingStore.kt       첫 실행을 끝냈는지
     ├── LocationPermission.kt    위치 권한(FUSED_LOCATION)이 있는지

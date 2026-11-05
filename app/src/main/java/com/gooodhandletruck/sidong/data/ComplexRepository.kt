@@ -44,6 +44,12 @@ interface ComplexRepository {
     /** 오늘 들은 단지(S-06, API 초안의 '주행 중 질의 목록'). 오늘 0시부터, 최근 것부터 온다 */
     suspend fun heardToday(): HeardResponse
 
+    /**
+     * 근접 알림을 걸 단지(설계서의 geofences). ([lat], [lon]) 둘레에서 알림 조건에 맞는 단지들. 주행 중에 불러도 된다.
+     * TODO: 서버 형식이 아직 없다(API 검토 '고칠 것' 8번). 서버는 저장한 조건을 X-Device-Id로 읽을 테니 [conditions]는 목업만 쓴다
+     */
+    suspend fun geofences(lat: Double, lon: Double, conditions: AlertConditions): List<ComplexSummary>
+
     companion object {
         /** S-03은 단지 카드를 최대 10개 보여 준다 */
         const val NEARBY_LIMIT = 10

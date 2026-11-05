@@ -26,6 +26,9 @@ class AppContainer(context: Context) {
     /** S-03 범위 칩의 기본값(S-07) */
     val nearbyRangeStore = NearbyRangeStore(context)
 
+    /** 오늘 소리로 알려 준 단지(하루에 한 번만 자동 알림) */
+    val announcedStore = AnnouncedStore(context)
+
     /** 주행 중 음성 안내(플레오스 TextToSpeech) */
     val speechRepository = SpeechRepository(context, appScope)
 }

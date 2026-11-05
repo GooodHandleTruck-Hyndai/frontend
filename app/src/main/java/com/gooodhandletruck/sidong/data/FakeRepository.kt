@@ -96,6 +96,12 @@ class FakeRepository(context: Context) : ComplexRepository {
         allNearby.heardList(heardEntries.get(), since = startOfToday(), savedIds = savedIds())
     }
 
+    override suspend fun geofences(lat: Double, lon: Double, conditions: AlertConditions): List<ComplexSummary> =
+        withContext(Dispatchers.IO) {
+            delay(FAKE_LATENCY_MS)
+            allNearby.geofencesAround(lat, lon, GEOFENCE_RADIUS_METERS, conditions)
+        }
+
     private fun savedIds(): Set<String> = savedEntries.get().map { it.complexId }.toSet()
 
     private fun now(): OffsetDateTime = OffsetDateTime.now(SERVER_ZONE).truncatedTo(ChronoUnit.SECONDS)
@@ -110,6 +116,7 @@ class FakeRepository(context: Context) : ComplexRepository {
         const val DETAILS_FILE = "mock/complex_details.json"
         const val FAKE_LATENCY_MS = 400L
         const val BRIEF_RADIUS_METERS = 1000
+        const val GEOFENCE_RADIUS_METERS = 5000
         const val PREFS_NAME = "fake_server"
         const val KEY_SAVED = "saved"
         const val KEY_HEARD = "heard"
@@ -206,6 +213,16 @@ internal fun isAhead(bearing: Double, heading: Double): Boolean {
 
 private const val FULL_TURN = 360.0
 private const val QUARTER_TURN = 90.0
+
+/** 서버의 geofences 규칙: ([lat], [lon]) 반경 안에서 알림 조건에 맞는 단지들 */
+internal fun NearbyResponse.geofencesAround(
+    lat: Double,
+    lon: Double,
+    radiusMeters: Int,
+    conditions: AlertConditions
+): List<ComplexSummary> = items.filter { complex ->
+    distanceMeters(lat, lon, complex.lat, complex.lon) <= radiusMeters && conditions.matches(complex)
+}
 
 /** 서버의 저장 목록 규칙: 최근에 저장한 것부터 주고, 단지 요약은 주변 단지와 같은 모양에 saved만 true다. */
 internal fun NearbyResponse.savedList(entries: List<FakeSavedEntry>): SavedResponse {

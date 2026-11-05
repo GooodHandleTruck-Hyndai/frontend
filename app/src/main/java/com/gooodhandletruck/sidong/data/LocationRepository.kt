@@ -2,7 +2,11 @@ package com.gooodhandletruck.sidong.data
 
 import ai.pleos.playground.location.fused.FusedLocation
 import ai.pleos.playground.location.fused.listener.FusedLocationListener
+import ai.pleos.playground.location.fused.listener.ProximityAlertListener
 import ai.pleos.playground.location.fused.model.LocationData
+import ai.pleos.playground.location.fused.model.ProximityAlertEvent
+import ai.pleos.playground.location.fused.model.ProximityAlertRequest
+import ai.pleos.playground.location.fused.model.ProximityTransition
 import android.content.Context
 import android.util.Log
 import java.util.concurrent.atomic.AtomicBoolean
@@ -11,9 +15,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flatMapLatest
@@ -34,8 +41,12 @@ sealed interface LocationState {
     data object Unavailable : LocationState
 }
 
+/** 근접 알림을 걸 단지 하나. 이 둘레에 들어가면 주행 중에 소리로 알린다 */
+data class ProximityTarget(val complexId: String, val lat: Double, val lon: Double)
+
 /**
  * 차의 지금 위치와 향한 쪽을 알려 주는 곳. 플레오스 FusedLocation SDK를 감싼다(구글 Fused Location이 아니다).
+ * 주행 중 자동 알림에 쓰는 근접 알림([watchProximity])도 같은 SDK 연결로 건다.
  * [state]를 구독하는 곳이 있을 때만 위치를 받고, 구독이 모두 끝나면 5초 뒤 멈춘다.
  * 위치 권한(FUSED_LOCATION)이 있을 때만 구독한다. 권한이 없으면 SDK가 SecurityException을 던진다.
  *
@@ -66,6 +77,80 @@ class LocationRepository(context: Context, scope: CoroutineScope) {
 
     /** 위치를 못 받았을 때 [다시 시도] */
     fun retry() = attempts.update { it + 1 }
+
+    private val proximityLock = Any()
+
+    // proximityLock 안에서만 쓴다. 단지 id → SDK가 알려 준 alertId
+    private val proximityAlertIds = mutableMapOf<String, String>()
+
+    // watchProximity를 부를 때마다 1씩 올라, 예전 목록에서 늦게 온 등록·이벤트를 버린다
+    private var proximityGeneration = 0
+
+    private val _entered = MutableSharedFlow<String>(extraBufferCapacity = PROXIMITY_EVENT_BUFFER)
+
+    /** 근접 알림을 건 단지 둘레에 들어갔을 때 그 단지 id */
+    val entered: SharedFlow<String> = _entered.asSharedFlow()
+
+    /**
+     * 근접 알림(ENTER, 반경 [radiusMeters])을 [targets]로 바꿔 건다. 빈 목록이면 걸어 둔 것을 모두 지운다.
+     * 위치 서비스가 없거나 위치 권한이 없으면 걸지 않는다. SDK 이벤트는 바인더 스레드에서 온다.
+     */
+    fun watchProximity(targets: List<ProximityTarget>, radiusMeters: Float) {
+        synchronized(proximityLock) { replaceProximityAlerts(targets, radiusMeters) }
+    }
+
+    // proximityLock 안에서 부른다
+    private fun replaceProximityAlerts(targets: List<ProximityTarget>, radiusMeters: Float) {
+        val generation = ++proximityGeneration
+        proximityAlertIds.values.forEach(::removeProximityAlert)
+        proximityAlertIds.clear()
+        if (targets.isEmpty() || !fusedLocation.isSupported()) return
+        try {
+            if (initialized.compareAndSet(false, true)) fusedLocation.initialize()
+            targets.forEach { target ->
+                val request = ProximityAlertRequest(
+                    latitude = target.lat,
+                    longitude = target.lon,
+                    radiusMeters = radiusMeters,
+                    transitionTypes = setOf(ProximityTransition.ENTER)
+                )
+                fusedLocation.addProximityAlert(request, proximityListener(target.complexId, generation))
+            }
+        } catch (e: SecurityException) {
+            Log.w(TAG, "위치 권한이 없어 근접 알림을 걸지 못했어요", e)
+        }
+    }
+
+    private fun proximityListener(complexId: String, generation: Int) = object : ProximityAlertListener {
+        override fun onRegistered(alertId: String) {
+            synchronized(proximityLock) {
+                // 그사이 목록이 바뀌었으면 늦게 등록된 것을 바로 지운다
+                if (generation == proximityGeneration) {
+                    proximityAlertIds[complexId] = alertId
+                } else {
+                    removeProximityAlert(alertId)
+                }
+            }
+        }
+
+        override fun onTransition(event: ProximityAlertEvent) {
+            if (event.transition == ProximityTransition.ENTER && generation == proximityGeneration) {
+                _entered.tryEmit(complexId)
+            }
+        }
+
+        override fun onError(exception: Exception) {
+            Log.w(TAG, "근접 알림 오류($complexId)", exception)
+        }
+    }
+
+    private fun removeProximityAlert(alertId: String) {
+        try {
+            fusedLocation.removeProximityAlert(alertId)
+        } catch (e: SecurityException) {
+            Log.w(TAG, "근접 알림을 지우지 못했어요", e)
+        }
+    }
 
     /** 구독하는 동안 실시간 위치를 받는다. 실시간 위치가 늦을 수 있어 마지막 위치도 함께 묻는다(공식 샘플 안내) */
     private fun locationUpdates(): Flow<LocationState> = callbackFlow {
@@ -143,6 +228,7 @@ class LocationRepository(context: Context, scope: CoroutineScope) {
         const val TAG = "Location"
         const val STOP_DELAY_MS = 5_000L
         const val FIRST_FIX_TIMEOUT_MS = 15_000L
+        const val PROXIMITY_EVENT_BUFFER = 8
     }
 }
 
