@@ -15,9 +15,12 @@ import com.gooodhandletruck.sidong.ui.theme.AppColors
 import com.gooodhandletruck.sidong.ui.theme.AppDimens
 import com.gooodhandletruck.sidong.ui.theme.AppType
 
-/** 상태 상자. 한 줄 안내와 버튼 하나로 빈 목록·권한·오류를 알린다 (S-03, S-05, S-06). */
+/**
+ * 상태 상자. 한 줄 안내와 버튼 하나로 빈 목록·권한·오류를 알린다 (S-03, S-05, S-06).
+ * 누를 것이 없으면(예: 3km에도 단지가 없을 때) [actionLabel]을 비워 버튼을 뺀다.
+ */
 @Composable
-fun StatusBox(message: String, actionLabel: String, onAction: () -> Unit, modifier: Modifier = Modifier) {
+fun StatusBox(message: String, modifier: Modifier = Modifier, actionLabel: String? = null, onAction: () -> Unit = {}) {
     val shape = RoundedCornerShape(AppDimens.CardRadius)
     Column(
         modifier = modifier
@@ -28,6 +31,8 @@ fun StatusBox(message: String, actionLabel: String, onAction: () -> Unit, modifi
         verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceM)
     ) {
         Text(text = message, style = AppType.BodyM, color = AppColors.TextPrimary)
-        PrimaryButton(text = actionLabel, onClick = onAction)
+        if (actionLabel != null) {
+            PrimaryButton(text = actionLabel, onClick = onAction)
+        }
     }
 }

@@ -8,10 +8,9 @@
     <string name="tab_history">기록</string>
     <string name="tab_settings">설정</string>
 
-    <!-- 화면 이름: 화면 설계서 '화면 목록' (S-01은 실제 화면이라 아래 문구를 쓴다) -->
+    <!-- 화면 이름: 화면 설계서 '화면 목록' (S-01은 실제 화면이라 아래 문구를 쓰고, S-04는 단지 이름을 제목으로 쓴다) -->
     <string name="screen_alert_setup">알림 조건</string>
     <string name="screen_nearby">주변 단지</string>
-    <string name="screen_complex_detail">단지 상세</string>
     <string name="screen_saved">저장한 단지</string>
     <string name="screen_history">오늘 들은 단지</string>
     <string name="screen_settings">설정</string>
@@ -25,12 +24,50 @@
 
     <!-- 상태 상자: 한 줄 안내 (S-03 '상태별 문구') -->
     <string name="status_location_denied">내 위치를 알아야 주변 단지를 보여 드릴 수 있어요</string>
+    <string name="status_location_unavailable">지금 위치를 확인하지 못했어요</string>
+    <string name="status_load_failed">가격 정보를 불러오지 못했어요</string>
+    <string name="status_complex_not_found">이 단지 정보를 찾지 못했어요</string>
+
+    <!-- S-03 주변 단지 -->
+    <string name="nearby_header_range">내 위치에서 %1$s 안</string>
+    <string name="nearby_header_count">내 위치에서 %1$s 안 · %2$d곳</string>
+    <string name="nearby_loading">주변 단지를 찾고 있어요</string>
+    <string name="nearby_empty">%1$s 안에 단지가 없어요</string>
+
+    <!-- 단지 카드: 면적 · 기간 · 기준일 -->
+    <string name="card_meta">%1$s · 최근 %2$d개월 · %3$s 기준</string>
+    <string name="card_meta_no_trade">%1$s · %2$s 기준</string>
+    <string name="card_no_recent_trades">최근 %1$d개월 거래가 없어요</string>
+    <string name="date_month_day">%1$d월 %2$d일</string>
+    <string name="date_year_month">%1$d년 %2$d월</string>
+    <string name="date_year_month_day">%1$d년 %2$d월 %3$d일</string>
+
+    <!-- S-04 단지 상세 -->
+    <string name="type_apartment">아파트</string>
+    <string name="detail_area_label">전용</string>
+    <string name="detail_average_label">최근 %1$d개월 평균</string>
+    <string name="detail_trade_meta">거래 %1$d건 · %2$s 기준</string>
+    <string name="detail_last_trade_label">마지막 거래 · %1$s</string>
+    <string name="detail_no_recent_meta">최근 %1$d개월 거래가 없어요 · %2$s 기준</string>
+    <string name="detail_official_price">공시가격 %1$s</string>
+    <string name="detail_recent_trades">최근 거래</string>
+    <string name="detail_floor">%1$d층</string>
+    <string name="detail_no_trades">아직 거래 기록이 없어요</string>
+
+    <!-- 방향·거리 칩: 차가 향한 쪽 기준 8방향 -->
+    <string name="direction_chip">%1$s · %2$s</string>
+    <string name="direction_front">앞</string>
+    <string name="direction_front_right">오른쪽 앞</string>
+    <string name="direction_right">오른쪽</string>
+    <string name="direction_back_right">오른쪽 뒤</string>
+    <string name="direction_back">뒤</string>
+    <string name="direction_back_left">왼쪽 뒤</string>
+    <string name="direction_left">왼쪽</string>
+    <string name="direction_front_left">왼쪽 앞</string>
 
     <!-- 빈 화면 설명: 나중에 들어올 내용을 한 줄로 적는다 -->
     <string name="placeholder_alert_setup_onboarding">첫 실행 2단계예요. 주행 중에 알려 드릴 단지 조건을 골라요</string>
     <string name="placeholder_alert_setup_settings">주행 중에 알려 드릴 단지 조건을 바꿔요</string>
-    <string name="placeholder_nearby">정차하면 가장 먼저 보이는 홈이에요. 주변 단지를 약도와 목록으로 보여 줘요</string>
-    <string name="placeholder_complex_detail">평형별 가격, 최근 거래 3건, 저장·길 안내 버튼이 들어와요 (단지 id: %1$s)</string>
     <string name="placeholder_saved">저장한 단지 목록이에요. 카드를 누르면 단지 상세가 열려요</string>
     <string name="placeholder_history">오늘 주행 중에 소리로 들은 단지를 최근 것부터 보여 줘요</string>
     <string name="placeholder_settings">주행 중 음성 알림, 알림 조건, 주변 범위 기본값, 앱 정보가 들어와요</string>
@@ -49,9 +86,12 @@
     <string name="action_back">뒤로</string>
     <string name="action_start">위치 권한 허용하고 시작하기</string>
     <string name="action_allow_location">위치 권한 허용</string>
+    <string name="action_widen_range">%1$s로 넓히기</string>
+    <string name="action_retry">다시 시도</string>
     <string name="action_alert_accept">이 조건으로 알림 받기</string>
     <string name="action_alert_later">나중에 할게요</string>
     <string name="action_save">저장</string>
+    <string name="action_saved">저장했어요</string>
     <string name="action_open_detail">단지 상세 보기</string>
     <string name="action_go_nearby">주변 단지 보기</string>
     <string name="action_set_alert">알림 조건 정하기</string>

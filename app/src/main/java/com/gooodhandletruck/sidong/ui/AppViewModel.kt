@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-/** 빈 화면 단계에서 쓰는 예시 단지 id. 단지 데이터(FakeRepository)를 붙이면 지운다. */
-const val SAMPLE_COMPLEX_ID = "sample-1"
+/** S-05·S-06·S-08 빈 화면이 쓰는 예시 단지 id(목업의 한빛마을 3단지). 그 화면들을 만들면 지운다. */
+const val SAMPLE_COMPLEX_ID = "c-1001"
 
 /**
  * 앱 전체 화면 이동과 주행 상태를 맡는다. 화면은 [nav]만 보고 그리고, 누르면 아래 함수를 부른다.

@@ -61,10 +61,8 @@ class Navigator(
 
     private var alertTimeout: Job? = null
 
-    /** 정차 중 화면을 연다. 지금 화면과 같으면 다시 쌓지 않는다. */
-    fun open(screen: Screen.Parked) = _state.update {
-        if (it.backStack.last() == screen) it else it.copy(backStack = it.backStack + screen)
-    }
+    /** 정차 중 화면을 연다. 쌓는 규칙은 [pushed]에 있다. */
+    fun open(screen: Screen.Parked) = _state.update { it.copy(backStack = it.backStack.pushed(screen)) }
 
     fun back() = _state.update {
         if (it.canGoBack) it.copy(backStack = it.backStack.dropLast(1)) else it
@@ -110,7 +108,7 @@ class Navigator(
     /** '방금 들은 단지' 띠의 [보기]: 그 단지의 S-04를 열고 띠를 닫는다. */
     fun openHeardComplex() = _state.update {
         val complexId = it.lastHeardComplexId ?: return@update it
-        it.copy(backStack = it.backStack + Screen.ComplexDetail(complexId), lastHeardComplexId = null)
+        it.copy(backStack = it.backStack.pushed(Screen.ComplexDetail(complexId)), lastHeardComplexId = null)
     }
 
     /** '방금 들은 단지' 띠의 [닫기] */
@@ -119,4 +117,14 @@ class Navigator(
     private companion object {
         val ALERT_DURATION = 2.minutes
     }
+}
+
+/**
+ * 백스택 맨 위에 [screen]을 둔다. 지금 화면과 같으면 그대로 두고, 상세 위에서 상세를 열면 쌓지 않고 바꾼다.
+ * 1:2 창에서 목록의 다른 카드를 누르면 오른쪽 칸만 바뀌고, [닫기]나 뒤로 한 번이면 목록만 남는다.
+ */
+internal fun List<Screen.Parked>.pushed(screen: Screen.Parked): List<Screen.Parked> = when {
+    last() == screen -> this
+    screen is Screen.ComplexDetail && last() is Screen.ComplexDetail -> dropLast(1) + screen
+    else -> this + screen
 }
