@@ -1,51 +1,217 @@
 package com.gooodhandletruck.sidong.ui.onboarding
 
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gooodhandletruck.sidong.R
+import com.gooodhandletruck.sidong.data.AlertConditions
+import com.gooodhandletruck.sidong.data.AreaRange
+import com.gooodhandletruck.sidong.data.ComplexType
+import com.gooodhandletruck.sidong.data.PriceRange
 import com.gooodhandletruck.sidong.ui.WindowLayout
-import com.gooodhandletruck.sidong.ui.component.PlaceholderAction
-import com.gooodhandletruck.sidong.ui.component.PlaceholderScreen
+import com.gooodhandletruck.sidong.ui.component.PrimaryButton
+import com.gooodhandletruck.sidong.ui.component.SecondaryButton
+import com.gooodhandletruck.sidong.ui.component.ToggleChip
+import com.gooodhandletruck.sidong.ui.format.formatPrice
 import com.gooodhandletruck.sidong.ui.navigation.Screen
+import com.gooodhandletruck.sidong.ui.theme.AppColors
+import com.gooodhandletruck.sidong.ui.theme.AppDimens
+import com.gooodhandletruck.sidong.ui.theme.AppType
+
+// 넓은 창에서도 칩과 버튼이 한눈에 들어오게 본문 너비를 줄인다
+private val CONTENT_MAX_WIDTH = 800.dp
 
 /**
- * S-02 알림 조건.
- * 첫 실행에서는 [이 조건으로 알림 받기]·[나중에 할게요] 둘 다 첫 실행을 끝내고 S-03으로 간다.
- * 설정·기록에서 열었을 때는 [저장] 하나이고, 누르면 연 화면으로 돌아간다.
+ * S-02를 ViewModel에 잇는다. 열 때마다 저장한 조건에서 시작한다.
+ *
+ * @param onFinishOnboarding 첫 실행에서 두 버튼 모두 저장(또는 끄기) 뒤 부른다. 첫 실행을 끝내고 S-03으로 간다
+ * @param onSaved 설정에서 [저장]을 누른 뒤 부른다. 연 화면(S-07·S-06)으로 돌아간다
  */
 @Composable
-fun AlertSetupScreen(
+fun AlertSetupRoute(
     screen: Screen.AlertSetup,
     window: WindowLayout,
     onFinishOnboarding: () -> Unit,
-    onSave: () -> Unit,
+    onSaved: () -> Unit,
     onBack: (() -> Unit)?
 ) {
-    val description: Int
-    val actions: List<PlaceholderAction>
-    if (screen.isOnboarding) {
-        description = R.string.placeholder_alert_setup_onboarding
-        actions = listOf(
-            PlaceholderAction(
-                label = stringResource(R.string.action_alert_accept),
-                isPrimary = true,
-                onClick = onFinishOnboarding
-            ),
-            PlaceholderAction(label = stringResource(R.string.action_alert_later), onClick = onFinishOnboarding)
-        )
-    } else {
-        description = R.string.placeholder_alert_setup_settings
-        actions = listOf(
-            PlaceholderAction(label = stringResource(R.string.action_save), isPrimary = true, onClick = onSave)
-        )
-    }
-
-    PlaceholderScreen(
-        id = screen.id,
-        title = stringResource(R.string.screen_alert_setup),
-        description = stringResource(description),
+    val viewModel: AlertSetupViewModel = viewModel()
+    val draft by viewModel.draft.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) { viewModel.startEditing() }
+    AlertSetupScreen(
+        isOnboarding = screen.isOnboarding,
         window = window,
-        actions = actions,
+        draft = draft,
+        onToggleType = viewModel::toggleType,
+        onTogglePrice = viewModel::togglePrice,
+        onToggleArea = viewModel::toggleArea,
+        onAccept = {
+            viewModel.accept()
+            if (screen.isOnboarding) onFinishOnboarding() else onSaved()
+        },
+        onLater = {
+            viewModel.later()
+            onFinishOnboarding()
+        },
         onBack = onBack
     )
+}
+
+/**
+ * S-02 알림 조건. 제목·설명 아래에 유형·가격대·전용면적 칩이 있고, 항목마다 여러 개를 고를 수 있다.
+ * 첫 실행에서는 [이 조건으로 알림 받기](주 버튼)·[나중에 할게요](보조 버튼)이고, 설정에서는 [저장] 하나다.
+ * 항목 하나를 모두 끄면 맞는 단지가 없어서 [이 조건으로 알림 받기]·[저장]을 누를 수 없다.
+ */
+@Composable
+fun AlertSetupScreen(
+    isOnboarding: Boolean,
+    window: WindowLayout,
+    draft: AlertConditions,
+    onToggleType: (ComplexType) -> Unit,
+    onTogglePrice: (PriceRange) -> Unit,
+    onToggleArea: (AreaRange) -> Unit,
+    onAccept: () -> Unit,
+    onLater: () -> Unit,
+    onBack: (() -> Unit)?
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .widthIn(max = CONTENT_MAX_WIDTH + window.contentPadding * 2)
+            .padding(horizontal = window.contentPadding, vertical = AppDimens.ContentPaddingVertical),
+        verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceL)
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceL)
+        ) {
+            if (onBack != null) {
+                SecondaryButton(
+                    text = stringResource(R.string.action_back),
+                    onClick = onBack,
+                    height = AppDimens.TouchMin
+                )
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)) {
+                Text(text = stringResource(R.string.alert_title), style = AppType.TitleM, color = AppColors.TextPrimary)
+                Text(
+                    text = stringResource(R.string.alert_description),
+                    style = AppType.BodyM,
+                    color = AppColors.TextSecondary
+                )
+            }
+            ChipSection(title = stringResource(R.string.alert_section_type)) {
+                ComplexType.entries.forEach { type ->
+                    ToggleChip(
+                        text = typeLabel(type),
+                        checked = type in draft.types,
+                        enabled = type.available,
+                        onCheckedChange = { onToggleType(type) }
+                    )
+                }
+            }
+            ChipSection(title = stringResource(R.string.alert_section_price)) {
+                PriceRange.entries.forEach { range ->
+                    ToggleChip(
+                        text = priceRangeLabel(range),
+                        checked = range in draft.prices,
+                        onCheckedChange = { onTogglePrice(range) }
+                    )
+                }
+            }
+            ChipSection(title = stringResource(R.string.alert_section_area)) {
+                AreaRange.entries.forEach { range ->
+                    ToggleChip(
+                        text = areaRangeLabel(range),
+                        checked = range in draft.areas,
+                        onCheckedChange = { onToggleArea(range) }
+                    )
+                }
+            }
+        }
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceM)) {
+            val accept = stringResource(if (isOnboarding) R.string.action_alert_accept else R.string.action_save)
+            PrimaryButton(
+                text = accept,
+                onClick = onAccept,
+                modifier = Modifier.weight(1f),
+                enabled = draft.isComplete
+            )
+            if (isOnboarding) {
+                SecondaryButton(
+                    text = stringResource(R.string.action_alert_later),
+                    onClick = onLater,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+/** 항목 이름(labelL)과 칩 한 줄. 창이 좁으면 칩 줄만 옆으로 민다 */
+@Composable
+private fun ChipSection(title: String, chips: @Composable () -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)) {
+        Text(text = title, style = AppType.LabelL, color = AppColors.TextSecondary)
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)
+        ) {
+            chips()
+        }
+    }
+}
+
+@Composable
+private fun typeLabel(type: ComplexType): String {
+    val name = stringResource(
+        when (type) {
+            ComplexType.APT -> R.string.type_apartment
+            ComplexType.OFFICETEL -> R.string.type_officetel
+            ComplexType.ONE_ROOM -> R.string.type_one_room
+        }
+    )
+    return if (type.available) name else stringResource(R.string.chip_coming_soon, name)
+}
+
+/** "5억 이하" · "5억~10억" · "15억 넘게". 가격 숫자는 formatPrice로만 만든다 */
+@Composable
+private fun priceRangeLabel(range: PriceRange): String {
+    val min = range.minManwon
+    val max = range.maxManwon
+    return when {
+        min == null && max != null -> stringResource(R.string.range_up_to, formatPrice(max))
+        min != null && max == null -> stringResource(R.string.range_over, formatPrice(min))
+        else -> stringResource(R.string.range_between, formatPrice(min ?: 0), formatPrice(max ?: 0))
+    }
+}
+
+/** "60㎡ 이하" · "60~85㎡" · "85㎡ 넘게" */
+@Composable
+private fun areaRangeLabel(range: AreaRange): String {
+    val min = range.minM2
+    val max = range.maxM2
+    return when {
+        min == null && max != null -> stringResource(R.string.area_up_to, max)
+        min != null && max == null -> stringResource(R.string.area_over, min)
+        else -> stringResource(R.string.area_between, min ?: 0, max ?: 0)
+    }
 }

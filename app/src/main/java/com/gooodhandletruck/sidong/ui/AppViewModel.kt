@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.gooodhandletruck.sidong.R
 import com.gooodhandletruck.sidong.SidongApp
+import com.gooodhandletruck.sidong.data.AlertSettings
 import com.gooodhandletruck.sidong.data.CarLocation
 import com.gooodhandletruck.sidong.data.DrivingStateRepository
 import com.gooodhandletruck.sidong.data.LocationPermission
@@ -65,6 +66,9 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
 
     val nav: StateFlow<NavState> = navigator.state
 
+    /** 주행 중 자동 알림 설정(S-02·S-07). S-06 빈 목록과 S-08 상태 문구가 쓴다 */
+    val alertSettings: StateFlow<AlertSettings> = container.alertSettingsRepository.settings
+
     private val _locationGranted = MutableStateFlow(LocationPermission.isGranted(app))
 
     /** 위치 권한이 있는지. 없으면 S-03에 권한 요청 상태 상자가 보인다 */
@@ -122,8 +126,8 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         _locationGranted.value = LocationPermission.isGranted(getApplication())
     }
 
+    /** 첫 실행 S-02의 두 버튼. 알림 조건 저장(또는 끄기)은 S-02가 먼저 한다 */
     fun finishOnboarding() {
-        // TODO: S-02에서 고른 알림 조건을 저장하고, [나중에 할게요]면 주행 중 알림을 끈 채로 둔다
         onboardingStore.isDone = true
         navigator.finishOnboarding()
     }

@@ -15,15 +15,24 @@ import com.gooodhandletruck.sidong.ui.theme.AppColors
 import com.gooodhandletruck.sidong.ui.theme.AppDimens
 import com.gooodhandletruck.sidong.ui.theme.AppType
 
-/** 주 버튼: 강조색 바탕 + 흰 글자. 한 화면에 하나만 둔다. */
+/** 주 버튼: 강조색 바탕 + 흰 글자. 한 화면에 하나만 둔다. [enabled]가 false면 회색으로 바뀌고 누를 수 없다 */
 @Composable
 fun PrimaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    height: Dp = AppDimens.ButtonHeight
+    height: Dp = AppDimens.ButtonHeight,
+    enabled: Boolean = true
 ) {
-    AppButton(text, onClick, AppColors.Accent, AppColors.OnAccent, modifier, height)
+    AppButton(
+        text = text,
+        onClick = onClick,
+        containerColor = AppColors.Accent,
+        contentColor = AppColors.OnAccent,
+        modifier = modifier,
+        height = height,
+        enabled = enabled
+    )
 }
 
 /**
@@ -73,7 +82,7 @@ private fun AppButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
             contentColor = contentColor,
-            disabledContainerColor = containerColor,
+            disabledContainerColor = AppColors.ButtonSecondary,
             disabledContentColor = AppColors.TextTertiary
         ),
         contentPadding = PaddingValues(horizontal = horizontalPadding)

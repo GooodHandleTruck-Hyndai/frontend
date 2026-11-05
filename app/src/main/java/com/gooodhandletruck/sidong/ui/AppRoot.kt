@@ -39,7 +39,7 @@ import com.gooodhandletruck.sidong.ui.navigation.NavState
 import com.gooodhandletruck.sidong.ui.navigation.Screen
 import com.gooodhandletruck.sidong.ui.navigation.Tab
 import com.gooodhandletruck.sidong.ui.nearby.NearbyRoute
-import com.gooodhandletruck.sidong.ui.onboarding.AlertSetupScreen
+import com.gooodhandletruck.sidong.ui.onboarding.AlertSetupRoute
 import com.gooodhandletruck.sidong.ui.onboarding.WelcomeScreen
 import com.gooodhandletruck.sidong.ui.saved.SavedRoute
 import com.gooodhandletruck.sidong.ui.settings.SettingsScreen
@@ -75,11 +75,15 @@ fun AppRoot(viewModel: AppViewModel) {
     ) {
         val window = WindowLayout(width = maxWidth, height = maxHeight)
         when (val screen = nav.current) {
-            Screen.DrivingIdle -> DrivingIdleScreen(
-                window = window,
-                onboardingDone = nav.onboardingDone,
-                onListenNearby = viewModel::listenNearby
-            )
+            Screen.DrivingIdle -> {
+                val alertSettings by viewModel.alertSettings.collectAsStateWithLifecycle()
+                DrivingIdleScreen(
+                    window = window,
+                    onboardingDone = nav.onboardingDone,
+                    alertsOn = alertSettings.isOn,
+                    onListenNearby = viewModel::listenNearby
+                )
+            }
             is Screen.DrivingAlert -> {
                 val spoken by viewModel.spoken.collectAsStateWithLifecycle()
                 val current = spoken?.takeIf { it.complexId == screen.complexId }
@@ -263,6 +267,7 @@ private fun ParkedScreen(
     onBack: (() -> Unit)?
 ) {
     val locationGranted by viewModel.locationGranted.collectAsStateWithLifecycle()
+    val alertSettings by viewModel.alertSettings.collectAsStateWithLifecycle()
     val openComplex: (String) -> Unit = { complexId -> viewModel.open(Screen.ComplexDetail(complexId)) }
     val openAlertSetup = { viewModel.open(Screen.AlertSetup(isOnboarding = false)) }
 
@@ -274,11 +279,11 @@ private fun ParkedScreen(
                 viewModel.open(Screen.AlertSetup(isOnboarding = true))
             }
         )
-        is Screen.AlertSetup -> AlertSetupScreen(
+        is Screen.AlertSetup -> AlertSetupRoute(
             screen = screen,
             window = window,
             onFinishOnboarding = viewModel::finishOnboarding,
-            onSave = viewModel::back,
+            onSaved = viewModel::back,
             onBack = onBack
         )
         Screen.Nearby -> NearbyRoute(
@@ -310,8 +315,7 @@ private fun ParkedScreen(
         Screen.History -> HistoryRoute(
             window = window,
             locationGranted = locationGranted,
-            // TODO: S-02 알림 조건을 만들면 저장한 조건으로 바꾼다. 지금은 주행 중 자동 알림이 늘 꺼져 있다
-            alertsOn = false,
+            alertsOn = alertSettings.isOn,
             selectedComplexId = selectedComplexId,
             onOpenComplex = openComplex,
             onSetAlert = openAlertSetup

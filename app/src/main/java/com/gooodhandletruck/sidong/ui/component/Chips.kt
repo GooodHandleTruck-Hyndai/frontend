@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,6 +40,40 @@ fun TagChip(text: String, modifier: Modifier = Modifier, filled: Boolean = true)
             .then(background)
             .padding(horizontal = AppDimens.SpaceS, vertical = AppDimens.SpaceXs)
     )
+}
+
+/**
+ * 여러 개를 함께 고를 수 있는 칩(labelL, 76×76 이상). 고른 칩은 강조색이고, [enabled]가 false면 흐리게 두고 누를 수 없다.
+ * S-02 알림 조건이 쓴다.
+ */
+@Composable
+fun ToggleChip(
+    text: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
+) {
+    Box(
+        modifier = modifier
+            .heightIn(min = AppDimens.TouchMin)
+            .widthIn(min = AppDimens.TouchMin)
+            .clip(RoundedCornerShape(AppDimens.ButtonRadius))
+            .background(if (checked && enabled) AppColors.Accent else AppColors.ButtonSecondary)
+            .toggleable(value = checked, enabled = enabled, role = Role.Checkbox, onValueChange = onCheckedChange)
+            .padding(horizontal = AppDimens.SpaceM),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            style = AppType.LabelL,
+            color = when {
+                !enabled -> AppColors.TextTertiary
+                checked -> AppColors.OnAccent
+                else -> AppColors.TextPrimary
+            }
+        )
+    }
 }
 
 /**

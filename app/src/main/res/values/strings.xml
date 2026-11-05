@@ -83,11 +83,26 @@
     <string name="direction_front_left">왼쪽 앞</string>
 
     <!-- 빈 화면 설명: 나중에 들어올 내용을 한 줄로 적는다 -->
-    <string name="placeholder_alert_setup_onboarding">첫 실행 2단계예요. 주행 중에 알려 드릴 단지 조건을 골라요</string>
-    <string name="placeholder_alert_setup_settings">주행 중에 알려 드릴 단지 조건을 바꿔요</string>
     <string name="placeholder_settings">주행 중 음성 알림, 알림 조건, 주변 범위 기본값, 앱 정보가 들어와요</string>
 
+    <!-- S-02 알림 조건 -->
+    <string name="alert_title">어떤 단지를 알려 드릴까요?</string>
+    <string name="alert_description">고른 조건에 맞는 단지를 지날 때만 소리로 알려 드려요</string>
+    <string name="alert_section_type">유형</string>
+    <string name="alert_section_price">가격대</string>
+    <string name="alert_section_area">전용면적</string>
+    <string name="type_officetel">오피스텔</string>
+    <string name="type_one_room">원룸</string>
+    <string name="chip_coming_soon">%1$s · 준비 중</string>
+    <string name="range_up_to">%1$s 이하</string>
+    <string name="range_between">%1$s~%2$s</string>
+    <string name="range_over">%1$s 넘게</string>
+    <string name="area_up_to">%1$d㎡ 이하</string>
+    <string name="area_between">%1$d~%2$d㎡</string>
+    <string name="area_over">%1$d㎡ 넘게</string>
+
     <!-- S-08 주행 중 대기: 가운데 상태 한 줄 -->
+    <string name="driving_status_alerts_on">단지를 지나면 소리로 알려 드릴게요</string>
     <string name="driving_status_alerts_off">정차하면 주변 단지 가격을 보여 드려요</string>
     <!-- 첫 실행을 끝내기 전에 주행을 시작했을 때 S-08에 보이는 한 줄 -->
     <string name="driving_onboarding_pending">정차하면 설정을 이어서 할 수 있어요</string>

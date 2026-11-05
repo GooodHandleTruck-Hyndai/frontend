@@ -3,7 +3,7 @@
 > GooodHandleTruck · 주행 중 운전자를 돕는 차량용 서비스
 
 Kotlin과 Jetpack Compose로 만든 플레오스 커넥트(Android Automotive) 앱이에요.
-지금은 S-01 시작하기, S-03 주변 단지(실제 위치 + 목업 단지), S-04 단지 상세, S-05 저장한 단지, S-06 오늘 들은 단지, S-08·S-09 주행 중 화면이 실제 화면이에요. S-02 알림 조건과 S-07 설정은 아직 **제목과 이동 버튼만 있는 빈 화면**이에요.
+지금은 S-01 시작하기, S-02 알림 조건, S-03 주변 단지(실제 위치 + 목업 단지), S-04 단지 상세, S-05 저장한 단지, S-06 오늘 들은 단지, S-08·S-09 주행 중 화면이 실제 화면이에요. S-07 설정은 아직 **제목과 이동 버튼만 있는 빈 화면**이에요.
 화면 구성과 이동 규칙은 [화면 설계서](https://claude.ai/artifact/UgMDDBgkDfK7rZVFKAaoQt)에 있어요.
 
 - 협업 규칙(브랜치, 커밋, PR): [CONTRIBUTING.md](CONTRIBUTING.md)
@@ -78,6 +78,7 @@ app/src/main/java/com/gooodhandletruck/sidong/
     ├── LocationRepository.kt    차 위치 받기 (플레오스 FusedLocation, 화면이 구독할 때만)
     ├── NavigationRepository.kt  길 안내 보내기와 도착 (플레오스 NaviHelper)
     ├── SpeechRepository.kt      주행 중 음성 안내와 오디오 포커스 (플레오스 TextToSpeech)
+    ├── AlertSettingsRepository.kt 주행 중 자동 알림 조건과 켜기·끄기 (이 기기에 저장)
     ├── DrivingStateRepository.kt 주행 중인지 (AAOS UX 제한)
     ├── OnboardingStore.kt       첫 실행을 끝냈는지
     ├── LocationPermission.kt    위치 권한(FUSED_LOCATION)이 있는지

@@ -20,6 +20,9 @@ class AppContainer(context: Context) {
     /** 길 안내와 도착(플레오스 NaviHelper) */
     val navigationRepository = NavigationRepository(context)
 
+    /** 주행 중 자동 알림 조건과 켜기·끄기(S-02·S-07) */
+    val alertSettingsRepository = AlertSettingsRepository(context)
+
     /** 주행 중 음성 안내(플레오스 TextToSpeech) */
     val speechRepository = SpeechRepository(context, appScope)
 }
