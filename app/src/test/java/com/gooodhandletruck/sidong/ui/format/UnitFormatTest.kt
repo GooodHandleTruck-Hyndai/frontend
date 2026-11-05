@@ -22,4 +22,7 @@ class UnitFormatTest {
 
     @Test
     fun areaDropsDecimals() = assertEquals("84㎡", formatArea(84.97))
+
+    @Test
+    fun voiceAreaReadsSquareMeters() = assertEquals("84제곱미터", formatAreaVoice(84.97))
 }

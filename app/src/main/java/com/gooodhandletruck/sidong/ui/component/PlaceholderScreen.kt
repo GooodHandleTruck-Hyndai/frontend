@@ -3,19 +3,14 @@ package com.gooodhandletruck.sidong.ui.component
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import com.gooodhandletruck.sidong.R
 import com.gooodhandletruck.sidong.ui.WindowLayout
 import com.gooodhandletruck.sidong.ui.theme.AppColors
@@ -76,55 +71,6 @@ fun PlaceholderScreen(
                 PrimaryButton(text = action.label, onClick = action.onClick)
             } else {
                 SecondaryButton(text = action.label, onClick = action.onClick)
-            }
-        }
-    }
-}
-
-/**
- * 주행 중 빈 화면 틀. 왼쪽 탭 없이 가운데 정렬하고, 큰 버튼(높이 160)은 창 아래쪽에 둔다.
- * 주행 중에는 가격·목록·지도를 그리지 않는다.
- */
-@Composable
-fun DrivingPlaceholderScreen(
-    id: String,
-    title: String,
-    message: String,
-    window: WindowLayout,
-    actions: List<PlaceholderAction>,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = window.contentPadding, vertical = AppDimens.ContentPaddingVertical),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(Modifier.weight(1f))
-        Text(text = id, style = AppType.LabelL, color = AppColors.TextTertiary)
-        Spacer(Modifier.height(AppDimens.SpaceXs))
-        Text(
-            text = title,
-            style = AppType.TitleL,
-            color = AppColors.TextPrimary,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-        Spacer(Modifier.height(AppDimens.SpaceS))
-        Text(text = message, style = AppType.BodyL, color = AppColors.TextSecondary, textAlign = TextAlign.Center)
-        Spacer(Modifier.weight(1f))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceM)
-        ) {
-            actions.forEach { action ->
-                val buttonModifier = Modifier.weight(1f)
-                if (action.isPrimary) {
-                    PrimaryButton(action.label, action.onClick, buttonModifier, AppDimens.DrivingButtonHeight)
-                } else {
-                    SecondaryButton(action.label, action.onClick, buttonModifier, AppDimens.DrivingButtonHeight)
-                }
             }
         }
     }

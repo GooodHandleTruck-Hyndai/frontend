@@ -52,9 +52,17 @@ class LocationRepository(context: Context, scope: CoroutineScope) {
     /** [retry]를 부를 때마다 1씩 올라 위치 요청을 새로 보낸다 */
     private val attempts = MutableStateFlow(0)
 
+    /**
+     * 차 위치. 구독하는 화면이 없어 위치 받기를 멈추면 마지막 위치를 비우고(Searching) 다음 구독 때 새로 받는다.
+     * 주행 중 [주변 단지 듣기]가 S-03을 마지막으로 본 예전 위치를 쓰지 않게 하려는 것이다.
+     */
     val state: StateFlow<LocationState> = attempts
         .flatMapLatest { locationUpdates() }
-        .stateIn(scope, SharingStarted.WhileSubscribed(STOP_DELAY_MS), LocationState.Searching)
+        .stateIn(
+            scope,
+            SharingStarted.WhileSubscribed(stopTimeoutMillis = STOP_DELAY_MS, replayExpirationMillis = 0),
+            LocationState.Searching
+        )
 
     /** 위치를 못 받았을 때 [다시 시도] */
     fun retry() = attempts.update { it + 1 }

@@ -19,4 +19,7 @@ class AppContainer(context: Context) {
 
     /** 길 안내와 도착(플레오스 NaviHelper) */
     val navigationRepository = NavigationRepository(context)
+
+    /** 주행 중 음성 안내(플레오스 TextToSpeech) */
+    val speechRepository = SpeechRepository(context, appScope)
 }

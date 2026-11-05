@@ -1,6 +1,7 @@
 package com.gooodhandletruck.sidong.data
 
 import com.gooodhandletruck.sidong.data.model.ComplexDetail
+import com.gooodhandletruck.sidong.data.model.ComplexSummary
 import com.gooodhandletruck.sidong.data.model.NearbyResponse
 import com.gooodhandletruck.sidong.data.model.SavedResponse
 
@@ -25,6 +26,13 @@ interface ComplexRepository {
 
     /** 저장 목록(S-05). GET /api/v1/saved. 최근에 저장한 것부터 온다 */
     suspend fun saved(): SavedResponse
+
+    /**
+     * 앞쪽 단지(S-08 [주변 단지 듣기], 화면 설계서의 brief). 차가 향한 쪽 180도 안에서 가장 가까운 단지 하나, 없으면 null.
+     * 주행 중에 불러도 되는 서버 호출이다.
+     * TODO: 서버 형식이 아직 없다(API 검토 '고칠 것' 8번). 정해지면 요청·응답을 맞춘다
+     */
+    suspend fun brief(lat: Double, lon: Double, heading: Double): ComplexSummary?
 
     companion object {
         /** S-03은 단지 카드를 최대 10개 보여 준다 */

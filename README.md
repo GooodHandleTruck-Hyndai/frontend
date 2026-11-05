@@ -49,6 +49,8 @@ git clone https://github.com/GooodHandleTruck/<저장소이름>.git
    - 1:1:1 창은 앱 창 오른쪽 끝의 ⋮ 손잡이를 왼쪽으로 끌면 나와요(앱 창 841×1210dp). 손잡이를 화면 끝까지 끌어 되돌리면 시스템 화면이 앱 아이콘 가림막에 멈출 수 있어요. 그때는 오른쪽 끝 손잡이를 왼쪽으로 조금(100px쯤)만 끌었다 놓으면 1:2 창으로 돌아와요.
    - 에뮬레이터를 오래 켜 두면 플레오스 위치 서비스가 멈춰서 "지금 위치를 확인하지 못했어요"가 뜨거나 옛 위치(미국)가 나올 수 있어요. 그때는 `adb shell am force-stop --user 10 ai.pleos.playground.service.location.fused` 로 위치 서비스를 다시 띄우고, 앱도 다시 실행해요.
 4. 에뮬레이터의 **⋯ (Extended controls) → Car data** 에서 기어를 D로 바꾸면 주행 화면(S-08)이 덮고, P로 돌리면 보던 화면으로 돌아와요.
+   - 디버그 빌드에서는 `adb shell am start --user 10 -n com.gooodhandletruck.sidong/.MainActivity --ez debug_driving true` 로도 주행을 흉내 낼 수 있어요. 정차는 `false` 이고, 앱을 다시 켜면 차의 실제 값으로 돌아가요.
+   - S-08의 [주변 단지 듣기]를 누르면 차 앞쪽 180도 안에서 가장 가까운 단지를 소리로 말하고(플레오스 TextToSpeech) S-09로 바뀌어요. 정차하면 맨 위에 '방금 들은 단지' 띠가 떠요.
 5. 단위 테스트(가격 표기, 거리·방향 계산, 다시 불러오는 기준, 화면 쌓기 규칙, 목업 JSON)는 `./gradlew test` 로 돌려요.
 
 ## 📁 폴더 구조
@@ -75,6 +77,7 @@ app/src/main/java/com/gooodhandletruck/sidong/
     ├── CarLocation.kt           차 위치·향한 쪽, 목록을 다시 불러올 만큼 움직였는지
     ├── LocationRepository.kt    차 위치 받기 (플레오스 FusedLocation, 화면이 구독할 때만)
     ├── NavigationRepository.kt  길 안내 보내기와 도착 (플레오스 NaviHelper)
+    ├── SpeechRepository.kt      주행 중 음성 안내와 오디오 포커스 (플레오스 TextToSpeech)
     ├── DrivingStateRepository.kt 주행 중인지 (AAOS UX 제한)
     ├── OnboardingStore.kt       첫 실행을 끝냈는지
     ├── LocationPermission.kt    위치 권한(FUSED_LOCATION)이 있는지

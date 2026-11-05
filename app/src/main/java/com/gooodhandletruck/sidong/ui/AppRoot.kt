@@ -80,7 +80,17 @@ fun AppRoot(viewModel: AppViewModel) {
                 onboardingDone = nav.onboardingDone,
                 onListenNearby = viewModel::listenNearby
             )
-            is Screen.DrivingAlert -> DrivingAlertScreen(screen, window)
+            is Screen.DrivingAlert -> {
+                val spoken by viewModel.spoken.collectAsStateWithLifecycle()
+                val current = spoken?.takeIf { it.complexId == screen.complexId }
+                DrivingAlertScreen(
+                    window = window,
+                    name = current?.name.orEmpty(),
+                    saved = current?.saved == true,
+                    onReplay = viewModel::replaySpoken,
+                    onSave = viewModel::saveSpoken
+                )
+            }
             is Screen.Parked -> ParkedContent(nav, window, viewModel)
         }
     }
@@ -99,8 +109,9 @@ private fun ParkedContent(nav: NavState, window: WindowLayout, viewModel: AppVie
                 .fillMaxHeight()
         ) {
             nav.heardBannerComplexId?.let { complexId ->
+                val spoken by viewModel.spoken.collectAsStateWithLifecycle()
                 HeardBanner(
-                    complexId = complexId,
+                    name = spoken?.takeIf { it.complexId == complexId }?.name ?: complexId,
                     window = window,
                     onOpen = viewModel::openHeardComplex,
                     onDismiss = viewModel::dismissHeardBanner
@@ -303,7 +314,7 @@ private fun ParkedScreen(
 
 /** 정차하면 맨 위에 띄우는 '방금 들은 단지' 띠. [보기]는 S-04를 열고, [닫기]는 띠를 지운다. */
 @Composable
-private fun HeardBanner(complexId: String, window: WindowLayout, onOpen: () -> Unit, onDismiss: () -> Unit) {
+private fun HeardBanner(name: String, window: WindowLayout, onOpen: () -> Unit, onDismiss: () -> Unit) {
     val shape = RoundedCornerShape(AppDimens.CardRadius)
     Row(
         modifier = Modifier
@@ -316,7 +327,7 @@ private fun HeardBanner(complexId: String, window: WindowLayout, onOpen: () -> U
         horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)
     ) {
         Text(
-            text = stringResource(R.string.banner_heard, complexId),
+            text = stringResource(R.string.banner_heard, name),
             style = AppType.BodyM,
             color = AppColors.TextPrimary,
             maxLines = 1,

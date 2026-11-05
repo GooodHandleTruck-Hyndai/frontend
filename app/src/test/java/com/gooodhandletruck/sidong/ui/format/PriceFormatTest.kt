@@ -20,4 +20,7 @@ class PriceFormatTest {
 
     @Test
     fun largeEokHasComma() = assertEquals("1,234억 5,678만", formatPrice(12_345_678))
+
+    @Test
+    fun voiceAddsWon() = assertEquals("12억 3,000만 원", formatPriceVoice(123000))
 }

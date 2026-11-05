@@ -14,3 +14,6 @@ fun formatDistance(meters: Double): String {
 
 /** 전용면적 표기: 소수점 아래를 버린다(84.97 → "84㎡"). 부동산에서 부르는 평형 이름과 같다. */
 fun formatArea(areaM2: Double): String = "${areaM2.toInt()}㎡"
+
+/** 음성의 전용면적: "84㎡" 대신 읽을 수 있게 "84제곱미터"라고 쓴다 */
+fun formatAreaVoice(areaM2: Double): String = "${areaM2.toInt()}제곱미터"

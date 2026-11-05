@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.core.content.edit
 import com.gooodhandletruck.sidong.data.model.ComplexDetail
+import com.gooodhandletruck.sidong.data.model.ComplexSummary
 import com.gooodhandletruck.sidong.data.model.NearbyResponse
 import com.gooodhandletruck.sidong.data.model.OffsetDateTimeSerializer
 import com.gooodhandletruck.sidong.data.model.SavedComplex
@@ -76,6 +77,13 @@ class FakeRepository(context: Context) : ComplexRepository {
         allNearby.savedList(synchronized(savedLock) { savedEntries() })
     }
 
+    override suspend fun brief(lat: Double, lon: Double, heading: Double): ComplexSummary? =
+        withContext(Dispatchers.IO) {
+            delay(FAKE_LATENCY_MS)
+            val complex = allNearby.nearestAhead(lat, lon, heading, BRIEF_RADIUS_METERS)
+            complex?.copy(saved = complex.complexId in savedIds())
+        }
+
     private fun savedIds(): Set<String> = synchronized(savedLock) { savedEntries().map { it.complexId }.toSet() }
 
     // savedLock 안에서 부른다
@@ -104,6 +112,7 @@ class FakeRepository(context: Context) : ComplexRepository {
         const val NEARBY_FILE = "mock/complexes_nearby.json"
         const val DETAILS_FILE = "mock/complex_details.json"
         const val FAKE_LATENCY_MS = 400L
+        const val BRIEF_RADIUS_METERS = 1000
         const val PREFS_NAME = "fake_server"
         const val KEY_SAVED = "saved"
         const val SERVER_ZONE = "Asia/Seoul" // 시각은 +09:00으로 주고받는다
@@ -126,6 +135,29 @@ internal fun NearbyResponse.within(lat: Double, lon: Double, radiusMeters: Int, 
         .sortedBy { (_, distance) -> distance }
     return NearbyResponse(totalCount = inRange.size, items = inRange.take(limit).map { (complex, _) -> complex })
 }
+
+/** 서버의 앞쪽 단지 규칙: 반경 안에서 차가 향한 쪽 180도(좌우 90도) 안에 있는 단지 중 가장 가까운 하나 */
+internal fun NearbyResponse.nearestAhead(
+    lat: Double,
+    lon: Double,
+    heading: Double,
+    radiusMeters: Int
+): ComplexSummary? = items
+    .map { complex -> complex to distanceMeters(lat, lon, complex.lat, complex.lon) }
+    .filter { (complex, distance) ->
+        distance <= radiusMeters && isAhead(bearingDegrees(lat, lon, complex.lat, complex.lon), heading)
+    }
+    .minByOrNull { (_, distance) -> distance }
+    ?.first
+
+/** [bearing] 쪽이 [heading]을 향한 차의 앞쪽 180도 안인지. 둘 다 북쪽 0도, 시계 방향이다 */
+internal fun isAhead(bearing: Double, heading: Double): Boolean {
+    val relative = ((bearing - heading) % FULL_TURN + FULL_TURN) % FULL_TURN
+    return relative <= QUARTER_TURN || relative >= FULL_TURN - QUARTER_TURN
+}
+
+private const val FULL_TURN = 360.0
+private const val QUARTER_TURN = 90.0
 
 /** 서버의 저장 목록 규칙: 최근에 저장한 것부터 주고, 단지 요약은 주변 단지와 같은 모양에 saved만 true다. */
 internal fun NearbyResponse.savedList(entries: List<FakeSavedEntry>): SavedResponse {

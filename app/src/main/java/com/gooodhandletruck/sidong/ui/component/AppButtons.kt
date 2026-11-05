@@ -29,6 +29,7 @@ fun PrimaryButton(
 /**
  * 보조 버튼: #EDEEF2 바탕 + 검정 글자.
  * [horizontalPadding]을 줄이면 카드 안 [길 안내]처럼 76×76에 가까운 작은 버튼이 된다.
+ * [enabled]가 false면 누를 수 없고 글자가 흐려진다(S-09 "저장했어요").
  */
 @Composable
 fun SecondaryButton(
@@ -36,9 +37,19 @@ fun SecondaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     height: Dp = AppDimens.ButtonHeight,
-    horizontalPadding: Dp = AppDimens.SpaceL
+    horizontalPadding: Dp = AppDimens.SpaceL,
+    enabled: Boolean = true
 ) {
-    AppButton(text, onClick, AppColors.ButtonSecondary, AppColors.TextPrimary, modifier, height, horizontalPadding)
+    AppButton(
+        text = text,
+        onClick = onClick,
+        containerColor = AppColors.ButtonSecondary,
+        contentColor = AppColors.TextPrimary,
+        modifier = modifier,
+        height = height,
+        horizontalPadding = horizontalPadding,
+        enabled = enabled
+    )
 }
 
 @Composable
@@ -49,15 +60,22 @@ private fun AppButton(
     contentColor: Color,
     modifier: Modifier,
     height: Dp,
-    horizontalPadding: Dp = AppDimens.SpaceL
+    horizontalPadding: Dp = AppDimens.SpaceL,
+    enabled: Boolean = true
 ) {
     Button(
         onClick = onClick,
         modifier = modifier
             .height(height)
             .widthIn(min = AppDimens.TouchMin),
+        enabled = enabled,
         shape = RoundedCornerShape(AppDimens.ButtonRadius),
-        colors = ButtonDefaults.buttonColors(containerColor = containerColor, contentColor = contentColor),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            contentColor = contentColor,
+            disabledContainerColor = containerColor,
+            disabledContentColor = AppColors.TextTertiary
+        ),
         contentPadding = PaddingValues(horizontal = horizontalPadding)
     ) {
         Text(text = text, style = AppType.LabelL)
