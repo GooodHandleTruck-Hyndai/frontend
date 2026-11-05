@@ -3,19 +3,28 @@ package com.gooodhandletruck.sidong.ui
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.gooodhandletruck.sidong.SidongApp
 import com.gooodhandletruck.sidong.data.DrivingStateRepository
 import com.gooodhandletruck.sidong.data.LocationPermission
 import com.gooodhandletruck.sidong.data.OnboardingStore
+import com.gooodhandletruck.sidong.data.RouteTarget
 import com.gooodhandletruck.sidong.ui.navigation.NavState
 import com.gooodhandletruck.sidong.ui.navigation.Navigator
 import com.gooodhandletruck.sidong.ui.navigation.Screen
 import com.gooodhandletruck.sidong.ui.navigation.Tab
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
-/** S-05·S-06·S-08 빈 화면이 쓰는 예시 단지 id(목업의 한빛마을 3단지). 그 화면들을 만들면 지운다. */
+/** [길 안내]를 누른 뒤 앱 안에 3초 띄우는 한 줄 */
+enum class RouteMessage { STARTED, FAILED }
+
+/** S-06·S-08 빈 화면이 쓰는 예시 단지 id(목업의 한빛마을 3단지). 그 화면들을 만들면 지운다. */
 const val SAMPLE_COMPLEX_ID = "c-1001"
 
 /**
@@ -26,6 +35,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
 
     private val onboardingStore = OnboardingStore(app)
     private val drivingState = DrivingStateRepository(app)
+    private val navigation = (app as SidongApp).container.navigationRepository
     private val navigator = Navigator(viewModelScope, onboardingDone = onboardingStore.isDone)
 
     val nav: StateFlow<NavState> = navigator.state
@@ -35,10 +45,37 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     /** 위치 권한이 있는지. 없으면 S-03에 권한 요청 상태 상자가 보인다 */
     val locationGranted: StateFlow<Boolean> = _locationGranted.asStateFlow()
 
+    private val _routeMessage = MutableStateFlow<RouteMessage?>(null)
+
+    /** [길 안내]를 누른 뒤 3초 동안 보이는 한 줄. 없으면 null */
+    val routeMessage: StateFlow<RouteMessage?> = _routeMessage.asStateFlow()
+
+    private var routeMessageJob: Job? = null
+
     init {
         // 주행이 시작되면 어느 화면에서든 S-08로 덮고, 정차하면 보던 화면으로 돌아간다
         viewModelScope.launch {
             drivingState.isDriving().collect { navigator.onDrivingChanged(it) }
+        }
+        // 길 안내로 도착하면 정차하는 대로 그 단지의 S-04를 연다
+        viewModelScope.launch {
+            navigation.arrival.filterNotNull().collect { complexId ->
+                navigator.onArrived(complexId)
+                navigation.consumeArrival()
+            }
+        }
+    }
+
+    /**
+     * S-04 [길 안내]와 S-05 카드의 [길 안내]. 기본 내비에 목적지를 보내고 "길 안내를 시작했어요"를 3초 띄운다.
+     * 출발하면 주행 상태가 바뀌어 S-08로 덮인다.
+     */
+    fun startRoute(target: RouteTarget) {
+        _routeMessage.value = if (navigation.startRoute(target)) RouteMessage.STARTED else RouteMessage.FAILED
+        routeMessageJob?.cancel()
+        routeMessageJob = viewModelScope.launch {
+            delay(ROUTE_MESSAGE_DURATION)
+            _routeMessage.value = null
         }
     }
 
@@ -68,4 +105,8 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     fun openHeardComplex() = navigator.openHeardComplex()
 
     fun dismissHeardBanner() = navigator.dismissHeardBanner()
+
+    private companion object {
+        val ROUTE_MESSAGE_DURATION = 3.seconds
+    }
 }

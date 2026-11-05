@@ -16,4 +16,7 @@ class AppContainer(context: Context) {
 
     /** 차 위치와 향한 쪽(플레오스 FusedLocation) */
     val locationRepository = LocationRepository(context, appScope)
+
+    /** 길 안내와 도착(플레오스 NaviHelper) */
+    val navigationRepository = NavigationRepository(context)
 }

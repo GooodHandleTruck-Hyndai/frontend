@@ -21,8 +21,8 @@ sealed class Screen(val id: String) {
     /** 주변 단지: 정차 중 홈 */
     data object Nearby : Parked("S-03")
 
-    /** 단지 상세 */
-    data class ComplexDetail(val complexId: String) : Parked("S-04")
+    /** 단지 상세. 길 안내로 도착해서 열었으면 [arrived]가 true이고 '도착했어요' 띠를 보여 준다 */
+    data class ComplexDetail(val complexId: String, val arrived: Boolean = false) : Parked("S-04")
 
     /** 저장한 단지 */
     data object Saved : Parked("S-05")

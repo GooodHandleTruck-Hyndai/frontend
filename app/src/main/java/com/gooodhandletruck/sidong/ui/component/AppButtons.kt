@@ -26,15 +26,19 @@ fun PrimaryButton(
     AppButton(text, onClick, AppColors.Accent, AppColors.OnAccent, modifier, height)
 }
 
-/** 보조 버튼: #EDEEF2 바탕 + 검정 글자 */
+/**
+ * 보조 버튼: #EDEEF2 바탕 + 검정 글자.
+ * [horizontalPadding]을 줄이면 카드 안 [길 안내]처럼 76×76에 가까운 작은 버튼이 된다.
+ */
 @Composable
 fun SecondaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    height: Dp = AppDimens.ButtonHeight
+    height: Dp = AppDimens.ButtonHeight,
+    horizontalPadding: Dp = AppDimens.SpaceL
 ) {
-    AppButton(text, onClick, AppColors.ButtonSecondary, AppColors.TextPrimary, modifier, height)
+    AppButton(text, onClick, AppColors.ButtonSecondary, AppColors.TextPrimary, modifier, height, horizontalPadding)
 }
 
 @Composable
@@ -44,7 +48,8 @@ private fun AppButton(
     containerColor: Color,
     contentColor: Color,
     modifier: Modifier,
-    height: Dp
+    height: Dp,
+    horizontalPadding: Dp = AppDimens.SpaceL
 ) {
     Button(
         onClick = onClick,
@@ -53,7 +58,7 @@ private fun AppButton(
             .widthIn(min = AppDimens.TouchMin),
         shape = RoundedCornerShape(AppDimens.ButtonRadius),
         colors = ButtonDefaults.buttonColors(containerColor = containerColor, contentColor = contentColor),
-        contentPadding = PaddingValues(horizontal = AppDimens.SpaceL)
+        contentPadding = PaddingValues(horizontal = horizontalPadding)
     ) {
         Text(text = text, style = AppType.LabelL)
     }

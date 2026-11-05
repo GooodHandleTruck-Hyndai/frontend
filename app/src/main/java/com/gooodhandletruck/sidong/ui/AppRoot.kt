@@ -106,23 +106,48 @@ private fun ParkedContent(nav: NavState, window: WindowLayout, viewModel: AppVie
                     onDismiss = viewModel::dismissHeardBanner
                 )
             }
-            val panes = if (window.isWide) nav.widePanes() else null
-            if (panes != null) {
-                WidePanesContent(panes, window, viewModel, stateHolder)
-            } else {
-                val screen = nav.backStack.last()
-                val onBack = if (nav.canGoBack) viewModel::back else null
-                // 상세는 상태를 기억하지 않는다. 다시 열면 맨 위부터 보인다
-                if (screen is Screen.ComplexDetail) {
-                    ParkedScreen(screen, window, viewModel, selectedComplexId = null, onBack = onBack)
+            Box(modifier = Modifier.weight(1f)) {
+                val panes = if (window.isWide) nav.widePanes() else null
+                if (panes != null) {
+                    WidePanesContent(panes, window, viewModel, stateHolder)
                 } else {
-                    stateHolder.SaveableStateProvider(screen.stateKey) {
+                    val screen = nav.backStack.last()
+                    val onBack = if (nav.canGoBack) viewModel::back else null
+                    // 상세는 상태를 기억하지 않는다. 다시 열면 맨 위부터 보인다
+                    if (screen is Screen.ComplexDetail) {
                         ParkedScreen(screen, window, viewModel, selectedComplexId = null, onBack = onBack)
+                    } else {
+                        stateHolder.SaveableStateProvider(screen.stateKey) {
+                            ParkedScreen(screen, window, viewModel, selectedComplexId = null, onBack = onBack)
+                        }
                     }
                 }
+                val routeMessage by viewModel.routeMessage.collectAsStateWithLifecycle()
+                routeMessage?.let { RouteMessageBand(it, Modifier.align(Alignment.BottomCenter)) }
             }
         }
     }
+}
+
+/** [길 안내]를 누른 뒤 3초 동안 창 아래에 띄우는 한 줄. 전체 화면 팝업은 쓰지 않는다 */
+@Composable
+private fun RouteMessageBand(message: RouteMessage, modifier: Modifier = Modifier) {
+    val shape = RoundedCornerShape(AppDimens.CardRadius)
+    Text(
+        text = stringResource(
+            when (message) {
+                RouteMessage.STARTED -> R.string.route_started
+                RouteMessage.FAILED -> R.string.route_failed
+            }
+        ),
+        style = AppType.BodyM,
+        color = AppColors.TextPrimary,
+        modifier = modifier
+            .padding(bottom = AppDimens.ContentPaddingVertical)
+            .background(AppColors.Surface, shape)
+            .border(1.dp, AppColors.Outline, shape)
+            .padding(horizontal = AppDimens.SpaceL, vertical = AppDimens.SpaceS)
+    )
 }
 
 /**
@@ -162,7 +187,8 @@ private fun WidePanesContent(
                         window = window,
                         isSidePane = true,
                         locationGranted = locationGranted,
-                        onClose = viewModel::back
+                        onClose = viewModel::back,
+                        onStartRoute = viewModel::startRoute
                     )
                 }
             } else if (panes.list == Screen.Saved || panes.list == Screen.History) {
@@ -258,7 +284,8 @@ private fun ParkedScreen(
                 window = window,
                 isSidePane = false,
                 locationGranted = locationGranted,
-                onClose = viewModel::back
+                onClose = viewModel::back,
+                onStartRoute = viewModel::startRoute
             )
         }
         Screen.Saved -> SavedRoute(
@@ -266,6 +293,7 @@ private fun ParkedScreen(
             locationGranted = locationGranted,
             selectedComplexId = selectedComplexId,
             onOpenComplex = openComplex,
+            onStartRoute = viewModel::startRoute,
             onGoNearby = { viewModel.selectTab(Tab.NEARBY) }
         )
         Screen.History -> HistoryScreen(window = window, onOpenComplex = openComplex, onSetAlert = openAlertSetup)

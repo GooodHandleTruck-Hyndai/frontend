@@ -20,7 +20,9 @@ data class NavState(
     /** 주행 중 단지 알림(S-09). null이면 대기(S-08)다. */
     val alert: Screen.DrivingAlert? = null,
     /** 주행 중에 마지막으로 들은 단지. 정차하면 '방금 들은 단지' 띠로 보여 준다. */
-    val lastHeardComplexId: String? = null
+    val lastHeardComplexId: String? = null,
+    /** 주행 중에 길 안내로 도착한 단지. 정차하면 그 단지의 S-04를 연다. */
+    val pendingArrivalComplexId: String? = null
 ) {
     /** 지금 창에 그릴 화면. 주행 중에는 정차 화면을 기억해 둔 채 주행 화면으로 덮는다. */
     val current: Screen
@@ -85,8 +87,25 @@ class Navigator(
             alertTimeout?.cancel()
             alertTimeout = null
         }
-        _state.update { it.copy(isDriving = isDriving, alert = if (isDriving) it.alert else null) }
+        _state.update {
+            val moved = it.copy(isDriving = isDriving, alert = if (isDriving) it.alert else null)
+            val arrival = it.pendingArrivalComplexId
+            if (isDriving || arrival == null) moved else moved.withArrival(arrival)
+        }
     }
+
+    /**
+     * 길 안내로 단지에 도착했을 때(화면 설계서 '주행·정차 전환 규칙' 길 안내 도착).
+     * 정차 중이면 바로, 주행 중이면 정차하는 순간 그 단지의 S-04를 '도착했어요' 띠와 함께 연다.
+     */
+    fun onArrived(complexId: String) = _state.update {
+        if (it.isDriving) it.copy(pendingArrivalComplexId = complexId) else it.withArrival(complexId)
+    }
+
+    private fun NavState.withArrival(complexId: String) = copy(
+        backStack = backStack.pushed(Screen.ComplexDetail(complexId, arrived = true)),
+        pendingArrivalComplexId = null
+    )
 
     /**
      * 주행 중 단지를 말했을 때 S-09로 바꾸고 2분 뒤 S-08로 돌린다.

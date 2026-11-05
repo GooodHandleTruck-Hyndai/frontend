@@ -1,6 +1,7 @@
 package com.gooodhandletruck.sidong.ui.detail
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,9 +34,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gooodhandletruck.sidong.R
+import com.gooodhandletruck.sidong.data.RouteTarget
 import com.gooodhandletruck.sidong.data.model.AreaPrice
 import com.gooodhandletruck.sidong.data.model.ComplexDetail
 import com.gooodhandletruck.sidong.data.model.Trade
+import com.gooodhandletruck.sidong.data.toRouteTarget
 import com.gooodhandletruck.sidong.ui.WindowLayout
 import com.gooodhandletruck.sidong.ui.component.ComplexPhoto
 import com.gooodhandletruck.sidong.ui.component.DirectionChip
@@ -72,7 +75,8 @@ fun ComplexDetailRoute(
     window: WindowLayout,
     isSidePane: Boolean,
     locationGranted: Boolean,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    onStartRoute: (RouteTarget) -> Unit
 ) {
     val viewModel: ComplexDetailViewModel = viewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -88,25 +92,30 @@ fun ComplexDetailRoute(
         state = if (state.complexId == screen.complexId) state else ComplexDetailUiState(complexId = screen.complexId),
         window = window,
         isSidePane = isSidePane,
+        arrived = screen.arrived,
         onClose = onClose,
         onSelectArea = viewModel::selectArea,
         onToggleSaved = viewModel::toggleSaved,
+        onStartRoute = onStartRoute,
         onRetry = viewModel::retry
     )
 }
 
 /**
- * S-04 단지 상세. 위에서 아래로 머리글, 사진, 주소, 평형 칩, 가격 요약, 최근 거래 3건이고, [저장]은 아래에 고정한다.
+ * S-04 단지 상세. 위에서 아래로 머리글, 사진, 주소, 평형 칩, 가격 요약, 최근 거래 3건이고, [저장]·[길 안내]는 아래에 고정한다.
  * 1:2 창에서는 목록 옆 칸에, 1:1:1 창에서는 창 전체로 열린다. 1:1:1 창은 사진 높이를 320으로 줄여 한 화면에 들어오게 한다.
+ * 길 안내로 도착해서 열었으면([arrived]) 머리글 위에 "도착했어요" 띠를 둔다.
  */
 @Composable
 fun ComplexDetailScreen(
     state: ComplexDetailUiState,
     window: WindowLayout,
     isSidePane: Boolean,
+    arrived: Boolean,
     onClose: () -> Unit,
     onSelectArea: (Double) -> Unit,
     onToggleSaved: () -> Unit,
+    onStartRoute: (RouteTarget) -> Unit,
     onRetry: () -> Unit
 ) {
     val content = state.content
@@ -122,6 +131,7 @@ fun ComplexDetailScreen(
             ),
         verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceM)
     ) {
+        if (arrived) ArrivedBand()
         DetailHeader(
             detail = (content as? DetailContent.Loaded)?.detail,
             place = state.place,
@@ -144,7 +154,11 @@ fun ComplexDetailScreen(
                     onSelectArea = onSelectArea,
                     modifier = Modifier.weight(1f)
                 )
-                ActionButtons(saved = state.saved, onToggleSaved = onToggleSaved)
+                ActionButtons(
+                    saved = state.saved,
+                    onToggleSaved = onToggleSaved,
+                    onStartRoute = { onStartRoute(content.detail.toRouteTarget()) }
+                )
             }
         }
     }
@@ -327,11 +341,12 @@ private fun RecentTrades(trades: List<Trade>, asOf: LocalDate) {
 }
 
 /**
- * 아래 고정 버튼. [저장]은 누르면 바로 "저장했어요"로 바뀌고, 한 번 더 누르면 저장을 취소한다(확인 팝업 없음).
+ * 아래 고정 버튼: [저장](주 버튼, 왼쪽) [길 안내](보조 버튼, 오른쪽). 운전석에 가까운 왼쪽에 저장을 둔다.
+ * [저장]은 누르면 바로 "저장했어요"로 바뀌고, 한 번 더 누르면 저장을 취소한다(확인 팝업 없음).
  * 저장한 뒤에는 보조 버튼 모양으로 바꿔, 다시 누르라는 버튼이 아니라 지금 상태라는 것을 보인다.
  */
 @Composable
-private fun ActionButtons(saved: Boolean, onToggleSaved: () -> Unit) {
+private fun ActionButtons(saved: Boolean, onToggleSaved: () -> Unit, onStartRoute: () -> Unit) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceM)) {
         if (saved) {
             SecondaryButton(
@@ -346,9 +361,28 @@ private fun ActionButtons(saved: Boolean, onToggleSaved: () -> Unit) {
                 modifier = Modifier.weight(1f)
             )
         }
-        // TODO: [길 안내](보조 버튼, 오른쪽)는 P1(기획.md '길 안내 기능')이다.
-        //  NaviHelper.requestRoute(RouteInfo(...))로 보내고 "길 안내를 시작했어요"를 3초 띄운다
+        SecondaryButton(
+            text = stringResource(R.string.action_route),
+            onClick = onStartRoute,
+            modifier = Modifier.weight(1f)
+        )
     }
+}
+
+/** 길 안내로 도착했을 때 머리글 위에 두는 "도착했어요" 띠 */
+@Composable
+private fun ArrivedBand() {
+    val shape = RoundedCornerShape(AppDimens.CardRadius)
+    Text(
+        text = stringResource(R.string.detail_arrived),
+        style = AppType.BodyM,
+        color = AppColors.TextPrimary,
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(AppColors.Surface, shape)
+            .border(1.dp, AppColors.Outline, shape)
+            .padding(horizontal = AppDimens.SpaceM, vertical = AppDimens.SpaceS)
+    )
 }
 
 /** 불러오는 중: 움직이지 않는 회색 자리 (반복 애니메이션 금지) */

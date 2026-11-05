@@ -61,6 +61,11 @@
     <string name="detail_recent_trades">최근 거래</string>
     <string name="detail_floor">%1$d층</string>
     <string name="detail_no_trades">아직 거래 기록이 없어요</string>
+    <string name="detail_arrived">도착했어요</string>
+
+    <!-- 길 안내: 누른 뒤 앱 안에 3초 띄우는 한 줄 -->
+    <string name="route_started">길 안내를 시작했어요</string>
+    <string name="route_failed">길 안내를 시작하지 못했어요</string>
 
     <!-- 방향·거리 칩: 차가 향한 쪽 기준 8방향 -->
     <string name="direction_chip">%1$s · %2$s</string>
@@ -99,6 +104,7 @@
     <string name="action_alert_later">나중에 할게요</string>
     <string name="action_save">저장</string>
     <string name="action_saved">저장했어요</string>
+    <string name="action_route">길 안내</string>
     <string name="action_open_detail">단지 상세 보기</string>
     <string name="action_go_nearby">주변 단지 보기</string>
     <string name="action_set_alert">알림 조건 정하기</string>

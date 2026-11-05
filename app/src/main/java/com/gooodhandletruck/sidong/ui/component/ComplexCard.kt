@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
@@ -48,13 +50,15 @@ fun ComplexSummary.toCardModel(car: CarLocation) = ComplexCardModel(complex = th
  * 단지 카드 (S-03·S-05·S-06 공통): 사진 132×132, 이름(bodyL), 방향·거리 칩, 가격(titleS), 면적·기간·기준일(labelS).
  * 최근 거래가 없으면 가격 자리에 "최근 3개월 거래가 없어요"를 쓴다 (화면 설계서 S-03 '상태별 문구').
  * 1:2 창에서 오른쪽 칸에 상세를 연 카드는 [selected]로 강조색 테두리를 두른다.
+ * [trailing]은 카드 오른쪽 끝에 둘 버튼이다(S-05 [길 안내]).
  */
 @Composable
 fun ComplexCard(
     model: ComplexCardModel,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    selected: Boolean = false
+    selected: Boolean = false,
+    trailing: (@Composable () -> Unit)? = null
 ) {
     val shape = RoundedCornerShape(AppDimens.CardRadius)
     Row(
@@ -90,6 +94,9 @@ fun ComplexCard(
             )
             model.place?.let { DirectionChip(place = it) }
             PriceLines(price = model.complex.price)
+        }
+        if (trailing != null) {
+            Box(modifier = Modifier.align(Alignment.CenterVertically)) { trailing() }
         }
     }
 }

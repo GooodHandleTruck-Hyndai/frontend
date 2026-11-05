@@ -20,9 +20,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gooodhandletruck.sidong.R
+import com.gooodhandletruck.sidong.data.RouteTarget
+import com.gooodhandletruck.sidong.data.toRouteTarget
 import com.gooodhandletruck.sidong.ui.WindowLayout
 import com.gooodhandletruck.sidong.ui.component.ComplexCard
 import com.gooodhandletruck.sidong.ui.component.LoadingCards
+import com.gooodhandletruck.sidong.ui.component.SecondaryButton
 import com.gooodhandletruck.sidong.ui.component.StatusBox
 import com.gooodhandletruck.sidong.ui.theme.AppColors
 import com.gooodhandletruck.sidong.ui.theme.AppDimens
@@ -38,6 +41,7 @@ fun SavedRoute(
     locationGranted: Boolean,
     selectedComplexId: String?,
     onOpenComplex: (String) -> Unit,
+    onStartRoute: (RouteTarget) -> Unit,
     onGoNearby: () -> Unit
 ) {
     val viewModel: SavedViewModel = viewModel()
@@ -54,15 +58,17 @@ fun SavedRoute(
         state = state,
         selectedComplexId = selectedComplexId,
         onOpenComplex = onOpenComplex,
+        onStartRoute = onStartRoute,
         onGoNearby = onGoNearby,
         onRetry = viewModel::retry
     )
 }
 
 /**
- * S-05 저장한 단지. 머리글 "저장한 단지 · 8곳"과 저장한 순 단지 카드 목록이다. 카드를 누르면 S-04가 열린다.
+ * S-05 저장한 단지. 머리글 "저장한 단지 · 8곳"과 저장한 순 단지 카드 목록이다. 카드를 누르면 S-04가 열리고,
+ * 카드 오른쪽 끝 [길 안내]는 S-04를 거치지 않고 바로 길 안내를 시작한다.
  * 1:2 창에서는 왼쪽 640에 목록을 두고 오른쪽 칸에 상세를 연다.
- * TODO: 카드 오른쪽 끝 [길 안내](76×76)는 길 안내 기능(P1)을 만들 때 더한다. 정렬·필터도 P1이다
+ * TODO: 정렬(저장한 순·가까운 순·가격 순)과 유형 필터는 P1이다
  */
 @Composable
 fun SavedScreen(
@@ -70,6 +76,7 @@ fun SavedScreen(
     state: SavedUiState,
     selectedComplexId: String?,
     onOpenComplex: (String) -> Unit,
+    onStartRoute: (RouteTarget) -> Unit,
     onGoNearby: () -> Unit,
     onRetry: () -> Unit
 ) {
@@ -119,7 +126,15 @@ fun SavedScreen(
                         ComplexCard(
                             model = card,
                             onClick = { onOpenComplex(card.complex.complexId) },
-                            selected = card.complex.complexId == selectedComplexId
+                            selected = card.complex.complexId == selectedComplexId,
+                            trailing = {
+                                SecondaryButton(
+                                    text = stringResource(R.string.action_route),
+                                    onClick = { onStartRoute(card.complex.toRouteTarget()) },
+                                    height = AppDimens.TouchMin,
+                                    horizontalPadding = AppDimens.SpaceXs
+                                )
+                            }
                         )
                     }
                 }
