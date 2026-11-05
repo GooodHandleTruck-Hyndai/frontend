@@ -120,6 +120,20 @@ data class SavedComplex(
     val complex: ComplexSummary
 )
 
+/**
+ * 오늘 들은 단지 응답(S-06). 오늘 0시(+09:00)부터 주행 중에 들은 단지를 최근 것부터 준다.
+ * 같은 단지를 여러 번 들었으면 마지막으로 들은 시각 하나만 온다. 저장 목록과 같은 모양에 savedAt 대신 heardAt이다.
+ */
+@Serializable
+data class HeardResponse(val items: List<HeardComplex>)
+
+@Serializable
+data class HeardComplex(
+    @Serializable(with = OffsetDateTimeSerializer::class)
+    val heardAt: OffsetDateTime,
+    val complex: ComplexSummary
+)
+
 /** S-04가 처음 고를 평형: 서버가 정한 대표 평형. 목록에 없으면 최근 거래가 가장 많은 평형이다 */
 val ComplexDetail.defaultArea: AreaPrice?
     get() = areas.firstOrNull { it.areaM2 == defaultAreaM2 } ?: areas.maxByOrNull { it.tradeCount }

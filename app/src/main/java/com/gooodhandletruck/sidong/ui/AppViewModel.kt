@@ -40,9 +40,6 @@ import kotlinx.coroutines.withTimeoutOrNull
 /** [길 안내]를 누른 뒤 앱 안에 3초 띄우는 한 줄 */
 enum class RouteMessage { STARTED, FAILED }
 
-/** S-06 빈 화면이 쓰는 예시 단지 id(목업의 한빛마을 3단지). 그 화면을 만들면 지운다. */
-const val SAMPLE_COMPLEX_ID = "c-1001"
-
 /** 주행 중에 말한 단지. S-09에 이름을 보여 주고, [다시 듣기]는 [speech]를 다시 말한다 */
 data class SpokenComplex(
     val complexId: String,
@@ -152,8 +149,20 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
             val text = speechFor(complex, car.placeOf(complex.lat, complex.lon))
             _spoken.value = SpokenComplex(complex.complexId, complex.name, text, complex.saved)
             navigator.showAlert(complex.complexId)
-            speech.speak(text)
-            // TODO: 말한 단지를 HEARD로 남겨 S-06에 보여 준다(S-06을 만들 때)
+            if (speech.speak(text)) recordHeard(complex.complexId)
+        }
+    }
+
+    /** 말한 단지를 HEARD로 남겨 S-06 오늘 들은 단지에 보여 준다. 실패해도 주행 화면은 그대로 둔다 */
+    private fun recordHeard(complexId: String) {
+        viewModelScope.launch {
+            try {
+                repository.recordHeard(complexId)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w(TAG, "들은 기록을 남기지 못했어요", e)
+            }
         }
     }
 

@@ -3,7 +3,7 @@
 > GooodHandleTruck · 주행 중 운전자를 돕는 차량용 서비스
 
 Kotlin과 Jetpack Compose로 만든 플레오스 커넥트(Android Automotive) 앱이에요.
-지금은 S-01 시작하기, S-03 주변 단지(실제 위치 + 목업 단지), S-04 단지 상세, S-05 저장한 단지(목업)가 실제 화면이고, 나머지 5개는 **제목과 이동 버튼만 있는 빈 화면**으로 이어져 있어요.
+지금은 S-01 시작하기, S-03 주변 단지(실제 위치 + 목업 단지), S-04 단지 상세, S-05 저장한 단지, S-06 오늘 들은 단지, S-08·S-09 주행 중 화면이 실제 화면이에요. S-02 알림 조건과 S-07 설정은 아직 **제목과 이동 버튼만 있는 빈 화면**이에요.
 화면 구성과 이동 규칙은 [화면 설계서](https://claude.ai/artifact/UgMDDBgkDfK7rZVFKAaoQt)에 있어요.
 
 - 협업 규칙(브랜치, 커밋, PR): [CONTRIBUTING.md](CONTRIBUTING.md)
@@ -50,7 +50,7 @@ git clone https://github.com/GooodHandleTruck/<저장소이름>.git
    - 에뮬레이터를 오래 켜 두면 플레오스 위치 서비스가 멈춰서 "지금 위치를 확인하지 못했어요"가 뜨거나 옛 위치(미국)가 나올 수 있어요. 그때는 `adb shell am force-stop --user 10 ai.pleos.playground.service.location.fused` 로 위치 서비스를 다시 띄우고, 앱도 다시 실행해요.
 4. 에뮬레이터의 **⋯ (Extended controls) → Car data** 에서 기어를 D로 바꾸면 주행 화면(S-08)이 덮고, P로 돌리면 보던 화면으로 돌아와요.
    - 디버그 빌드에서는 `adb shell am start --user 10 -n com.gooodhandletruck.sidong/.MainActivity --ez debug_driving true` 로도 주행을 흉내 낼 수 있어요. 정차는 `false` 이고, 앱을 다시 켜면 차의 실제 값으로 돌아가요.
-   - S-08의 [주변 단지 듣기]를 누르면 차 앞쪽 180도 안에서 가장 가까운 단지를 소리로 말하고(플레오스 TextToSpeech) S-09로 바뀌어요. 정차하면 맨 위에 '방금 들은 단지' 띠가 떠요.
+   - S-08의 [주변 단지 듣기]를 누르면 차 앞쪽 180도 안에서 가장 가까운 단지를 소리로 말하고(플레오스 TextToSpeech) S-09로 바뀌어요. 정차하면 맨 위에 '방금 들은 단지' 띠가 뜨고, 기록 탭(S-06)에 오늘 들은 단지가 남아요.
 5. 단위 테스트(가격 표기, 거리·방향 계산, 다시 불러오는 기준, 화면 쌓기 규칙, 목업 JSON)는 `./gradlew test` 로 돌려요.
 
 ## 📁 폴더 구조

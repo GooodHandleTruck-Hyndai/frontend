@@ -2,6 +2,7 @@ package com.gooodhandletruck.sidong.data
 
 import com.gooodhandletruck.sidong.data.model.ComplexDetail
 import com.gooodhandletruck.sidong.data.model.ComplexSummary
+import com.gooodhandletruck.sidong.data.model.HeardResponse
 import com.gooodhandletruck.sidong.data.model.NearbyResponse
 import com.gooodhandletruck.sidong.data.model.SavedResponse
 
@@ -33,6 +34,15 @@ interface ComplexRepository {
      * TODO: 서버 형식이 아직 없다(API 검토 '고칠 것' 8번). 정해지면 요청·응답을 맞춘다
      */
     suspend fun brief(lat: Double, lon: Double, heading: Double): ComplexSummary?
+
+    /**
+     * 주행 중에 단지를 말했다는 기록(설계서의 HEARD). 주행 중에 불러도 되는 서버 호출이다.
+     * TODO: 서버 형식이 아직 없다(API 초안의 '주행 중 질의 기록'). 정해지면 요청을 맞춘다
+     */
+    suspend fun recordHeard(complexId: String)
+
+    /** 오늘 들은 단지(S-06, API 초안의 '주행 중 질의 목록'). 오늘 0시부터, 최근 것부터 온다 */
+    suspend fun heardToday(): HeardResponse
 
     companion object {
         /** S-03은 단지 카드를 최대 10개 보여 준다 */

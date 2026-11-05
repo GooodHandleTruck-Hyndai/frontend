@@ -34,7 +34,7 @@ import com.gooodhandletruck.sidong.ui.component.SecondaryButton
 import com.gooodhandletruck.sidong.ui.detail.ComplexDetailRoute
 import com.gooodhandletruck.sidong.ui.driving.DrivingAlertScreen
 import com.gooodhandletruck.sidong.ui.driving.DrivingIdleScreen
-import com.gooodhandletruck.sidong.ui.history.HistoryScreen
+import com.gooodhandletruck.sidong.ui.history.HistoryRoute
 import com.gooodhandletruck.sidong.ui.navigation.NavState
 import com.gooodhandletruck.sidong.ui.navigation.Screen
 import com.gooodhandletruck.sidong.ui.navigation.Tab
@@ -307,7 +307,15 @@ private fun ParkedScreen(
             onStartRoute = viewModel::startRoute,
             onGoNearby = { viewModel.selectTab(Tab.NEARBY) }
         )
-        Screen.History -> HistoryScreen(window = window, onOpenComplex = openComplex, onSetAlert = openAlertSetup)
+        Screen.History -> HistoryRoute(
+            window = window,
+            locationGranted = locationGranted,
+            // TODO: S-02 알림 조건을 만들면 저장한 조건으로 바꾼다. 지금은 주행 중 자동 알림이 늘 꺼져 있다
+            alertsOn = false,
+            selectedComplexId = selectedComplexId,
+            onOpenComplex = openComplex,
+            onSetAlert = openAlertSetup
+        )
         Screen.Settings -> SettingsScreen(window = window, onEditAlert = openAlertSetup)
     }
 }

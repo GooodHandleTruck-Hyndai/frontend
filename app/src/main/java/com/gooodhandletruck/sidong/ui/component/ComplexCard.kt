@@ -50,7 +50,7 @@ fun ComplexSummary.toCardModel(car: CarLocation) = ComplexCardModel(complex = th
  * 단지 카드 (S-03·S-05·S-06 공통): 사진 132×132, 이름(bodyL), 방향·거리 칩, 가격(titleS), 면적·기간·기준일(labelS).
  * 최근 거래가 없으면 가격 자리에 "최근 3개월 거래가 없어요"를 쓴다 (화면 설계서 S-03 '상태별 문구').
  * 1:2 창에서 오른쪽 칸에 상세를 연 카드는 [selected]로 강조색 테두리를 두른다.
- * [trailing]은 카드 오른쪽 끝에 둘 버튼이다(S-05 [길 안내]).
+ * [showSavedMark]면 저장한 단지에 "저장함" 칩을 붙인다(S-06). [trailing]은 카드 오른쪽 끝에 둘 버튼이다(S-05 [길 안내]).
  */
 @Composable
 fun ComplexCard(
@@ -58,6 +58,7 @@ fun ComplexCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     selected: Boolean = false,
+    showSavedMark: Boolean = false,
     trailing: (@Composable () -> Unit)? = null
 ) {
     val shape = RoundedCornerShape(AppDimens.CardRadius)
@@ -92,7 +93,13 @@ fun ComplexCard(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            model.place?.let { DirectionChip(place = it) }
+            val savedMark = showSavedMark && model.complex.saved
+            if (model.place != null || savedMark) {
+                Row(horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceXs)) {
+                    model.place?.let { DirectionChip(place = it) }
+                    if (savedMark) TagChip(text = stringResource(R.string.card_saved_mark), filled = false)
+                }
+            }
             PriceLines(price = model.complex.price)
         }
         if (trailing != null) {
