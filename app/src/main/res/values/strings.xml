@@ -78,8 +78,17 @@
     <string name="detail_trade_meta">거래 %1$d건 · %2$s 기준</string>
     <string name="detail_last_trade_label">마지막 거래 · %1$s</string>
     <string name="detail_no_recent_meta">최근 %1$d개월 거래가 없어요 · %2$s 기준</string>
-    <string name="detail_official_price">공시가격 %1$s</string>
+    <string name="official_price_chip">공시가격</string>
     <string name="detail_recent_trades">최근 거래</string>
+    <!-- 최근 거래 표의 칸 이름 -->
+    <string name="detail_col_date">계약일</string>
+    <string name="detail_col_floor">층</string>
+    <string name="detail_col_price">거래금액</string>
+    <!-- 자료 기준 카드 -->
+    <string name="detail_source_title">자료 기준</string>
+    <string name="detail_source_as_of">실거래가는 %1$s 기준이에요</string>
+    <string name="detail_source_delay">계약 뒤 30일 안에 신고돼서 최근 거래가 빠져 있을 수 있어요</string>
+    <string name="detail_source_official">공시가격은 올해 1월 1일 기준이에요</string>
     <string name="detail_floor">%1$d층</string>
     <string name="detail_no_trades">아직 거래 기록이 없어요</string>
     <string name="detail_arrived">도착했어요</string>

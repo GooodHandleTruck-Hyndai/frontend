@@ -32,9 +32,6 @@ object AppDimens {
     // S-03 약도: 좁은 창(1:1:1)에서는 목록 위 높이 480. 넓은 창(1:2)은 목록 옆 칸을 채운다
     val NarrowMapHeight = 480.dp
 
-    // S-04 단지 상세
-    val DetailPhotoHeight = 320.dp // 좁은 창(1:1:1)의 사진 높이. 넓은 창(1:2)은 16:9
-
     // 틀
     val HeaderHeight = 96.dp // 정차 중 화면 맨 위 머리글(로고·앱 이름·상태)
     val LogoSize = 56.dp
