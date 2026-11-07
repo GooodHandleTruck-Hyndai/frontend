@@ -1,8 +1,8 @@
 <resources>
-    <!-- 앱 이름을 바꿀지는 보류(화면 설계서 '정할 것' 5번) -->
-    <string name="app_name">시동</string>
-    <!-- 정차 중 화면 머리글의 앱 이름(시안과 같다). 앱 이름이 정해지면 같이 바꾼다 -->
-    <string name="brand_name">저 아파트 얼마야?</string>
+    <!-- 서비스 이름(2026-11-07 '집픽'으로 정함). 런처와 권한 창에 보인다 -->
+    <string name="app_name">집픽</string>
+    <!-- 정차 중 화면 머리글의 서비스 이름. app_name과 같게 둔다 -->
+    <string name="brand_name">집픽</string>
     <!-- 머리글 오른쪽 상태 알약 -->
     <string name="status_parked">정차 중</string>
 
