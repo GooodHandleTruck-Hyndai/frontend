@@ -93,7 +93,7 @@ fun SettingsScreen(
             ),
         verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceM)
     ) {
-        Text(text = stringResource(R.string.screen_settings), style = AppType.TitleS, color = AppColors.TextPrimary)
+        Text(text = stringResource(R.string.screen_settings), style = AppType.DisplayM, color = AppColors.TextPrimary)
 
         // 줄 전체를 눌러도 스위치가 바뀐다(누를 곳이 76 이상)
         SettingsCard(

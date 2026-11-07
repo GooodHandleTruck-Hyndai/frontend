@@ -111,11 +111,17 @@ fun AlertSetupScreen(
                 SecondaryButton(
                     text = stringResource(R.string.action_back),
                     onClick = onBack,
-                    height = AppDimens.TouchMin
+                    height = AppDimens.TouchMin,
+                    horizontalPadding = AppDimens.SpaceS,
+                    icon = R.drawable.ic_chevron_left
                 )
             }
             Column(verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)) {
-                Text(text = stringResource(R.string.alert_title), style = AppType.TitleM, color = AppColors.TextPrimary)
+                Text(
+                    text = stringResource(R.string.alert_title),
+                    style = AppType.DisplayM,
+                    color = AppColors.TextPrimary
+                )
                 Text(
                     text = stringResource(R.string.alert_description),
                     style = AppType.BodyM,
@@ -159,11 +165,11 @@ fun AlertSetupScreen(
                 modifier = Modifier.weight(1f),
                 enabled = draft.isComplete
             )
+            // [나중에 할게요]는 글자 너비만 쓰고 나머지를 주 버튼에 준다(좁은 창에서도 두 버튼 글자가 한 줄에 들어간다)
             if (isOnboarding) {
                 SecondaryButton(
                     text = stringResource(R.string.action_alert_later),
-                    onClick = onLater,
-                    modifier = Modifier.weight(1f)
+                    onClick = onLater
                 )
             }
         }
