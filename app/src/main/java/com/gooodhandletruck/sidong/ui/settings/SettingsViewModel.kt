@@ -2,14 +2,14 @@ package com.gooodhandletruck.sidong.ui.settings
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.gooodhandletruck.sidong.SidongApp
+import com.gooodhandletruck.sidong.ZippickApp
 import com.gooodhandletruck.sidong.data.AlertSettings
 import kotlinx.coroutines.flow.StateFlow
 
 /** S-07 설정. 주행 중 음성 알림 켜기·끄기와 주변 범위 기본값을 바로 저장한다 */
 class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
-    private val container = (app as SidongApp).container
+    private val container = (app as ZippickApp).container
     private val alertStore = container.alertSettingsRepository
     private val rangeStore = container.nearbyRangeStore
 

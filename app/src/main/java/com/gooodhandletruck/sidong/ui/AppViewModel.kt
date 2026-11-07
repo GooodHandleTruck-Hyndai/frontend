@@ -7,7 +7,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.gooodhandletruck.sidong.R
-import com.gooodhandletruck.sidong.SidongApp
+import com.gooodhandletruck.sidong.ZippickApp
 import com.gooodhandletruck.sidong.data.AlertSettings
 import com.gooodhandletruck.sidong.data.CarLocation
 import com.gooodhandletruck.sidong.data.DestinationEvent
@@ -62,7 +62,7 @@ data class SpokenComplex(
  */
 class AppViewModel(app: Application) : AndroidViewModel(app) {
 
-    private val container = (app as SidongApp).container
+    private val container = (app as ZippickApp).container
     private val repository = container.complexRepository
     private val locationRepository = container.locationRepository
     private val speech = container.speechRepository

@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Sidong"
+rootProject.name = "Zippick"
 include(":app")

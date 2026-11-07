@@ -1,4 +1,4 @@
-# 집픽: 플레오스 커넥트 차량 앱
+# 집픽 (Zippick): 플레오스 커넥트 차량 앱
 
 > GooodHandleTruck · 주행 중 운전자를 돕는 차량용 서비스
 
@@ -62,7 +62,7 @@ git clone https://github.com/GooodHandleTruck/<저장소이름>.git
 ```
 app/src/main/java/com/gooodhandletruck/sidong/
 ├── MainActivity.kt              앱 진입점 (Activity 하나)
-├── SidongApp.kt                 Application. 저장소를 담은 AppContainer를 들고 있음
+├── ZippickApp.kt                Application. 저장소를 담은 AppContainer를 들고 있음
 ├── ui/
 │   ├── AppRoot.kt               창 크기 판단, 주행·정차에 따라 화면 그리기, 1:2 창의 목록+상세 두 칸
 │   ├── AppViewModel.kt          화면 이동·주행 상태

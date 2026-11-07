@@ -4,7 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.gooodhandletruck.sidong.SidongApp
+import com.gooodhandletruck.sidong.ZippickApp
 import com.gooodhandletruck.sidong.data.CarLocation
 import com.gooodhandletruck.sidong.data.LocationState
 import com.gooodhandletruck.sidong.data.model.SavedComplex
@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
  */
 class SavedViewModel(app: Application) : AndroidViewModel(app) {
 
-    private val container = (app as SidongApp).container
+    private val container = (app as ZippickApp).container
     private val repository = container.complexRepository
     private val locationRepository = container.locationRepository
 

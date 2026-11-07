@@ -2,7 +2,7 @@ package com.gooodhandletruck.sidong.ui.onboarding
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.gooodhandletruck.sidong.SidongApp
+import com.gooodhandletruck.sidong.ZippickApp
 import com.gooodhandletruck.sidong.data.AlertConditions
 import com.gooodhandletruck.sidong.data.AreaRange
 import com.gooodhandletruck.sidong.data.ComplexType
@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.update
  */
 class AlertSetupViewModel(app: Application) : AndroidViewModel(app) {
 
-    private val store = (app as SidongApp).container.alertSettingsRepository
+    private val store = (app as ZippickApp).container.alertSettingsRepository
 
     private val _draft = MutableStateFlow(AlertConditions())
     val draft: StateFlow<AlertConditions> = _draft.asStateFlow()
