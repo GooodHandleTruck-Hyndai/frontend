@@ -41,7 +41,7 @@ import com.gooodhandletruck.sidong.data.model.Trade
 import com.gooodhandletruck.sidong.data.toRouteTarget
 import com.gooodhandletruck.sidong.ui.WindowLayout
 import com.gooodhandletruck.sidong.ui.component.ComplexPhoto
-import com.gooodhandletruck.sidong.ui.component.DirectionChip
+import com.gooodhandletruck.sidong.ui.component.DirectionLabel
 import com.gooodhandletruck.sidong.ui.component.PrimaryButton
 import com.gooodhandletruck.sidong.ui.component.SecondaryButton
 import com.gooodhandletruck.sidong.ui.component.SelectChip
@@ -183,7 +183,7 @@ private fun DetailHeader(detail: ComplexDetail?, place: RelativePlace?, closeLab
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceXs)) {
                     complexTypeName(detail.type)?.let { TagChip(text = it, filled = false) }
-                    place?.let { DirectionChip(place = it) }
+                    place?.let { DirectionLabel(place = it) }
                 }
             }
         }

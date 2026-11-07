@@ -80,7 +80,7 @@ fun SecondaryButton(
     )
 }
 
-/** 높이 96 이상이면 큰 글자(ButtonL)와 아이콘 32, 76짜리 작은 버튼이면 ButtonS와 아이콘 28을 쓴다 */
+/** 높이 96 이상이면 큰 글자(ButtonL)와 아이콘 32, 76짜리 작은 버튼이면 LabelBold와 아이콘 28을 쓴다 */
 @Composable
 private fun AppButton(
     text: String,
@@ -126,7 +126,7 @@ private fun AppButton(
             // 버튼이 좁아 글자가 넘치면 말줄임 대신 두 줄로 쓴다(높이 96에 두 줄이 들어간다)
             Text(
                 text = text,
-                style = if (large) AppType.ButtonL else AppType.ButtonS,
+                style = if (large) AppType.ButtonL else AppType.LabelBold,
                 textAlign = TextAlign.Center
             )
         }

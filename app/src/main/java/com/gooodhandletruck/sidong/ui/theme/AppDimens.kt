@@ -24,8 +24,9 @@ object AppDimens {
     val ButtonRadius = 24.dp // 버튼, 칩
 
     // 단지 카드
-    val CardPhotoSize = 132.dp // 카드 왼쪽 사진
-    val ThumbnailRadius = 16.dp // 카드 안 사진 모서리. 설계서에 따로 없어서 카드(28)보다 작게 둔다
+    val BadgeSize = 72.dp // S-03 카드 왼쪽 번호 배지(약도 번호와 같다)
+    val TimeColumnWidth = 88.dp // S-06 카드 왼쪽 들은 시각 칸
+    val CardPlaceholderHeight = 208.dp // 불러오는 중 회색 카드. 방향·거리 줄이 있는 카드 높이와 같다
     val SelectedBorder = 3.dp // 1:2 창에서 상세를 연 카드의 강조색 테두리
 
     // S-03 약도: 좁은 창(1:1:1)에서는 목록 위 높이 480. 넓은 창(1:2)은 목록 옆 칸을 채운다

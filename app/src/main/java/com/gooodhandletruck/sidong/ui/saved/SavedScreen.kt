@@ -107,7 +107,7 @@ fun SavedScreen(
             } else {
                 stringResource(R.string.screen_saved)
             },
-            style = AppType.TitleS,
+            style = AppType.DisplayM,
             color = AppColors.TextPrimary
         )
         if (content is SavedContent.Loaded && content.cards.size > 1) {
@@ -149,7 +149,8 @@ fun SavedScreen(
                                     text = stringResource(R.string.action_route),
                                     onClick = { onStartRoute(card.complex.toRouteTarget()) },
                                     height = AppDimens.TouchMin,
-                                    horizontalPadding = AppDimens.SpaceXs
+                                    horizontalPadding = AppDimens.SpaceS,
+                                    icon = R.drawable.ic_route
                                 )
                             }
                         )

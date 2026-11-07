@@ -4,8 +4,10 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,8 +27,8 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
@@ -51,14 +53,17 @@ private val RING_METERS = listOf(500, 1000, 3000)
 
 private val CAR_SIZE = 28.dp
 private val DOT_SIZE = 8.dp
-private val BUBBLE_HEIGHT = 40.dp
-private val BUBBLE_GAP = 4.dp
+private val PIN_HEIGHT = 48.dp
+private val PIN_NUMBER_SIZE = 32.dp
+private val PIN_BORDER = 2.dp
+private val PIN_GAP = 4.dp
 
 /**
  * S-03 약도. 지도 타일 없이 앱이 직접 그린다(구글 지도를 쓰지 않는다).
- * 차가 향한 쪽이 위이고, 차를 가운데 두고 거리 원을 그리며 단지마다 가격 말풍선("12.3억")을 띄운다.
- * 말풍선을 누르면 S-04가 열리고, 목록에서 고른 단지([selectedComplexId])는 말풍선이 강조색이다.
- * 최근 3개월 평균이 없는 단지는 말풍선에 "-"를 흐리게 쓴다.
+ * 차가 향한 쪽이 위이고, 차를 가운데 두고 거리 원을 그리며 단지마다 [번호 + 가격] 핀("① 12.3억")을 띄운다.
+ * 번호는 [cards] 순서이고 목록 카드의 번호 배지와 같다(시안 D-02). 그래서 목록과 같은 정렬로 넘긴다.
+ * 핀을 누르면 S-04가 열리고, 목록에서 고른 단지([selectedComplexId])는 핀이 강조색이다.
+ * 최근 3개월 평균이 없는 단지는 핀에 "-"를 흐리게 쓴다.
  */
 @Composable
 fun NearbyMap(
@@ -73,7 +78,7 @@ fun NearbyMap(
     BoxWithConstraints(
         modifier = modifier
             .clip(shape)
-            .background(AppColors.Surface)
+            .background(AppColors.Background)
             .border(1.dp, AppColors.Outline, shape)
     ) {
         // 화면 가운데에서 짧은 쪽 끝까지가 고른 범위의 EXTENT_FACTOR배다
@@ -84,7 +89,7 @@ fun NearbyMap(
         MapBackground(rings = rings, dpPerMeter = dpPerMeter)
         rings.forEach { meters -> RingLabel(meters = meters, offsetX = -(meters * dpPerMeter).dp) }
 
-        cards.forEach { card ->
+        cards.forEachIndexed { index, card ->
             val complex = card.complex
             val relative = Math.toRadians(
                 bearingDegrees(center.lat, center.lon, complex.lat, complex.lon) - center.heading
@@ -94,7 +99,8 @@ fun NearbyMap(
             val y = (-cos(relative) * distance).dp
             // 약도 밖으로 나가는 단지는 그리지 않는다
             if (abs(x.value) <= maxWidth.value / 2 && abs(y.value) <= maxHeight.value / 2) {
-                PriceBubble(
+                MapPin(
+                    number = index + 1,
                     card = card,
                     selected = complex.complexId == selectedComplexId,
                     anchorX = maxWidth / 2 + x,
@@ -170,15 +176,21 @@ private fun RingLabel(meters: Int, offsetX: Dp) {
 }
 
 /**
- * 단지 하나의 가격 말풍선. 단지 자리([anchorX], [anchorY])에 점을 찍고 그 바로 위에 말풍선을 둔다.
- * 누를 곳은 말풍선을 가운데 둔 76×76 이상이다.
+ * 단지 하나의 핀. 단지 자리([anchorX], [anchorY])에 점을 찍고 그 바로 위에 [번호 + 가격] 알약을 둔다.
+ * 고르지 않은 핀은 흰 알약에 강조색 번호, 고른 핀은 강조색 알약에 흰 번호다. 누를 곳은 알약을 가운데 둔 76×76 이상이다.
  */
 @Composable
-private fun PriceBubble(card: ComplexCardModel, selected: Boolean, anchorX: Dp, anchorY: Dp, onClick: () -> Unit) {
+private fun MapPin(
+    number: Int,
+    card: ComplexCardModel,
+    selected: Boolean,
+    anchorX: Dp,
+    anchorY: Dp,
+    onClick: () -> Unit
+) {
     val average = card.complex.price?.avgPriceManwon
     val label = average?.let(::formatPriceShort) ?: stringResource(R.string.map_no_average)
-    val description = stringResource(R.string.map_bubble_description, card.complex.name, label)
-    val bubbleShape = RoundedCornerShape(AppDimens.ButtonRadius)
+    val description = stringResource(R.string.map_pin_description, number, card.complex.name, label)
 
     Box(
         modifier = Modifier
@@ -189,21 +201,35 @@ private fun PriceBubble(card: ComplexCardModel, selected: Boolean, anchorX: Dp, 
     )
     Box(
         modifier = Modifier
-            .placeCenterAt(anchorX, anchorY - DOT_SIZE / 2 - BUBBLE_GAP - BUBBLE_HEIGHT / 2)
+            .placeCenterAt(anchorX, anchorY - DOT_SIZE / 2 - PIN_GAP - PIN_HEIGHT / 2)
             .sizeIn(minWidth = AppDimens.TouchMin, minHeight = AppDimens.TouchMin)
             .clickable(role = Role.Button, onClick = onClick)
-            .semantics { contentDescription = description },
+            .clearAndSetSemantics { contentDescription = description },
         contentAlignment = Alignment.Center
     ) {
-        Box(
+        Row(
             modifier = Modifier
-                .height(BUBBLE_HEIGHT)
-                .clip(bubbleShape)
+                .height(PIN_HEIGHT)
+                .clip(CircleShape)
                 .background(if (selected) AppColors.Accent else AppColors.Surface)
-                .border(1.dp, if (selected) AppColors.Accent else AppColors.Outline, bubbleShape)
-                .padding(horizontal = AppDimens.SpaceS),
-            contentAlignment = Alignment.Center
+                .border(PIN_BORDER, if (selected) AppColors.Accent else AppColors.AccentLine, CircleShape)
+                .padding(start = AppDimens.SpaceXs, end = AppDimens.SpaceS),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceXs)
         ) {
+            Box(
+                modifier = Modifier
+                    .size(PIN_NUMBER_SIZE)
+                    .clip(CircleShape)
+                    .background(if (selected) AppColors.OnAccent else AppColors.Accent),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = number.toString(),
+                    style = AppType.LabelBold,
+                    color = if (selected) AppColors.Accent else AppColors.OnAccent
+                )
+            }
             Text(
                 text = label,
                 style = AppType.LabelS,

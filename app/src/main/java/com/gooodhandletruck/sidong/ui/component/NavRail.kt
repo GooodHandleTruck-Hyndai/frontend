@@ -72,7 +72,7 @@ private fun RailItem(tab: Tab, selected: Boolean, onClick: () -> Unit) {
         )
         Text(
             text = stringResource(tab.label),
-            style = if (selected) AppType.ButtonS else AppType.LabelL,
+            style = if (selected) AppType.LabelBold else AppType.LabelL,
             color = color
         )
     }

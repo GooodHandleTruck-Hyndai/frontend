@@ -52,9 +52,11 @@ object AppType {
     val DisplayM = textStyle(36, 44, FontWeight.ExtraBold) // 화면 제목, 카드 가격
     val DisplayS = textStyle(32, 40, FontWeight.ExtraBold) // 거래 표 가격, 번호 배지
 
-    // 버튼 글자: 높이 96 이상이면 ButtonL, 76짜리 작은 버튼은 ButtonS
+    // 높이 96 이상 버튼의 글자
     val ButtonL = textStyle(30, 38, FontWeight.Bold)
-    val ButtonS = textStyle(24, 28, FontWeight.Bold)
+
+    // labelL을 굵게(700): 76짜리 작은 버튼, 고른 탭 이름, 방향·거리 줄
+    val LabelBold = textStyle(24, 28, FontWeight.Bold)
 }
 
 /**

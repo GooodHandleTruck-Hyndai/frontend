@@ -21,6 +21,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gooodhandletruck.sidong.R
 import com.gooodhandletruck.sidong.ui.WindowLayout
+import com.gooodhandletruck.sidong.ui.component.CardTime
 import com.gooodhandletruck.sidong.ui.component.ComplexCard
 import com.gooodhandletruck.sidong.ui.component.LoadingCards
 import com.gooodhandletruck.sidong.ui.component.StatusBox
@@ -64,7 +65,8 @@ fun HistoryRoute(
 }
 
 /**
- * S-06 오늘 들은 단지. 오늘 0시부터 주행 중에 소리로 들은 단지를 최근 것부터, 들은 시각("14:32")과 함께 보여 준다.
+ * S-06 오늘 들은 단지. 오늘 0시부터 주행 중에 소리로 들은 단지를 최근 것부터 보여 주고,
+ * 카드 왼쪽 칸에 들은 시각("14:32")을 써서 하루 기록처럼 읽히게 한다(시안 D-05).
  * 저장한 단지는 카드에 "저장함"을 붙인다. 카드를 누르면 S-04가 열린다.
  * 빈 목록은 알림이 켜져 있으면 안내 한 줄만, 꺼져 있으면 [알림 조건 정하기](S-02)를 함께 보여 준다.
  */
@@ -96,7 +98,7 @@ fun HistoryScreen(
             } else {
                 stringResource(R.string.screen_history)
             },
-            style = AppType.TitleS,
+            style = AppType.DisplayM,
             color = AppColors.TextPrimary
         )
         when (content) {
@@ -123,15 +125,13 @@ fun HistoryScreen(
                     contentPadding = PaddingValues(bottom = AppDimens.ContentPaddingVertical)
                 ) {
                     items(content.rows, key = { it.card.complex.complexId }) { row ->
-                        Column(verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceXs)) {
-                            Text(text = row.time, style = AppType.LabelL, color = AppColors.TextSecondary)
-                            ComplexCard(
-                                model = row.card,
-                                onClick = { onOpenComplex(row.card.complex.complexId) },
-                                selected = row.card.complex.complexId == selectedComplexId,
-                                showSavedMark = true
-                            )
-                        }
+                        ComplexCard(
+                            model = row.card,
+                            onClick = { onOpenComplex(row.card.complex.complexId) },
+                            selected = row.card.complex.complexId == selectedComplexId,
+                            showSavedMark = true,
+                            leading = { CardTime(time = row.time) }
+                        )
                     }
                 }
             }

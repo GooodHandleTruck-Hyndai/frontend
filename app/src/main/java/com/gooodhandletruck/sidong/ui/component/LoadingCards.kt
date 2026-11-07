@@ -31,7 +31,7 @@ fun LoadingCards(modifier: Modifier = Modifier, message: String? = null) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(AppDimens.CardPhotoSize + AppDimens.SpaceM * 2)
+                    .height(AppDimens.CardPlaceholderHeight)
                     .clip(RoundedCornerShape(AppDimens.CardRadius))
                     .background(AppColors.ButtonSecondary)
             )
