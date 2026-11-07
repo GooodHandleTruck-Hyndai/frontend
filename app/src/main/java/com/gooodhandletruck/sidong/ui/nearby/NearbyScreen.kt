@@ -96,7 +96,7 @@ fun NearbyMapPane(window: WindowLayout, onOpenComplex: (String) -> Unit) {
             .fillMaxSize()
             .padding(
                 end = window.contentPadding,
-                top = AppDimens.ContentPaddingVertical,
+                top = AppDimens.ContentPaddingTop,
                 bottom = AppDimens.ContentPaddingVertical
             )
     )
@@ -130,7 +130,7 @@ fun NearbyScreen(
             .padding(
                 start = window.contentPadding,
                 end = window.contentPadding,
-                top = AppDimens.ContentPaddingVertical
+                top = AppDimens.ContentPaddingTop
             ),
         verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceM)
     ) {

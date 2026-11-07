@@ -25,7 +25,8 @@ val AstaSans = FontFamily(
     astaSans(FontWeight.Normal),
     astaSans(FontWeight.Medium),
     astaSans(FontWeight.SemiBold),
-    astaSans(FontWeight.Bold)
+    astaSans(FontWeight.Bold),
+    astaSans(FontWeight.ExtraBold)
 )
 
 private fun textStyle(size: Int, lineHeight: Int, weight: FontWeight) = TextStyle(
@@ -43,8 +44,17 @@ object AppType {
     val BodyL = textStyle(30, 38, FontWeight.SemiBold) // 카드 단지 이름
     val BodyM = textStyle(28, 36, FontWeight.Normal) // 본문, 거래 내역
     val BodyS = textStyle(26, 34, FontWeight.Normal) // 주소, 설명
-    val LabelL = textStyle(24, 28, FontWeight.SemiBold) // 버튼, 칩, 탭 이름, 방향·거리
+    val LabelL = textStyle(24, 28, FontWeight.SemiBold) // 칩, 탭 이름, 방향·거리
     val LabelS = textStyle(20, 24, FontWeight.Medium) // 기준일, 캡션, 약도 말풍선
+
+    // 시안(데모 화면)처럼 이름과 가격을 더 굵게(800) 쓰는 글자. 크기·줄높이는 위 8단계에서 고른다
+    val DisplayL = textStyle(40, 52, FontWeight.ExtraBold) // 주행 중 단지 이름, 상세 단지 이름·대표 가격
+    val DisplayM = textStyle(36, 44, FontWeight.ExtraBold) // 화면 제목, 카드 가격
+    val DisplayS = textStyle(32, 40, FontWeight.ExtraBold) // 거래 표 가격, 번호 배지
+
+    // 버튼 글자: 높이 96 이상이면 ButtonL, 76짜리 작은 버튼은 ButtonS
+    val ButtonL = textStyle(30, 38, FontWeight.Bold)
+    val ButtonS = textStyle(24, 28, FontWeight.Bold)
 }
 
 /**

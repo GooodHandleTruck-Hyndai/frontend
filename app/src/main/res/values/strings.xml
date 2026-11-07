@@ -1,6 +1,10 @@
 <resources>
     <!-- 앱 이름을 바꿀지는 보류(화면 설계서 '정할 것' 5번) -->
     <string name="app_name">시동</string>
+    <!-- 정차 중 화면 머리글의 앱 이름(시안과 같다). 앱 이름이 정해지면 같이 바꾼다 -->
+    <string name="brand_name">저 아파트 얼마야?</string>
+    <!-- 머리글 오른쪽 상태 알약 -->
+    <string name="status_parked">정차 중</string>
 
     <!-- 왼쪽 탭 -->
     <string name="tab_nearby">주변</string>
@@ -157,5 +161,5 @@
     <string name="action_close">닫기</string>
 
     <!-- 정차하면 맨 위에 띄우는 띠 -->
-    <string name="banner_heard">방금 들은 단지 · %1$s</string>
+    <string name="banner_heard_label">방금 들은 단지</string>
 </resources>

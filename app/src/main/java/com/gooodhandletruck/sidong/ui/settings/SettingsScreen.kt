@@ -85,7 +85,12 @@ fun SettingsScreen(
             .fillMaxHeight()
             .widthIn(max = CONTENT_MAX_WIDTH + window.contentPadding * 2)
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = window.contentPadding, vertical = AppDimens.ContentPaddingVertical),
+            .padding(
+                start = window.contentPadding,
+                end = window.contentPadding,
+                top = AppDimens.ContentPaddingTop,
+                bottom = AppDimens.ContentPaddingVertical
+            ),
         verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceM)
     ) {
         Text(text = stringResource(R.string.screen_settings), style = AppType.TitleS, color = AppColors.TextPrimary)

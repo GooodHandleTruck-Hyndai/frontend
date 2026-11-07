@@ -86,7 +86,7 @@ fun HistoryScreen(
             .padding(
                 start = window.contentPadding,
                 end = window.contentPadding,
-                top = AppDimens.ContentPaddingVertical
+                top = AppDimens.ContentPaddingTop
             ),
         verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceM)
     ) {

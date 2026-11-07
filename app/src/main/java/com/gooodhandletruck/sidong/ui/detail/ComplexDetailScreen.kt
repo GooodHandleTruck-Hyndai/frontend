@@ -126,7 +126,7 @@ fun ComplexDetailScreen(
                 // 옆 칸이면 목록 칸의 오른쪽 여백이 두 칸 사이를 띄운다
                 start = if (isSidePane) 0.dp else window.contentPadding,
                 end = window.contentPadding,
-                top = AppDimens.ContentPaddingVertical,
+                top = AppDimens.ContentPaddingTop,
                 bottom = AppDimens.ContentPaddingVertical
             ),
         verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceM)

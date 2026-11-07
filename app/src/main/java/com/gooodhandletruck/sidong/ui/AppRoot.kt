@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,6 +24,7 @@ import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -29,6 +32,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gooodhandletruck.sidong.R
+import com.gooodhandletruck.sidong.ui.component.AppHeader
+import com.gooodhandletruck.sidong.ui.component.IconBadge
 import com.gooodhandletruck.sidong.ui.component.NavRail
 import com.gooodhandletruck.sidong.ui.component.SecondaryButton
 import com.gooodhandletruck.sidong.ui.detail.ComplexDetailRoute
@@ -105,65 +110,100 @@ fun AppRoot(viewModel: AppViewModel) {
 private fun ParkedContent(nav: NavState, window: WindowLayout, viewModel: AppViewModel) {
     // 화면마다 스크롤 위치 같은 상태를 따로 기억한다. 상세를 닫고 돌아오면 목록이 보던 자리에 그대로 있다
     val stateHolder = rememberSaveableStateHolder()
-    Row(modifier = Modifier.fillMaxSize()) {
-        // 첫 실행(S-01·S-02) 중에는 탭을 숨긴다
-        nav.selectedTab?.let { tab -> NavRail(selected = tab, onSelect = viewModel::selectTab) }
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-        ) {
-            nav.heardBannerComplexId?.let { complexId ->
-                val spoken by viewModel.spoken.collectAsStateWithLifecycle()
-                HeardBanner(
-                    name = spoken?.takeIf { it.complexId == complexId }?.name ?: complexId,
-                    window = window,
-                    onOpen = viewModel::openHeardComplex,
-                    onDismiss = viewModel::dismissHeardBanner
-                )
-            }
-            Box(modifier = Modifier.weight(1f)) {
-                val panes = if (window.isWide) nav.widePanes() else null
-                if (panes != null) {
-                    WidePanesContent(panes, window, viewModel, stateHolder)
-                } else {
-                    val screen = nav.backStack.last()
-                    val onBack = if (nav.canGoBack) viewModel::back else null
-                    // 상세는 상태를 기억하지 않는다. 다시 열면 맨 위부터 보인다
-                    if (screen is Screen.ComplexDetail) {
-                        ParkedScreen(screen, window, viewModel, selectedComplexId = null, onBack = onBack)
-                    } else {
-                        stateHolder.SaveableStateProvider(screen.stateKey) {
-                            ParkedScreen(screen, window, viewModel, selectedComplexId = null, onBack = onBack)
-                        }
-                    }
+    // 첫 실행(S-01·S-02) 중에는 탭을 숨긴다
+    val tab = nav.selectedTab
+    Column(modifier = Modifier.fillMaxSize()) {
+        AppHeader(
+            // 탭이 있으면 로고를 탭 가운데에, 없으면 본문 왼쪽 여백에 맞춘다
+            startPadding = if (tab != null) (AppDimens.RailWidth - AppDimens.LogoSize) / 2 else window.contentPadding,
+            endPadding = window.contentPadding
+        )
+        Row(modifier = Modifier.weight(1f)) {
+            tab?.let { NavRail(selected = it, onSelect = viewModel::selectTab) }
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+            ) {
+                nav.heardBannerComplexId?.let { complexId ->
+                    val spoken by viewModel.spoken.collectAsStateWithLifecycle()
+                    HeardBanner(
+                        name = spoken?.takeIf { it.complexId == complexId }?.name ?: complexId,
+                        window = window,
+                        onOpen = viewModel::openHeardComplex,
+                        onDismiss = viewModel::dismissHeardBanner
+                    )
                 }
-                val routeMessage by viewModel.routeMessage.collectAsStateWithLifecycle()
-                routeMessage?.let { RouteMessageBand(it, Modifier.align(Alignment.BottomCenter)) }
+                Box(modifier = Modifier.weight(1f)) {
+                    ParkedPanes(nav, window, viewModel, stateHolder)
+                    val routeMessage by viewModel.routeMessage.collectAsStateWithLifecycle()
+                    routeMessage?.let { RouteMessageBand(it, Modifier.align(Alignment.BottomCenter)) }
+                }
             }
         }
     }
 }
 
-/** [길 안내]를 누른 뒤 3초 동안 창 아래에 띄우는 한 줄. 전체 화면 팝업은 쓰지 않는다 */
+/** 1:2 창이면 두 칸으로, 1:1:1 창이면 백스택 맨 위 화면 하나를 그린다 */
+@Composable
+private fun ParkedPanes(
+    nav: NavState,
+    window: WindowLayout,
+    viewModel: AppViewModel,
+    stateHolder: SaveableStateHolder
+) {
+    val panes = if (window.isWide) nav.widePanes() else null
+    if (panes != null) {
+        WidePanesContent(panes, window, viewModel, stateHolder)
+        return
+    }
+    val screen = nav.backStack.last()
+    val onBack = if (nav.canGoBack) viewModel::back else null
+    // 상세는 상태를 기억하지 않는다. 다시 열면 맨 위부터 보인다
+    if (screen is Screen.ComplexDetail) {
+        ParkedScreen(screen, window, viewModel, selectedComplexId = null, onBack = onBack)
+    } else {
+        stateHolder.SaveableStateProvider(screen.stateKey) {
+            ParkedScreen(screen, window, viewModel, selectedComplexId = null, onBack = onBack)
+        }
+    }
+}
+
+/**
+ * [길 안내]를 누른 뒤 3초 동안 창 아래에 띄우는 한 줄. 전체 화면 팝업은 쓰지 않는다.
+ * 시작했으면 강조색 길 안내 아이콘을 앞에 붙인다.
+ */
 @Composable
 private fun RouteMessageBand(message: RouteMessage, modifier: Modifier = Modifier) {
     val shape = RoundedCornerShape(AppDimens.CardRadius)
-    Text(
-        text = stringResource(
-            when (message) {
-                RouteMessage.STARTED -> R.string.route_started
-                RouteMessage.FAILED -> R.string.route_failed
-            }
-        ),
-        style = AppType.BodyM,
-        color = AppColors.TextPrimary,
+    Row(
         modifier = modifier
             .padding(bottom = AppDimens.ContentPaddingVertical)
             .background(AppColors.Surface, shape)
             .border(1.dp, AppColors.Outline, shape)
-            .padding(horizontal = AppDimens.SpaceL, vertical = AppDimens.SpaceS)
-    )
+            .padding(horizontal = AppDimens.SpaceL, vertical = AppDimens.SpaceS),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)
+    ) {
+        if (message == RouteMessage.STARTED) {
+            Icon(
+                painter = painterResource(R.drawable.ic_route),
+                contentDescription = null,
+                tint = AppColors.Accent,
+                modifier = Modifier.size(AppDimens.IconL)
+            )
+        }
+        Text(
+            text = stringResource(
+                when (message) {
+                    RouteMessage.STARTED -> R.string.route_started
+                    RouteMessage.FAILED -> R.string.route_failed
+                }
+            ),
+            style = AppType.BodyM,
+            color = AppColors.TextPrimary
+        )
+    }
 }
 
 /**
@@ -216,15 +256,17 @@ private fun WidePanesContent(
     }
 }
 
-/** 1:2 창에서 S-05·S-06 목록 옆 칸이 비어 있을 때의 안내 */
+/** 1:2 창에서 S-05·S-06 목록 옆 칸이 비어 있을 때의 안내: 옅은 강조색 동그라미 안 건물 그림과 한 줄 */
 @Composable
 private fun DetailPaneHint(window: WindowLayout) {
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(end = window.contentPadding),
-        contentAlignment = Alignment.Center
+        verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceM, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        IconBadge(icon = R.drawable.ic_app_logo, size = AppDimens.TouchMin * 2, filled = false)
         Text(
             text = stringResource(R.string.detail_pane_hint),
             style = AppType.BodyM,
@@ -326,30 +368,38 @@ private fun ParkedScreen(
     }
 }
 
-/** 정차하면 맨 위에 띄우는 '방금 들은 단지' 띠. [보기]는 S-04를 열고, [닫기]는 띠를 지운다. */
+/**
+ * 정차하면 맨 위에 띄우는 '방금 들은 단지' 띠. [보기]는 S-04를 열고, [닫기]는 띠를 지운다.
+ * 시안처럼 흰 카드에 옅은 강조색 테두리(3)를 두르고, 앞에 소리 아이콘을 둔다.
+ */
 @Composable
 private fun HeardBanner(name: String, window: WindowLayout, onOpen: () -> Unit, onDismiss: () -> Unit) {
     val shape = RoundedCornerShape(AppDimens.CardRadius)
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = window.contentPadding, end = window.contentPadding, top = AppDimens.SpaceM)
+            .padding(start = window.contentPadding, end = window.contentPadding, bottom = AppDimens.SpaceXs)
             .background(AppColors.Surface, shape)
-            .border(1.dp, AppColors.Outline, shape)
+            .border(AppDimens.HighlightBorder, AppColors.AccentLine, shape)
             .padding(AppDimens.SpaceS),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)
     ) {
-        Text(
-            text = stringResource(R.string.banner_heard, name),
-            style = AppType.BodyM,
-            color = AppColors.TextPrimary,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = AppDimens.SpaceS)
-        )
+        IconBadge(icon = R.drawable.ic_speaker)
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(R.string.banner_heard_label),
+                style = AppType.LabelL,
+                color = AppColors.TextTertiary
+            )
+            Text(
+                text = name,
+                style = AppType.TitleS,
+                color = AppColors.TextPrimary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
         SecondaryButton(text = stringResource(R.string.action_view), onClick = onOpen, height = AppDimens.TouchMin)
         SecondaryButton(text = stringResource(R.string.action_close), onClick = onDismiss, height = AppDimens.TouchMin)
     }

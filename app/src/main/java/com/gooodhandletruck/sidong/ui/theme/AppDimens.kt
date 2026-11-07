@@ -26,7 +26,7 @@ object AppDimens {
     // 단지 카드
     val CardPhotoSize = 132.dp // 카드 왼쪽 사진
     val ThumbnailRadius = 16.dp // 카드 안 사진 모서리. 설계서에 따로 없어서 카드(28)보다 작게 둔다
-    val SelectedBorder = 2.dp // 1:2 창에서 상세를 연 카드의 강조색 테두리
+    val SelectedBorder = 3.dp // 1:2 창에서 상세를 연 카드의 강조색 테두리
 
     // S-03 약도: 좁은 창(1:1:1)에서는 목록 위 높이 480. 넓은 창(1:2)은 목록 옆 칸을 채운다
     val NarrowMapHeight = 480.dp
@@ -35,10 +35,19 @@ object AppDimens {
     val DetailPhotoHeight = 320.dp // 좁은 창(1:1:1)의 사진 높이. 넓은 창(1:2)은 16:9
 
     // 틀
+    val HeaderHeight = 96.dp // 정차 중 화면 맨 위 머리글(로고·앱 이름·상태)
+    val LogoSize = 56.dp
+    val LogoRadius = 16.dp
     val RailWidth = 136.dp // 왼쪽 탭
     val RailIconSize = 40.dp
     val ListPaneWidth = 640.dp // 넓은 창의 목록 칸
     val ContentPaddingWide = 40.dp // 넓은 창 본문 좌우 여백
     val ContentPaddingNarrow = 32.dp // 좁은 창 본문 좌우 여백
-    val ContentPaddingVertical = 32.dp // 본문 위아래 여백
+    val ContentPaddingTop = 16.dp // 머리글 아래 본문 위 여백
+    val ContentPaddingVertical = 32.dp // 본문 아래 여백, 머리글이 없는 주행 화면의 위아래 여백
+
+    // 아이콘
+    val IconL = 32.dp // 큰 버튼 안, 상태 줄
+    val IconS = 28.dp // 작은 버튼 안, 방향·거리 줄
+    val HighlightBorder = 3.dp // 눈에 띄게 할 카드의 테두리(AccentLine)
 }
