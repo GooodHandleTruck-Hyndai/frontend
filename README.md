@@ -7,7 +7,7 @@ Kotlin과 Jetpack Compose로 만든 플레오스 커넥트(Android Automotive) �
 화면 구성과 이동 규칙은 [화면 설계서](https://claude.ai/artifact/UgMDDBgkDfK7rZVFKAaoQt)에 있어요.
 
 - 협업 규칙(브랜치, 커밋, PR): [CONTRIBUTING.md](CONTRIBUTING.md)
-- 패키지: `com.gooodhandletruck.sidong`
+- 패키지: `com.gooodhandletruck.zippick`
 
 ---
 
@@ -40,7 +40,7 @@ git clone https://github.com/GooodHandleTruck/<저장소이름>.git
 1. Android Studio → **Open** → 클론한 폴더를 선택하고, Gradle Sync 가 끝날 때까지 기다려요.
 2. 기기 목록에서 플레오스 AVD 를 고르고 ▶ **Run** 을 눌러요.
 3. 첫 화면(S-01 시작하기)에서 [위치 권한 허용하고 시작하기]를 누르면 위치 권한 창이 떠요. 허용하든 거부하든 S-02 알림 조건을 거쳐 S-03 주변 단지로 가고, 그다음부터는 S-03에서 시작해요.
-   - 첫 실행부터 다시 보려면 `adb shell pm clear --user 10 com.gooodhandletruck.sidong` 을 실행해요. 플레오스 에뮬레이터에서는 앱이 사용자 10으로 돌아요.
+   - 첫 실행부터 다시 보려면 `adb shell pm clear --user 10 com.gooodhandletruck.zippick` 을 실행해요. 플레오스 에뮬레이터에서는 앱이 사용자 10으로 돌아요.
    - S-03은 차 위치(플레오스 FusedLocation)를 받아 `app/src/main/assets/mock/complexes_nearby.json` 의 가상 단지를 보여 줘요. 가상 단지는 강남역 둘레에 있으니 `adb emu geo fix 127.0276 37.4979` 로 에뮬레이터 위치를 옮겨요(경도가 먼저). 50m 넘게 옮기면 목록을 다시 불러와요.
    - 에뮬레이터는 차 방향(heading)을 늘 0(북쪽)으로 줘요. 그래서 방향 칩은 차가 북쪽을 본다고 보고 나와요.
    - S-03 약도는 차가 향한 쪽이 위이고, 단지마다 가격 말풍선("12.3억")이 떠요. 1:2 창에서는 목록 옆 칸, 1:1:1 창에서는 목록 맨 위에 있어요. 말풍선을 눌러도 S-04가 열려요.
@@ -52,7 +52,7 @@ git clone https://github.com/GooodHandleTruck/<저장소이름>.git
    - 1:1:1 창은 앱 창 오른쪽 끝의 ⋮ 손잡이를 왼쪽으로 끌면 나와요(앱 창 841×1210dp). 손잡이를 화면 끝까지 끌어 되돌리면 시스템 화면이 앱 아이콘 가림막에 멈출 수 있어요. 그때는 오른쪽 끝 손잡이를 왼쪽으로 조금(100px쯤)만 끌었다 놓으면 1:2 창으로 돌아와요.
    - 에뮬레이터를 오래 켜 두면 플레오스 위치 서비스가 멈춰서 "지금 위치를 확인하지 못했어요"가 뜨거나 옛 위치(미국)가 나올 수 있어요. 그때는 `adb shell am force-stop --user 10 ai.pleos.playground.service.location.fused` 로 위치 서비스를 다시 띄우고, 앱도 다시 실행해요.
 4. 에뮬레이터의 **⋯ (Extended controls) → Car data** 에서 기어를 D로 바꾸면 주행 화면(S-08)이 덮고, P로 돌리면 보던 화면으로 돌아와요.
-   - 디버그 빌드에서는 `adb shell am start --user 10 -n com.gooodhandletruck.sidong/.MainActivity --ez debug_driving true` 로도 주행을 흉내 낼 수 있어요. 정차는 `false` 이고, 앱을 다시 켜면 차의 실제 값으로 돌아가요.
+   - 디버그 빌드에서는 `adb shell am start --user 10 -n com.gooodhandletruck.zippick/.MainActivity --ez debug_driving true` 로도 주행을 흉내 낼 수 있어요. 정차는 `false` 이고, 앱을 다시 켜면 차의 실제 값으로 돌아가요.
    - S-08의 [주변 단지 듣기]를 누르면 차 앞쪽 180도 안에서 가장 가까운 단지를 소리로 말하고(플레오스 TextToSpeech) S-09로 바뀌어요. 정차하면 맨 위에 '방금 들은 단지' 띠가 뜨고, 기록 탭(S-06)에 오늘 들은 단지가 남아요.
    - 알림 조건(S-02)을 정하고 알림을 켜 두면, 주행 중에 조건에 맞는 단지 반경 300m로 들어갈 때 저절로 말해요. 같은 단지는 하루에 한 번, 알림 사이는 1분 이상이에요. 에뮬레이터에서는 단지에서 멀리 둔 채 주행을 시작한 뒤 `adb emu geo fix 127.0339 37.4976` (늘푸른 4단지 앞)으로 옮겨 보세요.
 5. 단위 테스트(가격 표기, 거리·방향 계산, 다시 불러오는 기준, 화면 쌓기 규칙, 목업 JSON)는 `./gradlew test` 로 돌려요.
@@ -60,7 +60,7 @@ git clone https://github.com/GooodHandleTruck/<저장소이름>.git
 ## 📁 폴더 구조
 
 ```
-app/src/main/java/com/gooodhandletruck/sidong/
+app/src/main/java/com/gooodhandletruck/zippick/
 ├── MainActivity.kt              앱 진입점 (Activity 하나)
 ├── ZippickApp.kt                Application. 저장소를 담은 AppContainer를 들고 있음
 ├── ui/

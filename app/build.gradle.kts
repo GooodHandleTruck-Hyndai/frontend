@@ -7,14 +7,14 @@ plugins {
 }
 
 android {
-    namespace = "com.gooodhandletruck.sidong"
+    namespace = "com.gooodhandletruck.zippick"
     compileSdk = 34 // 에뮬레이터(Pleos Connect v2.1 = Android 14)에 맞춘다
 
     // 차량 API(android.car.*)를 쓰기 위한 설정. AAOS 앱에는 필수예요.
     useLibrary("android.car")
 
     defaultConfig {
-        applicationId = "com.gooodhandletruck.sidong" // 앱마켓 출시 후에는 절대 변경 금지
+        applicationId = "com.gooodhandletruck.zippick" // 앱마켓 출시 후에는 절대 변경 금지
         minSdk = 28 // 플레오스 최소 요구사항
         targetSdk = 34 // 플레오스 에뮬레이터 = API 34
         versionCode = 1

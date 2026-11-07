@@ -4,7 +4,7 @@
 set -u
 cd "$(dirname "$0")/.."
 
-PKG=com.gooodhandletruck.sidong
+PKG=com.gooodhandletruck.zippick
 ACT=$PKG/.MainActivity
 USER_ID=10   # 앱은 headless 시스템 사용자 10에서 돌아요
 PASS=0; FAIL=0
