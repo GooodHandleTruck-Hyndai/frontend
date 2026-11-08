@@ -55,7 +55,11 @@ git clone https://github.com/GooodHandleTruck/<저장소이름>.git
    - 디버그 빌드에서는 `adb shell am start --user 10 -n com.gooodhandletruck.zippick/.MainActivity --ez debug_driving true` 로도 주행을 흉내 낼 수 있어요. 정차는 `false` 이고, 앱을 다시 켜면 차의 실제 값으로 돌아가요.
    - S-08의 [주변 단지 듣기]를 누르면 차 앞쪽 180도 안에서 가장 가까운 단지를 소리로 말하고(플레오스 TextToSpeech) S-09로 바뀌어요. 정차하면 맨 위에 '방금 들은 단지' 띠가 뜨고, 기록 탭(S-06)에 오늘 들은 단지가 남아요.
    - 알림 조건(S-02)을 정하고 알림을 켜 두면, 주행 중에 조건에 맞는 단지 반경 300m로 들어갈 때 저절로 말해요. 같은 단지는 하루에 한 번, 알림 사이는 1분 이상이에요. 에뮬레이터에서는 단지에서 멀리 둔 채 주행을 시작한 뒤 `adb emu geo fix 127.0339 37.4976` (늘푸른 4단지 앞)으로 옮겨 보세요.
-5. 단위 테스트(가격 표기, 거리·방향 계산, 다시 불러오는 기준, 화면 쌓기 규칙, 목업 JSON)는 `./gradlew test` 로 돌려요.
+5. 단위 테스트(가격 표기, 거리·방향 계산, 다시 불러오는 기준, 화면 쌓기 규칙, 목업 JSON, 서버 통신)는 `./gradlew test` 로 돌려요. 서버 통신 테스트는 네트워크 없이 가짜 서버로 돌아요.
+6. 서버(백엔드)와 통신하는 코드는 `data/remote/` 에 있어요. 화면은 아직 목업을 쓰고, 앱을 켜면 뒤에서 서버에 기기를 한 번 등록해요(`adb logcat -s ApiClient okhttp.OkHttpClient` 로 볼 수 있어요).
+   - 기본 서버 주소는 백엔드 개발용 임시 서버(ngrok)예요. 서버가 꺼져 있으면 접속되지 않으니 테스트 전에 백엔드 담당에게 켜 달라고 해요.
+   - 내 PC에서 백엔드를 돌릴 때는 `local.properties` 에 `api.baseUrl=http://10.0.2.2:8080/` 을 적고 다시 빌드해요(에뮬레이터에서 내 PC는 10.0.2.2).
+   - 서버가 켜져 있으면 `ZIPPICK_LIVE_API=1 ./gradlew :app:testDebugUnitTest --tests '*LiveServerTest*' --rerun` 으로 실제 서버의 API를 앱 코드로 확인해요. 테스트 기기를 등록하고, 건물 21을 저장했다가 지워요. 내 PC 백엔드는 `ZIPPICK_LIVE_API=http://localhost:8080/` 이에요. 요청·응답과 결과는 `app/build/reports/live-server/` 의 로그 파일에 남아요.
 
 ## 📁 폴더 구조
 
@@ -89,7 +93,7 @@ app/src/main/java/com/gooodhandletruck/zippick/
     ├── OnboardingStore.kt       첫 실행을 끝냈는지
     ├── LocationPermission.kt    위치 권한(FUSED_LOCATION)이 있는지
     ├── CarDataRepository.kt     속도/기어 구독 (표준 AAOS API, 지금은 안 씀)
-    └── ApiClient.kt             서버 API
+    └── remote/                  서버 통신: ApiClient(공통 헤더·기기 등록·실패 응답), ZippickApi(API 목록), dto/(응답 모양)
 app/src/main/assets/mock/        가상 단지 목업 JSON (Claude Docs 'API 명세 초안 검토'의 P0 형식)
 app/src/test/                    단위 테스트
 ```
