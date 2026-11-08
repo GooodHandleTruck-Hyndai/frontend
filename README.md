@@ -1,12 +1,13 @@
-# 시동 (Sidong): 플레오스 커넥트 차량 앱
+# 집픽 (Zippick): 플레오스 커넥트 차량 앱
 
 > GooodHandleTruck · 주행 중 운전자를 돕는 차량용 서비스
 
 Kotlin과 Jetpack Compose로 만든 플레오스 커넥트(Android Automotive) 앱이에요.
-지금은 **속도, 기어, 서버 연결 상태**를 보여주는 기본 뼈대 상태예요.
+화면 9개(S-01~S-09)가 모두 실제 화면이에요. 단지 데이터는 서버가 준비될 때까지 목업(가상 단지)을 쓰고, 위치·근접 알림·길 안내·음성은 플레오스 SDK를 실제로 불러요. S-03 약도는 지도 타일 없이 앱이 직접 그려요.
+화면 구성과 이동 규칙은 [화면 설계서](https://claude.ai/artifact/UgMDDBgkDfK7rZVFKAaoQt)에 있어요.
 
 - 협업 규칙(브랜치, 커밋, PR): [CONTRIBUTING.md](CONTRIBUTING.md)
-- 패키지: `com.gooodhandletruck.sidong`
+- 패키지: `com.gooodhandletruck.zippick`
 
 ---
 
@@ -38,21 +39,59 @@ git clone https://github.com/GooodHandleTruck/<저장소이름>.git
 ```
 1. Android Studio → **Open** → 클론한 폴더를 선택하고, Gradle Sync 가 끝날 때까지 기다려요.
 2. 기기 목록에서 플레오스 AVD 를 고르고 ▶ **Run** 을 눌러요.
-3. 속도 권한 팝업이 뜨면 **허용** 을 눌러요.
-4. 에뮬레이터의 **⋯ (Extended controls) → Car data** 에서 기어나 속도를 바꾸면 화면 숫자가 바뀌어요.
+3. 첫 화면(S-01 시작하기)에서 [위치 권한 허용하고 시작하기]를 누르면 위치 권한 창이 떠요. 허용하든 거부하든 S-02 알림 조건을 거쳐 S-03 주변 단지로 가고, 그다음부터는 S-03에서 시작해요.
+   - 첫 실행부터 다시 보려면 `adb shell pm clear --user 10 com.gooodhandletruck.zippick` 을 실행해요. 플레오스 에뮬레이터에서는 앱이 사용자 10으로 돌아요.
+   - S-03은 차 위치(플레오스 FusedLocation)를 받아 `app/src/main/assets/mock/complexes_nearby.json` 의 가상 단지를 보여 줘요. 가상 단지는 강남역 둘레에 있으니 `adb emu geo fix 127.0276 37.4979` 로 에뮬레이터 위치를 옮겨요(경도가 먼저). 50m 넘게 옮기면 목록을 다시 불러와요.
+   - 에뮬레이터는 차 방향(heading)을 늘 0(북쪽)으로 줘요. 그래서 방향 칩은 차가 북쪽을 본다고 보고 나와요.
+   - S-03 약도는 차가 향한 쪽이 위이고, 단지마다 가격 말풍선("12.3억")이 떠요. 1:2 창에서는 목록 옆 칸, 1:1:1 창에서는 목록 맨 위에 있어요. 말풍선을 눌러도 S-04가 열려요.
+   - S-03은 범위 칩 옆 정렬 칩으로 가까운 순·가격 낮은 순·가격 높은 순을, S-05는 저장한 순·가까운 순·가격 순을 고를 수 있어요.
+   - S-03 카드를 누르면 S-04 단지 상세가 열려요. 1:2 창에서는 목록 옆 칸에 열리고([닫기]), 1:1:1 창에서는 창 전체를 덮어요([뒤로]). 상세는 `app/src/main/assets/mock/complex_details.json` 을 읽어요.
+   - S-04의 [길 안내]와 S-05 카드의 [길 안내]는 기본 내비(플레오스 NaviHelper)에 단지를 목적지로 보내요. 1:2 창에서는 내비가 이 앱 칸을 덮으니, 내비에서 [안내 종료]를 누르고 아래 독의 앱 아이콘을 누르면 돌아와요.
+   - 도착하면 그 단지의 S-04가 '도착했어요' 띠와 함께 열려요. 내비 도착 이벤트가 오지 않아도 목적지 200m 안에서 정차하면 도착으로 봐요(근접 알림).
+   - S-04에서 [저장]한 단지는 저장 탭(S-05)에 최근에 저장한 것부터 모여요. 서버를 붙이기 전까지는 이 기기에 기억해서 앱을 다시 켜도 남고, `pm clear` 로 앱 데이터를 지우면 사라져요.
+   - 1:1:1 창은 앱 창 오른쪽 끝의 ⋮ 손잡이를 왼쪽으로 끌면 나와요(앱 창 841×1210dp). 손잡이를 화면 끝까지 끌어 되돌리면 시스템 화면이 앱 아이콘 가림막에 멈출 수 있어요. 그때는 오른쪽 끝 손잡이를 왼쪽으로 조금(100px쯤)만 끌었다 놓으면 1:2 창으로 돌아와요.
+   - 에뮬레이터를 오래 켜 두면 플레오스 위치 서비스가 멈춰서 "지금 위치를 확인하지 못했어요"가 뜨거나 옛 위치(미국)가 나올 수 있어요. 그때는 `adb shell am force-stop --user 10 ai.pleos.playground.service.location.fused` 로 위치 서비스를 다시 띄우고, 앱도 다시 실행해요.
+4. 에뮬레이터의 **⋯ (Extended controls) → Car data** 에서 기어를 D로 바꾸면 주행 화면(S-08)이 덮고, P로 돌리면 보던 화면으로 돌아와요.
+   - 디버그 빌드에서는 `adb shell am start --user 10 -n com.gooodhandletruck.zippick/.MainActivity --ez debug_driving true` 로도 주행을 흉내 낼 수 있어요. 정차는 `false` 이고, 앱을 다시 켜면 차의 실제 값으로 돌아가요.
+   - S-08의 [주변 단지 듣기]를 누르면 차 앞쪽 180도 안에서 가장 가까운 단지를 소리로 말하고(플레오스 TextToSpeech) S-09로 바뀌어요. 정차하면 맨 위에 '방금 들은 단지' 띠가 뜨고, 기록 탭(S-06)에 오늘 들은 단지가 남아요.
+   - 알림 조건(S-02)을 정하고 알림을 켜 두면, 주행 중에 조건에 맞는 단지 반경 300m로 들어갈 때 저절로 말해요. 같은 단지는 하루에 한 번, 알림 사이는 1분 이상이에요. 에뮬레이터에서는 단지에서 멀리 둔 채 주행을 시작한 뒤 `adb emu geo fix 127.0339 37.4976` (늘푸른 4단지 앞)으로 옮겨 보세요.
+5. 단위 테스트(가격 표기, 거리·방향 계산, 다시 불러오는 기준, 화면 쌓기 규칙, 목업 JSON)는 `./gradlew test` 로 돌려요.
 
 ## 📁 폴더 구조
 
 ```
-app/src/main/java/com/gooodhandletruck/sidong/
-├── MainActivity.kt          앱 진입점, 권한 요청
+app/src/main/java/com/gooodhandletruck/zippick/
+├── MainActivity.kt              앱 진입점 (Activity 하나)
+├── ZippickApp.kt                Application. 저장소를 담은 AppContainer를 들고 있음
 ├── ui/
-│   ├── DriveScreen.kt       화면 (Compose)
-│   └── MainViewModel.kt     화면 상태 + 로직
+│   ├── AppRoot.kt               창 크기 판단, 주행·정차에 따라 화면 그리기, 1:2 창의 목록+상세 두 칸
+│   ├── AppViewModel.kt          화면 이동·주행 상태
+│   ├── navigation/              Screen(화면 9개), Navigator(이동 규칙)
+│   ├── component/               왼쪽 탭, 버튼, 칩, 단지 카드·사진 자리, 방향·거리 칩, 상태 상자, 불러오는 중 카드, 위치 권한 요청
+│   ├── format/                  가격·거리·면적·방향 표기 (가격 문자열은 여기서만 만듦)
+│   ├── onboarding/ nearby/ detail/ saved/ history/ settings/ driving/   화면별 파일 (nearby/·detail/에 ViewModel)
+│   └── theme/                   색·글자·간격 (화면 설계서 공통 규격)
 └── data/
-    ├── CarDataRepository.kt 속도/기어 구독 (표준 AAOS API)
-    ├── PleosVehicle.kt      플레오스 Vehicle SDK 예시 (주석 상태)
-    └── ApiClient.kt         서버 API
+    ├── model/                   서버 응답과 같은 모양의 데이터 클래스 (kotlinx.serialization)
+    ├── ComplexRepository.kt     단지 데이터 창구. 지금은 FakeRepository, 나중에 RemoteRepository
+    ├── FakeRepository.kt        assets/mock/ 목업 JSON을 읽어 서버처럼 답함
+    ├── AppContainer.kt          저장소를 한 번만 만들어 나눠 줌 (DI 프레임워크 없이)
+    ├── AppJson.kt               JSON 읽기 설정
+    ├── Geo.kt                   두 좌표 사이 거리·방위각
+    ├── CarLocation.kt           차 위치·향한 쪽, 목록을 다시 불러올 만큼 움직였는지
+    ├── LocationRepository.kt    차 위치 받기와 근접 알림 (플레오스 FusedLocation)
+    ├── NavigationRepository.kt  길 안내 보내기와 도착 (플레오스 NaviHelper)
+    ├── SpeechRepository.kt      주행 중 음성 안내와 오디오 포커스 (플레오스 TextToSpeech)
+    ├── AlertSettingsRepository.kt 주행 중 자동 알림 조건과 켜기·끄기 (이 기기에 저장)
+    ├── NearbyRangeStore.kt      주변 범위 기본값 (S-07)
+    ├── AnnouncedStore.kt        오늘 소리로 알린 단지 (하루에 한 번만 자동 알림)
+    ├── DrivingStateRepository.kt 주행 중인지 (AAOS UX 제한)
+    ├── OnboardingStore.kt       첫 실행을 끝냈는지
+    ├── LocationPermission.kt    위치 권한(FUSED_LOCATION)이 있는지
+    ├── CarDataRepository.kt     속도/기어 구독 (표준 AAOS API, 지금은 안 씀)
+    └── ApiClient.kt             서버 API
+app/src/main/assets/mock/        가상 단지 목업 JSON (Claude Docs 'API 명세 초안 검토'의 P0 형식)
+app/src/test/                    단위 테스트
 ```
 
 ## 📚 참고 문서

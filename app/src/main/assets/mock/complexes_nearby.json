@@ -1,0 +1,390 @@
+{
+  "totalCount": 18,
+  "items": [
+    {
+      "complexId": "c-1001",
+      "type": "APT",
+      "name": "한빛마을 3단지",
+      "address": "서울특별시 강남구 예시로 12",
+      "lat": 37.5003,
+      "lon": 127.0311,
+      "imageUrl": null,
+      "saved": false,
+      "price": {
+        "areaM2": 84.97,
+        "avgPriceManwon": 123000,
+        "tradeCount": 4,
+        "periodDays": 90,
+        "asOf": "2026-10-31",
+        "lastTrade": {
+          "contractDate": "2026-10-24",
+          "floor": 12,
+          "priceManwon": 123000
+        }
+      }
+    },
+    {
+      "complexId": "c-1002",
+      "type": "APT",
+      "name": "한솔 5단지",
+      "address": "서울특별시 강남구 예시로 40",
+      "lat": 37.5021,
+      "lon": 127.0221,
+      "imageUrl": null,
+      "saved": false,
+      "price": {
+        "areaM2": 59.97,
+        "avgPriceManwon": null,
+        "tradeCount": 0,
+        "periodDays": 90,
+        "asOf": "2026-10-31",
+        "lastTrade": {
+          "contractDate": "2026-03-14",
+          "floor": 3,
+          "priceManwon": 64500
+        }
+      }
+    },
+    {
+      "complexId": "c-1003",
+      "type": "APT",
+      "name": "새솔마을 1단지",
+      "address": "서울특별시 서초구 예시대로 7",
+      "lat": 37.4982,
+      "lon": 127.0248,
+      "imageUrl": null,
+      "saved": false,
+      "price": {
+        "areaM2": 59.96,
+        "avgPriceManwon": 98500,
+        "tradeCount": 3,
+        "periodDays": 90,
+        "asOf": "2026-10-31",
+        "lastTrade": {
+          "contractDate": "2026-10-17",
+          "floor": 9,
+          "priceManwon": 99000
+        }
+      }
+    },
+    {
+      "complexId": "c-1004",
+      "type": "APT",
+      "name": "은하수 2단지",
+      "address": "서울특별시 강남구 예시대로 21",
+      "lat": 37.4949,
+      "lon": 127.0278,
+      "imageUrl": null,
+      "saved": false,
+      "price": {
+        "areaM2": 114.8,
+        "avgPriceManwon": 120000,
+        "tradeCount": 2,
+        "periodDays": 90,
+        "asOf": "2026-10-31",
+        "lastTrade": {
+          "contractDate": "2026-09-29",
+          "floor": 18,
+          "priceManwon": 120000
+        }
+      }
+    },
+    {
+      "complexId": "c-1005",
+      "type": "APT",
+      "name": "다온채 1단지",
+      "address": "서울특별시 강남구 예시로 58",
+      "lat": 37.4952,
+      "lon": 127.0316,
+      "imageUrl": null,
+      "saved": false,
+      "price": {
+        "areaM2": 84.99,
+        "avgPriceManwon": 135700,
+        "tradeCount": 5,
+        "periodDays": 90,
+        "asOf": "2026-10-31",
+        "lastTrade": {
+          "contractDate": "2026-10-28",
+          "floor": 7,
+          "priceManwon": 136000
+        }
+      }
+    },
+    {
+      "complexId": "c-1006",
+      "type": "APT",
+      "name": "늘푸른 4단지",
+      "address": "서울특별시 강남구 예시로 77",
+      "lat": 37.4984,
+      "lon": 127.0339,
+      "imageUrl": null,
+      "saved": false,
+      "price": {
+        "areaM2": 84.92,
+        "avgPriceManwon": 156000,
+        "tradeCount": 6,
+        "periodDays": 90,
+        "asOf": "2026-10-31",
+        "lastTrade": {
+          "contractDate": "2026-10-30",
+          "floor": 14,
+          "priceManwon": 157500
+        }
+      }
+    },
+    {
+      "complexId": "c-1007",
+      "type": "APT",
+      "name": "별빛마을 2단지",
+      "address": "서울특별시 서초구 예시대로 33",
+      "lat": 37.4923,
+      "lon": 127.0271,
+      "imageUrl": null,
+      "saved": false,
+      "price": {
+        "areaM2": 59.94,
+        "avgPriceManwon": 89000,
+        "tradeCount": 2,
+        "periodDays": 90,
+        "asOf": "2026-10-31",
+        "lastTrade": {
+          "contractDate": "2026-08-21",
+          "floor": 4,
+          "priceManwon": 88500
+        }
+      }
+    },
+    {
+      "complexId": "c-1008",
+      "type": "APT",
+      "name": "해오름 1단지",
+      "address": "서울특별시 강남구 예시로 101",
+      "lat": 37.5043,
+      "lon": 127.0279,
+      "imageUrl": null,
+      "saved": false,
+      "price": {
+        "areaM2": 134.9,
+        "avgPriceManwon": 215000,
+        "tradeCount": 1,
+        "periodDays": 90,
+        "asOf": "2026-10-31",
+        "lastTrade": {
+          "contractDate": "2026-10-05",
+          "floor": 21,
+          "priceManwon": 215000
+        }
+      }
+    },
+    {
+      "complexId": "c-1009",
+      "type": "APT",
+      "name": "소나무숲 3단지",
+      "address": "서울특별시 서초구 예시길 15",
+      "lat": 37.4929,
+      "lon": 127.0215,
+      "imageUrl": null,
+      "saved": false,
+      "price": {
+        "areaM2": 84.97,
+        "avgPriceManwon": 142300,
+        "tradeCount": 3,
+        "periodDays": 90,
+        "asOf": "2026-10-31",
+        "lastTrade": {
+          "contractDate": "2026-10-12",
+          "floor": 11,
+          "priceManwon": 143000
+        }
+      }
+    },
+    {
+      "complexId": "c-1010",
+      "type": "APT",
+      "name": "가온누리 1단지",
+      "address": "서울특별시 강남구 예시길 9",
+      "lat": 37.5033,
+      "lon": 127.0344,
+      "imageUrl": null,
+      "saved": false,
+      "price": {
+        "areaM2": 74.98,
+        "avgPriceManwon": 128800,
+        "tradeCount": 2,
+        "periodDays": 90,
+        "asOf": "2026-10-31",
+        "lastTrade": {
+          "contractDate": "2026-09-14",
+          "floor": 6,
+          "priceManwon": 129000
+        }
+      }
+    },
+    {
+      "complexId": "c-1011",
+      "type": "APT",
+      "name": "미리내 2단지",
+      "address": "서울특별시 서초구 예시로 140",
+      "lat": 37.4986,
+      "lon": 127.0175,
+      "imageUrl": null,
+      "saved": false,
+      "price": {
+        "areaM2": 101.9,
+        "avgPriceManwon": 167500,
+        "tradeCount": 2,
+        "periodDays": 90,
+        "asOf": "2026-10-31",
+        "lastTrade": {
+          "contractDate": "2026-10-08",
+          "floor": 16,
+          "priceManwon": 168000
+        }
+      }
+    },
+    {
+      "complexId": "c-1012",
+      "type": "APT",
+      "name": "햇살마을 6단지",
+      "address": "서울특별시 강남구 예시대로 88",
+      "lat": 37.4918,
+      "lon": 127.0353,
+      "imageUrl": null,
+      "saved": false,
+      "price": {
+        "areaM2": 49.95,
+        "avgPriceManwon": 75000,
+        "tradeCount": 4,
+        "periodDays": 90,
+        "asOf": "2026-10-31",
+        "lastTrade": {
+          "contractDate": "2026-10-26",
+          "floor": 2,
+          "priceManwon": 75500
+        }
+      }
+    },
+    {
+      "complexId": "c-1013",
+      "type": "APT",
+      "name": "시냇가 1단지",
+      "address": "서울특별시 강남구 예시로 205",
+      "lat": 37.5096,
+      "lon": 127.0287,
+      "imageUrl": null,
+      "saved": false,
+      "price": {
+        "areaM2": 84.95,
+        "avgPriceManwon": 182000,
+        "tradeCount": 3,
+        "periodDays": 90,
+        "asOf": "2026-10-31",
+        "lastTrade": {
+          "contractDate": "2026-10-19",
+          "floor": 13,
+          "priceManwon": 183000
+        }
+      }
+    },
+    {
+      "complexId": "c-1014",
+      "type": "APT",
+      "name": "하늘채움 2단지",
+      "address": "서울특별시 강남구 예시대로 150",
+      "lat": 37.4975,
+      "lon": 127.0469,
+      "imageUrl": null,
+      "saved": false,
+      "price": {
+        "areaM2": 59.99,
+        "avgPriceManwon": 104000,
+        "tradeCount": 2,
+        "periodDays": 90,
+        "asOf": "2026-10-31",
+        "lastTrade": {
+          "contractDate": "2026-09-25",
+          "floor": 8,
+          "priceManwon": 103500
+        }
+      }
+    },
+    {
+      "complexId": "c-1015",
+      "type": "APT",
+      "name": "도담마을 1단지",
+      "address": "서울특별시 서초구 예시대로 190",
+      "lat": 37.479,
+      "lon": 127.0276,
+      "imageUrl": null,
+      "saved": false,
+      "price": {
+        "areaM2": 84.93,
+        "avgPriceManwon": 118500,
+        "tradeCount": 5,
+        "periodDays": 90,
+        "asOf": "2026-10-31",
+        "lastTrade": {
+          "contractDate": "2026-10-29",
+          "floor": 10,
+          "priceManwon": 119000
+        }
+      }
+    },
+    {
+      "complexId": "c-1016",
+      "type": "APT",
+      "name": "너울 3단지",
+      "address": "서울특별시 서초구 예시길 60",
+      "lat": 37.4988,
+      "lon": 127.0004,
+      "imageUrl": null,
+      "saved": false,
+      "price": {
+        "areaM2": 114.9,
+        "avgPriceManwon": 205000,
+        "tradeCount": 1,
+        "periodDays": 90,
+        "asOf": "2026-10-31",
+        "lastTrade": {
+          "contractDate": "2026-08-30",
+          "floor": 19,
+          "priceManwon": 205000
+        }
+      }
+    },
+    {
+      "complexId": "c-1017",
+      "type": "APT",
+      "name": "바람꽃 1단지",
+      "address": "서울특별시 강남구 예시길 33",
+      "lat": 37.515,
+      "lon": 127.0491,
+      "imageUrl": null,
+      "saved": false,
+      "price": null
+    },
+    {
+      "complexId": "c-1018",
+      "type": "APT",
+      "name": "온새미로 2단지",
+      "address": "서울특별시 서초구 예시로 260",
+      "lat": 37.4795,
+      "lon": 127.0044,
+      "imageUrl": null,
+      "saved": false,
+      "price": {
+        "areaM2": 84.96,
+        "avgPriceManwon": 99000,
+        "tradeCount": 2,
+        "periodDays": 90,
+        "asOf": "2026-10-31",
+        "lastTrade": {
+          "contractDate": "2026-09-07",
+          "floor": 5,
+          "priceManwon": 99500
+        }
+      }
+    }
+  ]
+}

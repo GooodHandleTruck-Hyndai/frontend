@@ -1,3 +1,6 @@
 <resources>
-    <style name="Theme.Sidong" parent="android:Theme.Material.NoActionBar" />
+    <!-- 창 배경을 공통 규격의 배경색(#F7F8FA)으로 둬서, 앱이 켜질 때 검은 화면이 번쩍이지 않게 한다 -->
+    <style name="Theme.Zippick" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">#F7F8FA</item>
+    </style>
 </resources>

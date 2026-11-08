@@ -1,4 +1,4 @@
-# 시동 협업 가이드
+# 집픽 협업 가이드
 
 GooodHandleTruck 팀이 같은 방식으로 일하기 위한 규칙이에요. 짧게 유지하고, 바꾸고 싶은 규칙이 있으면 PR로 제안해 주세요.
 
@@ -100,7 +100,7 @@ chore: Pleos Vehicle SDK 2.1.0 으로 업데이트
   Windows 명령 프롬프트에서는 `gradlew.bat ktlintFormat` 이에요.
 - 패키지 구조
   ```
-  com.gooodhandletruck.sidong
+  com.gooodhandletruck.zippick
   ├── ui/     화면(Compose)과 ViewModel
   └── data/   차량 데이터, 서버 API, 저장소
   ```
