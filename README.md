@@ -59,7 +59,7 @@ git clone https://github.com/GooodHandleTruck/<저장소이름>.git
 6. 서버(백엔드)와 통신하는 코드는 `data/remote/` 에 있어요. 화면은 아직 목업을 쓰고, 앱을 켜면 뒤에서 서버에 기기를 한 번 등록해요(`adb logcat -s ApiClient okhttp.OkHttpClient` 로 볼 수 있어요).
    - 기본 서버 주소는 백엔드 개발용 임시 서버(ngrok)예요. 서버가 꺼져 있으면 접속되지 않으니 테스트 전에 백엔드 담당에게 켜 달라고 해요.
    - 내 PC에서 백엔드를 돌릴 때는 `local.properties` 에 `api.baseUrl=http://10.0.2.2:8080/` 을 적고 다시 빌드해요(에뮬레이터에서 내 PC는 10.0.2.2).
-   - 서버가 켜져 있으면 `ZIPPICK_LIVE_API=1 ./gradlew :app:testDebugUnitTest --tests '*LiveServerTest*' --rerun` 으로 실제 서버의 API를 앱 코드로 확인해요. 테스트 기기를 등록하고, 건물 21을 저장했다가 지워요. 내 PC 백엔드는 `ZIPPICK_LIVE_API=http://localhost:8080/` 이에요. 요청·응답과 결과는 `app/build/reports/live-server/` 의 로그 파일에 남아요.
+   - 서버가 켜져 있으면 `ZIPPICK_LIVE_API=1 ./gradlew :app:testDebugUnitTest --tests '*LiveServerTest*' --rerun` 으로 실제 서버의 API를 앱 코드로 확인해요. 테스트 기기를 등록하고, 건물 21을 저장했다가 지우고, 알림을 끈 관심 조건을 저장해요. 내 PC 백엔드는 `ZIPPICK_LIVE_API=http://localhost:8080/` 이에요. 요청·응답과 결과는 `app/build/reports/live-server/` 의 로그 파일에 남아요.
 
 ## 📁 폴더 구조
 

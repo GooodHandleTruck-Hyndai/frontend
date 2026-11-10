@@ -69,7 +69,26 @@ object ApiSamples {
         ]}
     """
 
-    /** 저장 취소처럼 data가 없는 성공 */
+    const val INTEREST_CONDITION = """
+        {"success":true,"code":"OK","message":"요청 성공","data":{
+          "regionCodes":["11440"],"priceMin":80000,"priceMax":150000,"types":["APT"],
+          "areaMinM2":59,"areaMaxM2":85,"alertEnabled":true}}
+    """
+
+    const val ALERTS = """
+        {"success":true,"code":"OK","message":"요청 성공","data":{"alerts":[
+          {"alertId":7,"buildingId":21,"buildingName":"한화오벨리스크",
+           "deal":{"price":59700,"dealDate":"2026-10-12","areaM2":36.49,"areaPyeong":11.0},
+           "read":false,"createdAt":"2026-11-09T04:30:01.123456+09:00"}
+        ]}}
+    """
+
+    const val ALERT_READ = """
+        {"success":true,"code":"OK","message":"요청 성공",
+         "data":{"alertId":7,"read":true,"readAt":"2026-11-09T10:12:00+09:00"}}
+    """
+
+    /** 저장 취소처럼 data가 없는 성공. 관심 조건을 정한 적이 없을 때의 조회도 이렇게 온다 */
     const val OK_NO_DATA = """{"success":true,"code":"OK","message":"요청 성공"}"""
 
     const val BUILDING_NOT_FOUND = """{"success": false, "code": "B001", "message": "건물을 찾을 수 없어요"}"""
@@ -77,6 +96,8 @@ object ApiSamples {
     const val DEVICE_NOT_FOUND = """{"success":false,"code":"D002","message":"등록되지 않은 기기예요"}"""
 
     const val FAVORITE_ALREADY_EXISTS = """{"success":false,"code":"F001","message":"이미 저장한 건물이에요"}"""
+
+    const val ALERT_NOT_FOUND = """{"success":false,"code":"N001","message":"알림을 찾을 수 없어요"}"""
 
     /** 개발 서버가 꺼져 있을 때 ngrok이 주는 404 페이지(앞부분) */
     const val NGROK_OFFLINE_HTML = """<!DOCTYPE html><html><head><noscript>

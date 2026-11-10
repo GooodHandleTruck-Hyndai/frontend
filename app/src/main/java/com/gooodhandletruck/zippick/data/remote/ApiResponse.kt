@@ -72,6 +72,9 @@ object ApiErrorCode {
 
     /** 404. 저장하지 않은 건물 */
     const val FAVORITE_NOT_FOUND = "F002"
+
+    /** 404. 내 알림이 아니거나 없는 알림 */
+    const val ALERT_NOT_FOUND = "N001"
 }
 
 /** 실패 응답 본문을 읽어 [ApiException]으로 바꾼다. 우리 형식이 아니면 code 없이, ngrok 오류 코드가 있으면 메시지에 남긴다 */

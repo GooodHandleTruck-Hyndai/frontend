@@ -1,17 +1,24 @@
 package com.gooodhandletruck.zippick.data.remote
 
+import com.gooodhandletruck.zippick.data.remote.dto.AlertListResponse
+import com.gooodhandletruck.zippick.data.remote.dto.AlertReadResponse
 import com.gooodhandletruck.zippick.data.remote.dto.BuildingDetailResponse
 import com.gooodhandletruck.zippick.data.remote.dto.DeviceRegisterRequest
 import com.gooodhandletruck.zippick.data.remote.dto.DeviceResponse
 import com.gooodhandletruck.zippick.data.remote.dto.FavoriteCreateRequest
 import com.gooodhandletruck.zippick.data.remote.dto.FavoriteResponse
+import com.gooodhandletruck.zippick.data.remote.dto.InterestConditionRequest
+import com.gooodhandletruck.zippick.data.remote.dto.InterestConditionResponse
 import com.gooodhandletruck.zippick.data.remote.dto.NearbyBuildingsResponse
 import com.gooodhandletruck.zippick.data.remote.dto.PriceTrendResponse
 import com.gooodhandletruck.zippick.data.remote.dto.TransactionListResponse
+import java.time.OffsetDateTime
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -77,6 +84,26 @@ interface ZippickApi {
     /** 저장 취소(S-04). 성공해도 data가 없다. 저장하지 않은 건물이면 F002(404). 헤더 필요 */
     @DELETE("api/v1/favorites/{buildingId}")
     suspend fun deleteFavorite(@Path("buildingId") buildingId: Long): ApiResponse<Unit>
+
+    /** 관심 조건 조회. 조건을 정한 적이 없으면 data가 없고, 그때는 서버가 알림을 만들지 않는다. 헤더 필요 */
+    @GET("api/v1/interest-conditions")
+    suspend fun interestCondition(): ApiResponse<InterestConditionResponse>
+
+    /** 관심 조건 저장. 전체 값을 바꾸고 저장한 조건을 돌려준다. 최소가 최대보다 크거나 형식이 틀리면 C001. 헤더 필요 */
+    @PUT("api/v1/interest-conditions")
+    suspend fun saveInterestCondition(@Body request: InterestConditionRequest): ApiResponse<InterestConditionResponse>
+
+    /**
+     * 관심 건물 알림 목록, 최신순 최대 100개. 헤더 필요.
+     *
+     * @param since 이 시각 이후 알림만. null이면 최근 7일. 주소에 넣을 때 +는 %2B로 바뀐다
+     */
+    @GET("api/v1/alerts")
+    suspend fun alerts(@Query("since") since: OffsetDateTime? = null): ApiResponse<AlertListResponse>
+
+    /** 알림 읽음. 이미 읽은 알림이면 처음 읽은 시각을 그대로 준다. 내 알림이 아니거나 없으면 N001(404). 헤더 필요 */
+    @PATCH("api/v1/alerts/{alertId}/read")
+    suspend fun markAlertRead(@Path("alertId") alertId: Long): ApiResponse<AlertReadResponse>
 
     companion object {
         /** 실거래 내역 한 쪽의 기본 크기(서버 기본값과 같다) */

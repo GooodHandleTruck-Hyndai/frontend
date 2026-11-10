@@ -2,8 +2,12 @@ package com.gooodhandletruck.zippick.data.remote
 
 import com.gooodhandletruck.zippick.BuildConfig
 import com.gooodhandletruck.zippick.data.remote.dto.FavoriteCreateRequest
+import com.gooodhandletruck.zippick.data.remote.dto.InterestConditionRequest
+import com.gooodhandletruck.zippick.data.remote.dto.InterestConditionResponse
 import java.io.File
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 import kotlinx.coroutines.runBlocking
@@ -13,6 +17,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import org.junit.AfterClass
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Before
@@ -26,7 +31,7 @@ import org.junit.runner.Description
  * `ZIPPICK_LIVE_API=1 ./gradlew :app:testDebugUnitTest --tests '*LiveServerTest*' --rerun`
  * 값이 1이면 BuildConfig.API_BASE_URL(개발 서버)이고, 주소를 넣으면 그 서버다(내 PC 백엔드는 http://localhost:8080/).
  * 테스트마다 보낸 요청, 받은 응답, 결과가 app/build/reports/live-server/의 로그 파일에 순서대로 남는다([LiveLog]).
- * 서버에 테스트 기기를 두 개 등록하고, 건물 21을 저장했다가 지운다.
+ * 서버에 테스트 기기를 두 개 등록하고, 건물 21을 저장했다가 지우고, 알림을 끈 관심 조건을 저장한다.
  */
 class LiveServerTest {
 
@@ -114,6 +119,47 @@ class LiveServerTest {
     }
 
     @Test
+    @Title("관심 조건: 처음엔 없음 → 저장 → 조회, 최소 가격 > 최대 가격은 C001")
+    fun interestConditionRoundTrip() = runBlocking<Unit> {
+        // 알림을 끈 채로 저장해서 서버 배치가 테스트 기기에 알림을 만들지 않게 한다
+        val request = InterestConditionRequest(
+            regionCodes = listOf(MAPO_GU),
+            priceMin = null,
+            priceMax = 150_000,
+            types = listOf("APT"),
+            areaMinM2 = 59,
+            areaMaxM2 = 85,
+            alertEnabled = false
+        )
+
+        val before = client.callAsDevice { interestCondition() }.data
+        val saved = client.callAsDevice { saveInterestCondition(request) }.requireData()
+        val after = client.callAsDevice { interestCondition() }.requireData()
+        val invalid = expectThrows<ApiException> {
+            client.callAsDevice { saveInterestCondition(request.copy(priceMin = 200_000)) }
+        }
+
+        LiveLog.note("저장 전: $before")
+        LiveLog.note("저장 뒤: $after")
+        assertNull(before) // 새 기기라 조건이 없다
+        assertEquals(saved, after)
+        assertEquals(InterestConditionResponse(listOf(MAPO_GU), null, 150_000, listOf("APT"), 59, 85, false), after)
+        assertEquals(ApiErrorCode.INVALID_INPUT, invalid.code)
+    }
+
+    @Test
+    @Title("관심 건물 알림: 목록(최근 7일·since), 없는 알림 읽음은 N001")
+    fun alertsListAndUnknownRead() = runBlocking<Unit> {
+        val recent = client.callAsDevice { alerts() }.requireData().alerts
+        val sinceYesterday = client.callAsDevice { alerts(OffsetDateTime.now(SEOUL).minusDays(1)) }.requireData()
+        val unknown = expectThrows<ApiException> { client.callAsDevice { markAlertRead(UNKNOWN_ALERT_ID) } }
+
+        LiveLog.note("알림: 최근 7일 ${recent.size}개, 어제부터 ${sinceYesterday.alerts.size}개")
+        assertTrue(recent.isEmpty()) // 새 기기라 알림이 없다
+        assertEquals(ApiErrorCode.ALERT_NOT_FOUND, unknown.code)
+    }
+
+    @Test
     @Title("서버가 모르는 기기 ID(D002)면 다시 등록하고 한 번 더 보내기")
     fun forgottenDeviceRegistersAgain() = runBlocking<Unit> {
         val unknownId = UUID.randomUUID().toString() // 서버가 모르는 ID
@@ -141,6 +187,9 @@ class LiveServerTest {
         // 서버 안내의 테스트 위치: 마포구 도화동
         private const val DOHWA_LAT = 37.5404
         private const val DOHWA_LON = 126.9455
+        private const val MAPO_GU = "11440"
+        private const val UNKNOWN_ALERT_ID = 999_999_999L
+        private val SEOUL: ZoneId = ZoneId.of("Asia/Seoul")
         private const val PRINT_COUNT = 5
         private const val NANOS_PER_MILLI = 1_000_000
 
