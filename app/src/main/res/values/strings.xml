@@ -171,4 +171,12 @@
 
     <!-- 정차하면 맨 위에 띄우는 띠 -->
     <string name="banner_heard_label">방금 들은 단지</string>
+
+    <!-- S-10 새 거래 알림 -->
+    <string name="screen_alerts">새 거래 알림</string>
+    <string name="alerts_empty">최근 7일 동안 새 거래 알림이 없어요.</string>
+    <string name="alerts_empty_detail">저장한 단지나 알림 조건에 맞는 단지에 새 거래가 신고되면 여기에 알려 드려요.</string>
+    <string name="alerts_deal">%1$s · %2$s · %3$d월 %4$d일 계약</string>
+    <string name="action_open_alerts">새 거래 알림</string>
+    <string name="action_open_alerts_count">새 거래 알림 %1$d</string>
 </resources>

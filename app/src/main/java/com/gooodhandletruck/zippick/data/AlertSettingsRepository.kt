@@ -83,7 +83,7 @@ data class AlertSettings(
 
 /**
  * 알림 조건과 켜기·끄기를 이 기기(SharedPreferences)에 기억한다.
- * TODO: API 초안의 '관심 조건 조회·저장'(P1) 형식이 정해지면 서버와 맞춘다. 지금은 이 기기에만 있다
+ * 서버 관심 조건(B 15·16번)에는 [InterestConditionSync]가 바뀔 때마다 보낸다.
  */
 class AlertSettingsRepository(context: Context) {
 
