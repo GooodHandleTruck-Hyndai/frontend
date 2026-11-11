@@ -133,12 +133,15 @@ fun NearbyMap(
 @Composable
 private fun MapBackground(rings: List<Int>, dpPerMeter: Float) {
     val density = LocalDensity.current
+    // 그리기 블록 안에서는 테마 색을 읽을 수 없어 먼저 담아 둔다
+    val ringColor = AppColors.Outline
+    val carColor = AppColors.TextPrimary
     Canvas(modifier = Modifier.fillMaxSize()) {
         val middle = Offset(size.width / 2, size.height / 2)
         val stroke = Stroke(width = with(density) { 1.dp.toPx() })
         rings.forEach { meters ->
             drawCircle(
-                color = AppColors.Outline,
+                color = ringColor,
                 radius = with(density) { (meters * dpPerMeter).dp.toPx() },
                 center = middle,
                 style = stroke
@@ -152,7 +155,7 @@ private fun MapBackground(rings: List<Int>, dpPerMeter: Float) {
             lineTo(middle.x - half * 0.8f, middle.y + half)
             close()
         }
-        drawPath(arrow, color = AppColors.TextPrimary)
+        drawPath(arrow, color = carColor)
     }
 }
 
