@@ -148,8 +148,7 @@ fun SavedScreen(
                                 SecondaryButton(
                                     text = stringResource(R.string.action_route),
                                     onClick = { onStartRoute(card.complex.toRouteTarget()) },
-                                    height = AppDimens.TouchMin,
-                                    horizontalPadding = AppDimens.SpaceS,
+                                    height = AppDimens.ButtonHeightM,
                                     icon = R.drawable.ic_route
                                 )
                             }

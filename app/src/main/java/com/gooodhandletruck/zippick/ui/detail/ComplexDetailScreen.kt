@@ -187,8 +187,7 @@ private fun DetailHeader(detail: ComplexDetail?, place: RelativePlace?, isSidePa
         SecondaryButton(
             text = stringResource(if (isSidePane) R.string.action_close else R.string.action_back),
             onClick = onClose,
-            height = AppDimens.TouchMin,
-            horizontalPadding = AppDimens.SpaceS,
+            height = AppDimens.ButtonHeightM,
             icon = if (isSidePane) R.drawable.ic_close else R.drawable.ic_chevron_left
         )
         if (detail != null) {

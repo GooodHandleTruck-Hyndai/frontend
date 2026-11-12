@@ -9,7 +9,9 @@ object AppDimens {
 
     // 누르는 것
     val TouchMin = 76.dp // 누를 수 있는 것은 모두 76×76 이상
-    val ButtonHeight = 96.dp // 정차 중 주 버튼·보조 버튼
+    // 버튼: Figma button/BoxButton의 Large·Medium. Small(64)은 76보다 작아 쓰지 않는다
+    val ButtonHeight = 100.dp // Large. 정차 중 주 버튼·보조 버튼
+    val ButtonHeightM = 80.dp // Medium. 머리글의 [뒤로], 카드 안 [길 안내]
     val DrivingButtonHeight = 160.dp // 주행 중 버튼
 
     // 간격: 8의 배수만 쓴다
@@ -21,7 +23,9 @@ object AppDimens {
 
     // 모서리
     val CardRadius = 28.dp
-    val ButtonRadius = 24.dp // 버튼, 칩
+    val ButtonRadius = 24.dp // 칩, 탭
+    val ButtonRadiusL = 12.dp // Large 버튼
+    val ButtonRadiusM = 8.dp // Medium 버튼
 
     // 단지 카드
     val BadgeSize = 72.dp // S-03 카드 왼쪽 번호 배지(약도 번호와 같다)
