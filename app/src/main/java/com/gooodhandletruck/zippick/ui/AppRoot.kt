@@ -401,6 +401,10 @@ private fun HeardBanner(name: String, window: WindowLayout, onOpen: () -> Unit, 
             )
         }
         SecondaryButton(text = stringResource(R.string.action_view), onClick = onOpen, height = AppDimens.ButtonHeightM)
-        SecondaryButton(text = stringResource(R.string.action_close), onClick = onDismiss, height = AppDimens.ButtonHeightM)
+        SecondaryButton(
+            text = stringResource(R.string.action_close),
+            onClick = onDismiss,
+            height = AppDimens.ButtonHeightM
+        )
     }
 }

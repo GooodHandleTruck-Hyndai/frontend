@@ -9,6 +9,7 @@ object AppDimens {
 
     // 누르는 것
     val TouchMin = 76.dp // 누를 수 있는 것은 모두 76×76 이상
+
     // 버튼: Figma button/BoxButton의 Large·Medium. Small(64)은 76보다 작아 쓰지 않는다
     val ButtonHeight = 100.dp // Large. 정차 중 주 버튼·보조 버튼
     val ButtonHeightM = 80.dp // Medium. 머리글의 [뒤로], 카드 안 [길 안내]
