@@ -172,7 +172,7 @@ fun SettingsScreen(
     }
 }
 
-/** 설정 한 칸: 카드 모양(흰 바탕, 테두리, 모서리 28) 안에 줄을 쌓는다 */
+/** 설정 한 칸: 카드 모양(카드 바탕, 테두리, 모서리 24) 안에 줄을 쌓는다 */
 @Composable
 private fun SettingsCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     val shape = RoundedCornerShape(AppDimens.CardRadius)

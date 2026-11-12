@@ -42,10 +42,10 @@ private fun colorScheme(palette: AppPalette): ColorScheme {
     )
 }
 
-/** 버튼·칩은 small·medium(모서리 24), 카드는 large·extraLarge(모서리 28)를 쓴다. */
+/** 버튼·칩은 small·medium(모서리 12), 카드는 large·extraLarge(모서리 24)를 쓴다. */
 private val AppShapes = Shapes(
-    small = RoundedCornerShape(AppDimens.ButtonRadius),
-    medium = RoundedCornerShape(AppDimens.ButtonRadius),
+    small = RoundedCornerShape(AppDimens.ChipRadius),
+    medium = RoundedCornerShape(AppDimens.ChipRadius),
     large = RoundedCornerShape(AppDimens.CardRadius),
     extraLarge = RoundedCornerShape(AppDimens.CardRadius)
 )

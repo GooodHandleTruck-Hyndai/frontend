@@ -35,7 +35,7 @@ import com.gooodhandletruck.zippick.ui.theme.AppType
  */
 @Composable
 fun TagChip(text: String, modifier: Modifier = Modifier, filled: Boolean = true) {
-    val shape = RoundedCornerShape(AppDimens.ButtonRadius)
+    val shape = RoundedCornerShape(AppDimens.ChipRadius)
     val background = if (filled) {
         Modifier.background(AppColors.ButtonSecondary, shape)
     } else {
@@ -68,7 +68,7 @@ fun ToggleChip(
         modifier = modifier
             .heightIn(min = AppDimens.TouchMin)
             .widthIn(min = AppDimens.TouchMin)
-            .clip(RoundedCornerShape(AppDimens.ButtonRadius))
+            .clip(RoundedCornerShape(AppDimens.ChipRadius))
             .background(if (checked && enabled) AppColors.Accent else AppColors.ButtonSecondary)
             .toggleable(value = checked, enabled = enabled, role = Role.Checkbox, onValueChange = onCheckedChange)
             .padding(horizontal = AppDimens.SpaceM),
@@ -96,7 +96,7 @@ fun SelectChip(text: String, selected: Boolean, onClick: () -> Unit, modifier: M
         modifier = modifier
             .heightIn(min = AppDimens.TouchMin)
             .widthIn(min = AppDimens.TouchMin)
-            .clip(RoundedCornerShape(AppDimens.ButtonRadius))
+            .clip(RoundedCornerShape(AppDimens.ChipRadius))
             .background(if (selected) AppColors.Accent else AppColors.ButtonSecondary)
             .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
             .padding(horizontal = AppDimens.SpaceM),

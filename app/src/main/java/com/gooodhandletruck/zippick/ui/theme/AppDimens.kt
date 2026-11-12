@@ -21,9 +21,9 @@ object AppDimens {
     val SpaceL = 32.dp
     val SpaceXl = 40.dp
 
-    // 모서리
-    val CardRadius = 28.dp
-    val ButtonRadius = 24.dp // 칩, 탭
+    // 모서리: Figma Number 컬렉션의 Radius 토큰(4·8·12·16·24·32·40·48)만 쓴다
+    val CardRadius = 24.dp // Radius/24. 카드, 상태 상자, 약도
+    val ChipRadius = 12.dp // Radius/12. 칩, 왼쪽 탭. Large 버튼과 같다
     val ButtonRadiusL = 12.dp // Large 버튼
     val ButtonRadiusM = 8.dp // Medium 버튼
 

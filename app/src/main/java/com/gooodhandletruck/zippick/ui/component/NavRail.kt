@@ -57,7 +57,7 @@ private fun RailItem(tab: Tab, selected: Boolean, onClick: () -> Unit) {
         modifier = Modifier
             .width(AppDimens.RailWidth - AppDimens.SpaceS * 2)
             .heightIn(min = AppDimens.TouchMin)
-            .clip(RoundedCornerShape(AppDimens.ButtonRadius))
+            .clip(RoundedCornerShape(AppDimens.ChipRadius))
             .background(if (selected) AppColors.AccentSoft else Color.Transparent)
             .selectable(selected = selected, role = Role.Tab, onClick = onClick)
             .padding(vertical = AppDimens.SpaceS),

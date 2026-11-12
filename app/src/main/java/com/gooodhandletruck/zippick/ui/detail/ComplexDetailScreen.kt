@@ -258,7 +258,7 @@ private fun DetailBody(
     }
 }
 
-/** 흰 카드(테두리, 모서리 28, 안쪽 여백 32). S-04의 가격·거래·자료 기준을 하나씩 담는다 */
+/** 카드(테두리, 모서리 24, 안쪽 여백 32). S-04의 가격·거래·자료 기준을 하나씩 담는다 */
 @Composable
 private fun DetailCard(content: @Composable ColumnScope.() -> Unit) {
     val shape = RoundedCornerShape(AppDimens.CardRadius)

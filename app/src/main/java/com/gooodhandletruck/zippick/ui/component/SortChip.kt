@@ -64,7 +64,7 @@ fun <T> SortChip(
             modifier = Modifier
                 .heightIn(min = AppDimens.TouchMin)
                 .widthIn(min = AppDimens.TouchMin)
-                .clip(RoundedCornerShape(AppDimens.ButtonRadius))
+                .clip(RoundedCornerShape(AppDimens.ChipRadius))
                 .background(AppColors.ButtonSecondary)
                 .clickable(role = Role.DropdownList) { expanded = true }
                 .padding(horizontal = AppDimens.SpaceM),
