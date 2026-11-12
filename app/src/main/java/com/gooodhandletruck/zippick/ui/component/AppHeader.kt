@@ -60,23 +60,15 @@ fun AppHeader(startPadding: Dp, endPadding: Dp, modifier: Modifier = Modifier) {
     }
 }
 
-/** 앱 로고: 강조색 둥근 네모 안에 흰 건물 그림 */
+/** 앱 로고: 디자인 시스템의 집픽 심볼(210×240)을 [size] 정사각형 안에 강조색으로 그린다 */
 @Composable
 fun AppLogo(modifier: Modifier = Modifier, size: Dp = AppDimens.LogoSize) {
-    Box(
-        modifier = modifier
-            .size(size)
-            .clip(RoundedCornerShape(AppDimens.LogoRadius))
-            .background(AppColors.Accent),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.ic_app_logo),
-            contentDescription = null,
-            tint = AppColors.OnAccent,
-            modifier = Modifier.size(size * LOGO_ICON_RATIO)
-        )
-    }
+    Icon(
+        painter = painterResource(R.drawable.logo_symbol),
+        contentDescription = null,
+        tint = AppColors.Accent,
+        modifier = modifier.size(size)
+    )
 }
 
 /** 지금 상태를 알리는 알약(labelL): "정차 중". 누를 수 없다 */

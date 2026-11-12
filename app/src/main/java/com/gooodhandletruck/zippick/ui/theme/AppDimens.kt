@@ -39,7 +39,6 @@ object AppDimens {
     // 틀
     val HeaderHeight = 96.dp // 정차 중 화면 맨 위 머리글(로고·앱 이름·상태)
     val LogoSize = 56.dp
-    val LogoRadius = 16.dp
     val RailWidth = 136.dp // 왼쪽 탭
     val RailIconSize = 40.dp
     val ListPaneWidth = 640.dp // 넓은 창의 목록 칸
