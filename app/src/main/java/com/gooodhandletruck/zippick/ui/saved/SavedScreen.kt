@@ -129,8 +129,7 @@ fun SavedScreen(
                     stringResource(R.string.action_open_alerts)
                 },
                 onClick = onOpenAlerts,
-                height = AppDimens.TouchMin,
-                horizontalPadding = AppDimens.SpaceS
+                height = AppDimens.ButtonHeightM
             )
         }
         if (content is SavedContent.Loaded && content.cards.size > 1) {
@@ -172,8 +171,7 @@ fun SavedScreen(
                                     text = stringResource(R.string.action_route),
                                     onClick = { onStartRoute(card.complex.toRouteTarget()) },
                                     enabled = card.complex.hasCoordinate,
-                                    height = AppDimens.TouchMin,
-                                    horizontalPadding = AppDimens.SpaceS,
+                                    height = AppDimens.ButtonHeightM,
                                     icon = R.drawable.ic_route
                                 )
                             }

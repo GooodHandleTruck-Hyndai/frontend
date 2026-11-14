@@ -91,8 +91,7 @@ fun AlertsScreen(
             SecondaryButton(
                 text = stringResource(R.string.action_back),
                 onClick = onBack,
-                height = AppDimens.TouchMin,
-                horizontalPadding = AppDimens.SpaceS,
+                height = AppDimens.ButtonHeightM,
                 icon = R.drawable.ic_chevron_left
             )
         }
