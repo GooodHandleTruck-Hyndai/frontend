@@ -8,6 +8,7 @@ import com.gooodhandletruck.zippick.ZippickApp
 import com.gooodhandletruck.zippick.data.CarLocation
 import com.gooodhandletruck.zippick.data.LocationState
 import com.gooodhandletruck.zippick.data.model.SavedComplex
+import com.gooodhandletruck.zippick.data.model.hasCoordinate
 import com.gooodhandletruck.zippick.ui.component.ComplexCardModel
 import com.gooodhandletruck.zippick.ui.component.placeOf
 import kotlinx.coroutines.CancellationException
@@ -27,6 +28,7 @@ class SavedViewModel(app: Application) : AndroidViewModel(app) {
     private val container = (app as ZippickApp).container
     private val repository = container.complexRepository
     private val locationRepository = container.locationRepository
+    private val alertInbox = container.alertInboxRepository
 
     private val _state = MutableStateFlow(SavedUiState())
     val state: StateFlow<SavedUiState> = _state.asStateFlow()
@@ -36,12 +38,14 @@ class SavedViewModel(app: Application) : AndroidViewModel(app) {
     private var car: CarLocation? = null
 
     private var loadJob: Job? = null
+    private var alertsJob: Job? = null
 
     /**
      * 화면에 들어올 때와 1:2 창에서 상세를 닫을 때 부른다. 보던 목록이 있으면 둔 채 새로 받아 온다.
      * 상세에서 저장을 취소한 단지는 이때 목록에서 빠진다.
      */
     fun refresh() {
+        refreshUnreadAlerts()
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
             try {
@@ -53,6 +57,21 @@ class SavedViewModel(app: Application) : AndroidViewModel(app) {
                 Log.w(TAG, "저장한 단지를 불러오지 못했어요", e)
                 // 보던 목록이 있으면 그대로 두고, 없을 때만 오류 상자를 띄운다
                 if (items == null) _state.update { it.copy(content = SavedContent.Failed) }
+            }
+        }
+    }
+
+    /** [새 거래 알림] 버튼의 숫자. 못 받으면 숫자 없이 둔다 */
+    private fun refreshUnreadAlerts() {
+        alertsJob?.cancel()
+        alertsJob = viewModelScope.launch {
+            try {
+                val unread = alertInbox.alerts().count { !it.read }
+                _state.update { it.copy(unreadAlerts = unread) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w(TAG, "새 거래 알림 수를 받지 못했어요", e)
             }
         }
     }
@@ -80,7 +99,12 @@ class SavedViewModel(app: Application) : AndroidViewModel(app) {
         val items = items ?: return
         val car = car
         val cards = items.map { saved ->
-            ComplexCardModel(complex = saved.complex, place = car?.placeOf(saved.complex.lat, saved.complex.lon))
+            val complex = saved.complex
+            // 좌표를 모르는 단지는 방향·거리 칩을 숨긴다
+            ComplexCardModel(
+                complex = complex,
+                place = car?.takeIf { complex.hasCoordinate }?.placeOf(complex.lat, complex.lon)
+            )
         }
         _state.update { it.copy(content = SavedContent.Loaded(cards)) }
     }

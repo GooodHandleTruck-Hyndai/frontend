@@ -8,6 +8,7 @@ import com.gooodhandletruck.zippick.ZippickApp
 import com.gooodhandletruck.zippick.data.CarLocation
 import com.gooodhandletruck.zippick.data.LocationState
 import com.gooodhandletruck.zippick.data.model.HeardComplex
+import com.gooodhandletruck.zippick.data.model.hasCoordinate
 import com.gooodhandletruck.zippick.ui.component.ComplexCardModel
 import com.gooodhandletruck.zippick.ui.component.placeOf
 import com.gooodhandletruck.zippick.ui.format.formatClock
@@ -75,7 +76,10 @@ class HistoryViewModel(app: Application) : AndroidViewModel(app) {
             val complex = heard.complex
             HeardRow(
                 time = formatClock(heard.heardAt),
-                card = ComplexCardModel(complex = complex, place = car?.placeOf(complex.lat, complex.lon))
+                card = ComplexCardModel(
+                    complex = complex,
+                    place = car?.takeIf { complex.hasCoordinate }?.placeOf(complex.lat, complex.lon)
+                )
             )
         }
         _state.update { it.copy(content = HistoryContent.Loaded(rows)) }

@@ -125,8 +125,12 @@ fun ComplexCard(
 private fun PriceLines(price: RepresentativePrice?) {
     val months = (price?.periodDays ?: DEFAULT_PERIOD_DAYS) / DAYS_PER_MONTH
     val average = price?.avgPriceManwon
+    val lastTrade = price?.lastTrade
     if (average != null) {
         Text(text = formatPrice(average), style = AppType.DisplayM, color = AppColors.TextPrimary)
+    } else if (lastTrade != null) {
+        // 평균이 없으면 마지막 거래를 보여 준다. 아래 줄에 계약 월을 꼭 같이 쓴다
+        Text(text = formatPrice(lastTrade.priceManwon), style = AppType.DisplayM, color = AppColors.TextPrimary)
     } else {
         Text(
             text = stringResource(R.string.card_no_recent_trades, months),
@@ -139,6 +143,13 @@ private fun PriceLines(price: RepresentativePrice?) {
         val asOf = stringResource(R.string.date_month_day, price.asOf.monthValue, price.asOf.dayOfMonth)
         val meta = if (average != null) {
             stringResource(R.string.card_meta, area, months, asOf)
+        } else if (lastTrade != null) {
+            val month = stringResource(
+                R.string.date_year_month,
+                lastTrade.contractDate.year,
+                lastTrade.contractDate.monthValue
+            )
+            stringResource(R.string.card_meta_last_trade, area, month)
         } else {
             stringResource(R.string.card_meta_no_trade, area, asOf)
         }

@@ -57,14 +57,29 @@ data class RepresentativePrice(
     val lastTrade: Trade? = null
 )
 
-/** 실거래 한 건 */
+/** 실거래 한 건. [floor]는 서버가 층을 주지 않으면 null이고 화면에는 "-"로 쓴다 */
 @Serializable
 data class Trade(
     @Serializable(with = LocalDateSerializer::class)
     val contractDate: LocalDate,
-    val floor: Int,
+    val floor: Int? = null,
     val priceManwon: Int
 )
+
+/**
+ * 서버가 좌표를 못 찾은 단지의 lat·lon. (0, 0)은 대서양 한가운데라 실제 단지와 겹치지 않는다.
+ * 좌표를 모르는 단지는 길 안내를 막고 방향·거리를 숨긴다.
+ */
+const val UNKNOWN_COORDINATE = 0.0
+
+private fun knownCoordinate(lat: Double, lon: Double) = !(lat == UNKNOWN_COORDINATE && lon == UNKNOWN_COORDINATE)
+
+/** 좌표를 아는지. 모르면 길 안내 버튼을 막고 방향·거리 칩을 숨긴다 */
+val ComplexSummary.hasCoordinate: Boolean
+    get() = knownCoordinate(lat, lon)
+
+val ComplexDetail.hasCoordinate: Boolean
+    get() = knownCoordinate(lat, lon)
 
 /**
  * 단지 상세 응답(S-04). 길 안내(NaviHelper RouteInfo)에는 lat·lon·name·address를 그대로 쓴다.
