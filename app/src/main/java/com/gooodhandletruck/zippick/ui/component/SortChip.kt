@@ -64,7 +64,7 @@ fun <T> SortChip(
             modifier = Modifier
                 .heightIn(min = AppDimens.TouchMin)
                 .widthIn(min = AppDimens.TouchMin)
-                .clip(RoundedCornerShape(AppDimens.ButtonRadius))
+                .clip(RoundedCornerShape(AppDimens.ChipRadius))
                 .background(AppColors.ButtonSecondary)
                 .clickable(role = Role.DropdownList) { expanded = true }
                 .padding(horizontal = AppDimens.SpaceM),
@@ -72,7 +72,7 @@ fun <T> SortChip(
         ) {
             Text(
                 text = stringResource(R.string.sort_chip, label(selected)),
-                style = AppType.LabelL,
+                style = AppType.Label1Medium,
                 color = AppColors.TextPrimary
             )
         }
@@ -82,7 +82,7 @@ fun <T> SortChip(
                     text = {
                         Text(
                             text = label(option),
-                            style = AppType.LabelL,
+                            style = AppType.Label1Medium,
                             color = if (option == selected) AppColors.Accent else AppColors.TextPrimary
                         )
                     },

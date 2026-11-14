@@ -23,7 +23,7 @@ import com.gooodhandletruck.zippick.ui.theme.AppDimens
 import com.gooodhandletruck.zippick.ui.theme.AppType
 
 /**
- * S-01 시작하기. 첫 실행 1단계. 제목(displayM) 아래에 주행 중·정차 중에 앱이 하는 일을 아이콘과 한 줄씩 쓴다.
+ * S-01 시작하기. 첫 실행 1단계. 제목(title2) 아래에 주행 중·정차 중에 앱이 하는 일을 아이콘과 한 줄씩 쓴다.
  * [위치 권한 허용하고 시작하기]를 누르면 위치 권한을 묻고, 허용하든 거부하든 창이 닫히면 [onStart]로 S-02에 간다.
  * 거부했으면 S-03에 권한 요청 상태 상자가 보인다.
  */
@@ -38,7 +38,7 @@ fun WelcomeScreen(window: WindowLayout, onStart: () -> Unit) {
     ) {
         Text(
             text = stringResource(R.string.welcome_title),
-            style = AppType.DisplayM,
+            style = AppType.Title2,
             color = AppColors.TextPrimary
         )
         Spacer(Modifier.height(AppDimens.SpaceL))
@@ -55,7 +55,7 @@ fun WelcomeScreen(window: WindowLayout, onStart: () -> Unit) {
     }
 }
 
-/** 옅은 강조색 동그라미 아이콘과 설명 한 줄(bodyM) */
+/** 옅은 강조색 동그라미 아이콘과 설명 한 줄(body2) */
 @Composable
 private fun WelcomeLine(@DrawableRes icon: Int, text: String) {
     Row(
@@ -63,6 +63,6 @@ private fun WelcomeLine(@DrawableRes icon: Int, text: String) {
         horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceM)
     ) {
         IconBadge(icon = icon, filled = false)
-        Text(text = text, style = AppType.BodyM, color = AppColors.TextSecondary, modifier = Modifier.weight(1f))
+        Text(text = text, style = AppType.Body2, color = AppColors.TextSecondary, modifier = Modifier.weight(1f))
     }
 }

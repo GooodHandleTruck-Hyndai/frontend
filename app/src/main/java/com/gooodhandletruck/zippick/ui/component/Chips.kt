@@ -31,11 +31,11 @@ import com.gooodhandletruck.zippick.ui.theme.AppDimens
 import com.gooodhandletruck.zippick.ui.theme.AppType
 
 /**
- * 누를 수 없는 작은 표시 칩(labelS). [filled]면 회색 바탕, 아니면 테두리만 그린다(S-04 유형 "아파트").
+ * 누를 수 없는 작은 표시 칩(label2). [filled]면 회색 바탕, 아니면 테두리만 그린다(S-04 유형 "아파트").
  */
 @Composable
 fun TagChip(text: String, modifier: Modifier = Modifier, filled: Boolean = true) {
-    val shape = RoundedCornerShape(AppDimens.ButtonRadius)
+    val shape = RoundedCornerShape(AppDimens.ChipRadius)
     val background = if (filled) {
         Modifier.background(AppColors.ButtonSecondary, shape)
     } else {
@@ -43,7 +43,7 @@ fun TagChip(text: String, modifier: Modifier = Modifier, filled: Boolean = true)
     }
     Text(
         text = text,
-        style = AppType.LabelS,
+        style = AppType.Label2,
         color = AppColors.TextSecondary,
         modifier = modifier
             .clip(shape)
@@ -53,7 +53,7 @@ fun TagChip(text: String, modifier: Modifier = Modifier, filled: Boolean = true)
 }
 
 /**
- * 여러 개를 함께 고를 수 있는 칩(labelL, 76×76 이상). 고른 칩은 강조색이고, [enabled]가 false면 흐리게 두고 누를 수 없다.
+ * 여러 개를 함께 고를 수 있는 칩(label1Medium, 76×76 이상). 고른 칩은 강조색이고, [enabled]가 false면 흐리게 두고 누를 수 없다.
  * S-02 알림 조건이 쓴다.
  */
 @Composable
@@ -68,7 +68,7 @@ fun ToggleChip(
         modifier = modifier
             .heightIn(min = AppDimens.TouchMin)
             .widthIn(min = AppDimens.TouchMin)
-            .clip(RoundedCornerShape(AppDimens.ButtonRadius))
+            .clip(RoundedCornerShape(AppDimens.ChipRadius))
             .background(if (checked && enabled) AppColors.Accent else AppColors.ButtonSecondary)
             .toggleable(value = checked, enabled = enabled, role = Role.Checkbox, onValueChange = onCheckedChange)
             .padding(horizontal = AppDimens.SpaceM),
@@ -76,7 +76,7 @@ fun ToggleChip(
     ) {
         Text(
             text = text,
-            style = AppType.LabelL,
+            style = AppType.Label1Medium,
             color = when {
                 !enabled -> AppColors.TextTertiary
                 checked -> AppColors.OnAccent
@@ -87,7 +87,7 @@ fun ToggleChip(
 }
 
 /**
- * 여럿 중 하나를 고르는 칩(labelL, 76×76 이상). 고른 칩은 강조색이다.
+ * 여럿 중 하나를 고르는 칩(label1Medium, 76×76 이상). 고른 칩은 강조색이다.
  * S-03 범위 칩(500m·1km·3km)과 S-04 평형 칩이 쓴다. 묶음에는 Modifier.selectableGroup()을 붙인다.
  */
 @Composable
@@ -96,7 +96,7 @@ fun SelectChip(text: String, selected: Boolean, onClick: () -> Unit, modifier: M
         modifier = modifier
             .heightIn(min = AppDimens.TouchMin)
             .widthIn(min = AppDimens.TouchMin)
-            .clip(RoundedCornerShape(AppDimens.ButtonRadius))
+            .clip(RoundedCornerShape(AppDimens.ChipRadius))
             .background(if (selected) AppColors.Accent else AppColors.ButtonSecondary)
             .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
             .padding(horizontal = AppDimens.SpaceM),
@@ -104,7 +104,7 @@ fun SelectChip(text: String, selected: Boolean, onClick: () -> Unit, modifier: M
     ) {
         Text(
             text = text,
-            style = AppType.LabelL,
+            style = AppType.Label1Medium,
             color = if (selected) AppColors.OnAccent else AppColors.TextPrimary
         )
     }
@@ -120,7 +120,7 @@ fun NumberBadge(
     filled: Boolean,
     modifier: Modifier = Modifier,
     size: Dp = AppDimens.BadgeSize,
-    style: TextStyle = AppType.DisplayS
+    style: TextStyle = AppType.Title2
 ) {
     Box(
         modifier = modifier
@@ -133,7 +133,7 @@ fun NumberBadge(
     }
 }
 
-/** "저장함" 칩: 옅은 강조색 바탕에 강조색 하트와 글자(labelS). 저장한 단지 카드에 붙인다(S-06) */
+/** "저장함" 칩: 옅은 강조색 바탕에 강조색 하트와 글자(label2). 저장한 단지 카드에 붙인다(S-06) */
 @Composable
 fun SavedMark(modifier: Modifier = Modifier) {
     Row(
@@ -150,7 +150,7 @@ fun SavedMark(modifier: Modifier = Modifier) {
             tint = AppColors.Accent,
             modifier = Modifier.size(SAVED_MARK_ICON_SIZE)
         )
-        Text(text = stringResource(R.string.card_saved_mark), style = AppType.LabelS, color = AppColors.Accent)
+        Text(text = stringResource(R.string.card_saved_mark), style = AppType.Label2, color = AppColors.Accent)
     }
 }
 

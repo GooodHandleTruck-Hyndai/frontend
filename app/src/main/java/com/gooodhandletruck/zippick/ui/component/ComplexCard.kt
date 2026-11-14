@@ -51,7 +51,7 @@ fun ComplexSummary.toCardModel(car: CarLocation) = ComplexCardModel(complex = th
 /**
  * 단지 카드 (S-03·S-05·S-06 공통). 시안(데모 화면)처럼 사진 칸 없이 글자와 숫자로 그린다.
  * 왼쪽 [leading]에는 번호 배지(S-03, 약도 번호와 같다)나 들은 시각(S-06)을 둔다.
- * 가운데는 위에서부터 이름(titleS), 방향·거리 줄(강조색), 가격(displayM), 면적·기간·기준일(labelS)이다.
+ * 가운데는 위에서부터 이름(body2Bold), 방향·거리 줄(강조색), 가격(title2), 면적·기간·기준일(label2)이다.
  * 최근 거래가 없으면 가격 자리에 "최근 3개월 거래가 없어요"를 쓴다 (화면 설계서 S-03 '상태별 문구').
  * 1:2 창에서 오른쪽 칸에 상세를 연 카드는 [selected]로 강조색 테두리(3)를 두른다.
  * [showSavedMark]면 저장한 단지에 "저장함" 칩을 붙인다(S-06).
@@ -90,7 +90,7 @@ fun ComplexCard(
         ) {
             Text(
                 text = model.complex.name,
-                style = AppType.TitleS,
+                style = AppType.Body2Bold,
                 color = AppColors.TextPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -120,21 +120,21 @@ fun ComplexCard(
     }
 }
 
-/** 가격(displayM)과 그 아래 "84㎡ · 최근 3개월 · 10월 31일 기준"(labelS) */
+/** 가격(title2)과 그 아래 "84㎡ · 최근 3개월 · 10월 31일 기준"(label2) */
 @Composable
 private fun PriceLines(price: RepresentativePrice?) {
     val months = (price?.periodDays ?: DEFAULT_PERIOD_DAYS) / DAYS_PER_MONTH
     val average = price?.avgPriceManwon
     val lastTrade = price?.lastTrade
     if (average != null) {
-        Text(text = formatPrice(average), style = AppType.DisplayM, color = AppColors.TextPrimary)
+        Text(text = formatPrice(average), style = AppType.Title2, color = AppColors.TextPrimary)
     } else if (lastTrade != null) {
         // 평균이 없으면 마지막 거래를 보여 준다. 아래 줄에 계약 월을 꼭 같이 쓴다
-        Text(text = formatPrice(lastTrade.priceManwon), style = AppType.DisplayM, color = AppColors.TextPrimary)
+        Text(text = formatPrice(lastTrade.priceManwon), style = AppType.Title2, color = AppColors.TextPrimary)
     } else {
         Text(
             text = stringResource(R.string.card_no_recent_trades, months),
-            style = AppType.BodyM,
+            style = AppType.Body2,
             color = AppColors.TextSecondary
         )
     }
@@ -153,16 +153,16 @@ private fun PriceLines(price: RepresentativePrice?) {
         } else {
             stringResource(R.string.card_meta_no_trade, area, asOf)
         }
-        Text(text = meta, style = AppType.LabelS, color = AppColors.TextTertiary)
+        Text(text = meta, style = AppType.Label2, color = AppColors.TextTertiary)
     }
 }
 
-/** S-06 카드 왼쪽의 들은 시각 "14:32"(bodyS, 너비 88) */
+/** S-06 카드 왼쪽의 들은 시각 "14:32"(body3, 너비 88) */
 @Composable
 fun CardTime(time: String, modifier: Modifier = Modifier) {
     Text(
         text = time,
-        style = AppType.BodyS,
+        style = AppType.Body3,
         color = AppColors.TextTertiary,
         modifier = modifier.width(AppDimens.TimeColumnWidth)
     )

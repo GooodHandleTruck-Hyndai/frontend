@@ -25,7 +25,7 @@ import com.gooodhandletruck.zippick.ui.theme.AppDimens
 import com.gooodhandletruck.zippick.ui.theme.AppType
 
 /**
- * S-09 주행 중 단지 알림. 단지 이름 한 줄(displayL, 길면 말줄임표)과 큰 버튼 두 개 [다시 듣기] [저장](높이 160, 반씩).
+ * S-09 주행 중 단지 알림. 단지 이름 한 줄(title1, 길면 말줄임표)과 큰 버튼 두 개 [다시 듣기] [저장](높이 160, 반씩).
  * 이름은 시안(D-01)처럼 옅은 강조색 테두리(3)의 흰 카드에 소리 아이콘과 함께 둔다. 글자는 이름 한 줄뿐이다.
  * 가격은 화면에 쓰지 않고 소리로만 말한다. 2분이 지나면 S-08로 돌아간다(Navigator).
  * [저장]을 누르면 "저장했어요"로 바뀌고 더 누를 수 없다. 취소는 정차 중에 한다.
@@ -87,7 +87,7 @@ private fun NameCard(name: String) {
         )
         Text(
             text = name,
-            style = AppType.DisplayL,
+            style = AppType.Title1,
             color = AppColors.TextPrimary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

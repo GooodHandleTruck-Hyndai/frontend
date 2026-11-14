@@ -171,18 +171,18 @@ fun NearbyScreen(
     }
 }
 
-/** "주변 단지"(displayM)와 "내 위치에서 1km 안 · 12곳"(bodyM) */
+/** "주변 단지"(title2)와 "내 위치에서 1km 안 · 12곳"(body2) */
 @Composable
 private fun NearbyHeader(radius: NearbyRadius, totalCount: Int?, showRange: Boolean) {
     Column(verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceXs)) {
-        Text(text = stringResource(R.string.screen_nearby), style = AppType.DisplayM, color = AppColors.TextPrimary)
+        Text(text = stringResource(R.string.screen_nearby), style = AppType.Title2, color = AppColors.TextPrimary)
         if (showRange) {
             val range = if (totalCount != null) {
                 stringResource(R.string.nearby_header_count, radius.label, totalCount)
             } else {
                 stringResource(R.string.nearby_header_range, radius.label)
             }
-            Text(text = range, style = AppType.BodyM, color = AppColors.TextTertiary)
+            Text(text = range, style = AppType.Body2, color = AppColors.TextTertiary)
         }
     }
 }
