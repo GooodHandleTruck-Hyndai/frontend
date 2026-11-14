@@ -31,8 +31,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // TODO: 실제 서버 주소로 교체
-            buildConfigField("String", "API_BASE_URL", "\"https://api.example.com/\"")
+            // 공모전 심사용 공개 서버(백엔드가 운영). debug 빌드는 그대로 내 PC 로컬 서버를 본다
+            buildConfigField("String", "API_BASE_URL", "\"https://3-37-254-181.sslip.io/\"")
+            // 심사·시연용 APK를 바로 설치할 수 있게 개발용 서명 키로 서명한다.
+            // TODO: 앱마켓에 낼 때는 팀 정식 서명 키로 바꾼다
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
