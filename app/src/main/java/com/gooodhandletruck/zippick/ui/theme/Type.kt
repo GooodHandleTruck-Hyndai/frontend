@@ -21,10 +21,10 @@ private fun astaSans(weight: FontWeight) = Font(
     variationSettings = FontVariation.Settings(FontVariation.weight(weight.weight))
 )
 
+// Figma 텍스트 스타일이 쓰는 굵기 네 가지(Regular 400, Medium 500, Bold 700, ExtraBold 800)
 val AstaSans = FontFamily(
     astaSans(FontWeight.Normal),
     astaSans(FontWeight.Medium),
-    astaSans(FontWeight.SemiBold),
     astaSans(FontWeight.Bold),
     astaSans(FontWeight.ExtraBold)
 )
@@ -33,51 +33,53 @@ private fun textStyle(size: Int, lineHeight: Int, weight: FontWeight) = TextStyl
     fontFamily = AstaSans,
     fontWeight = weight,
     fontSize = size.sp,
-    lineHeight = lineHeight.sp
+    lineHeight = lineHeight.sp,
+    letterSpacing = 0.sp
 )
 
-/** 화면 설계서 '공통 규격 > 글자'의 8단계. 20sp보다 작은 글자는 쓰지 않는다. */
+/**
+ * Figma 디자인 시스템(✦ Foundation)의 텍스트 스타일 14개. 이름도 Figma에 맞췄다(Body2/Bold → Body2Bold).
+ * 크기/줄높이 sp, 자간 0. 20sp보다 작은 글자는 쓰지 않는다.
+ */
 object AppType {
-    val TitleL = textStyle(40, 52, FontWeight.Bold) // 주행 중 단지 이름, 상세 가격
-    val TitleM = textStyle(36, 44, FontWeight.Bold) // 상세 단지 이름, 시작하기 제목
-    val TitleS = textStyle(32, 40, FontWeight.Bold) // 화면 제목, 카드 가격
-    val BodyL = textStyle(30, 38, FontWeight.SemiBold) // 카드 단지 이름
-    val BodyM = textStyle(28, 36, FontWeight.Normal) // 본문, 거래 내역
-    val BodyS = textStyle(26, 34, FontWeight.Normal) // 주소, 설명
-    val LabelL = textStyle(24, 28, FontWeight.SemiBold) // 칩, 탭 이름, 방향·거리
-    val LabelS = textStyle(20, 24, FontWeight.Medium) // 기준일, 캡션, 약도 말풍선
+    // Headline은 아직 쓰지 않는다(CLAUDE.md 화면 규격의 제목은 40 이하)
+    val Headline1 = textStyle(60, 80, FontWeight.ExtraBold)
+    val Headline2 = textStyle(48, 64, FontWeight.Bold)
 
-    // 시안(데모 화면)처럼 이름과 가격을 더 굵게(800) 쓰는 글자. 크기·줄높이는 위 8단계에서 고른다
-    val DisplayL = textStyle(40, 52, FontWeight.ExtraBold) // 주행 중 단지 이름, 상세 단지 이름·대표 가격
-    val DisplayM = textStyle(36, 44, FontWeight.ExtraBold) // 화면 제목, 카드 가격
-    val DisplayS = textStyle(32, 40, FontWeight.ExtraBold) // 거래 표 가격, 번호 배지
+    val Title1 = textStyle(40, 52, FontWeight.Bold) // 주행 중 단지 이름, 상세 단지 이름·대표 가격
+    val Title2 = textStyle(36, 44, FontWeight.Bold) // 화면 제목, 카드 가격, 상세 칸 제목, 번호 배지
+    val Body1 = textStyle(30, 38, FontWeight.Normal) // 설정 항목 이름, 주행 중 대기 문구, 공시가격
+    val Body2 = textStyle(28, 36, FontWeight.Normal) // 본문, 설명, 거래 표 날짜·층
+    val Body2Bold = textStyle(28, 36, FontWeight.Bold) // 카드 단지 이름, 거래 표 금액
+    val Body3 = textStyle(26, 34, FontWeight.Normal) // 주소, 보조 설명
+    val Label1Medium = textStyle(24, 28, FontWeight.Medium) // 칩, 고른 탭 이름, 방향·거리, 상태 알약
+    val Label1 = textStyle(24, 28, FontWeight.Normal) // 고르지 않은 탭 이름
+    val Label2 = textStyle(20, 24, FontWeight.Normal) // 기준일, 캡션, 약도 말풍선
 
-    // 버튼 글자: Figma 텍스트 스타일 Button/Large·Button/Medium
+    // 버튼 글자: Button/Large·Medium·Small. Small 버튼(64)은 76보다 작아 쓰지 않는다
     val ButtonL = textStyle(32, 40, FontWeight.Bold)
     val ButtonM = textStyle(30, 38, FontWeight.Bold)
-
-    // labelL을 굵게(700): 고른 탭 이름, 방향·거리 줄
-    val LabelBold = textStyle(24, 28, FontWeight.Bold)
+    val ButtonS = textStyle(26, 34, FontWeight.Bold)
 }
 
 /**
- * Material 컴포넌트가 기본으로 쓰는 글자도 위 8단계 안에서 고른다.
+ * Material 컴포넌트가 기본으로 쓰는 글자도 위 스타일 안에서 고른다.
  * Material 기본값은 11~16sp가 많아서 그대로 두면 20sp보다 작아진다.
  */
 val AppTypography = Typography(
-    displayLarge = AppType.TitleL,
-    displayMedium = AppType.TitleL,
-    displaySmall = AppType.TitleL,
-    headlineLarge = AppType.TitleM,
-    headlineMedium = AppType.TitleS,
-    headlineSmall = AppType.TitleS,
-    titleLarge = AppType.BodyL,
-    titleMedium = AppType.BodyL,
-    titleSmall = AppType.LabelL,
-    bodyLarge = AppType.BodyM,
-    bodyMedium = AppType.BodyS,
-    bodySmall = AppType.LabelS,
-    labelLarge = AppType.LabelL,
-    labelMedium = AppType.LabelS,
-    labelSmall = AppType.LabelS
+    displayLarge = AppType.Title1,
+    displayMedium = AppType.Title1,
+    displaySmall = AppType.Title1,
+    headlineLarge = AppType.Title2,
+    headlineMedium = AppType.Title2,
+    headlineSmall = AppType.Title2,
+    titleLarge = AppType.Body1,
+    titleMedium = AppType.Body1,
+    titleSmall = AppType.Label1Medium,
+    bodyLarge = AppType.Body2,
+    bodyMedium = AppType.Body3,
+    bodySmall = AppType.Label2,
+    labelLarge = AppType.Label1Medium,
+    labelMedium = AppType.Label2,
+    labelSmall = AppType.Label2
 )

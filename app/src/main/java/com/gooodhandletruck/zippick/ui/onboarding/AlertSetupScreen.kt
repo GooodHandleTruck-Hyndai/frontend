@@ -118,12 +118,12 @@ fun AlertSetupScreen(
             Column(verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)) {
                 Text(
                     text = stringResource(R.string.alert_title),
-                    style = AppType.DisplayM,
+                    style = AppType.Title2,
                     color = AppColors.TextPrimary
                 )
                 Text(
                     text = stringResource(R.string.alert_description),
-                    style = AppType.BodyM,
+                    style = AppType.Body2,
                     color = AppColors.TextSecondary
                 )
             }
@@ -175,11 +175,11 @@ fun AlertSetupScreen(
     }
 }
 
-/** 항목 이름(labelL)과 칩 한 줄. 창이 좁으면 칩 줄만 옆으로 민다 */
+/** 항목 이름(label1Medium)과 칩 한 줄. 창이 좁으면 칩 줄만 옆으로 민다 */
 @Composable
 private fun ChipSection(title: String, chips: @Composable () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)) {
-        Text(text = title, style = AppType.LabelL, color = AppColors.TextSecondary)
+        Text(text = title, style = AppType.Label1Medium, color = AppColors.TextSecondary)
         Row(
             modifier = Modifier.horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)

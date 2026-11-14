@@ -31,7 +31,7 @@ import com.gooodhandletruck.zippick.ui.theme.AppType
 private const val LOGO_ICON_RATIO = 0.6f
 
 /**
- * 정차 중 화면 맨 위 머리글(높이 96): 앱 로고, 앱 이름(titleS), 오른쪽 끝 상태 알약 "정차 중" (시안 머리글).
+ * 정차 중 화면 맨 위 머리글(높이 96): 앱 로고, 앱 이름(title2), 오른쪽 끝 상태 알약 "정차 중" (시안 머리글).
  * 왼쪽 탭이 보이면 [startPadding]으로 로고를 탭 가운데에 맞춘다. 주행 중 화면(S-08·S-09)에는 두지 않는다.
  */
 @Composable
@@ -47,7 +47,7 @@ fun AppHeader(startPadding: Dp, endPadding: Dp, modifier: Modifier = Modifier) {
         AppLogo()
         Text(
             text = stringResource(R.string.brand_name),
-            style = AppType.TitleS,
+            style = AppType.Title2,
             color = AppColors.TextPrimary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -70,12 +70,12 @@ fun AppLogo(modifier: Modifier = Modifier, size: Dp = AppDimens.LogoSize) {
     )
 }
 
-/** 지금 상태를 알리는 알약(labelL): "정차 중". 누를 수 없다 */
+/** 지금 상태를 알리는 알약(label1Medium): "정차 중". 누를 수 없다 */
 @Composable
 fun StatusPill(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
-        style = AppType.LabelL,
+        style = AppType.Label1Medium,
         color = AppColors.TextSecondary,
         maxLines = 1,
         modifier = modifier

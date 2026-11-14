@@ -112,7 +112,7 @@ fun NearbyMap(
 
         Text(
             text = stringResource(R.string.map_heading_up),
-            style = AppType.LabelS,
+            style = AppType.Label2,
             color = AppColors.TextTertiary,
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -120,7 +120,7 @@ fun NearbyMap(
         )
         Text(
             text = stringResource(R.string.map_legend),
-            style = AppType.LabelS,
+            style = AppType.Label2,
             color = AppColors.TextTertiary,
             modifier = Modifier
                 .align(Alignment.BottomStart)
@@ -165,7 +165,7 @@ private fun RingLabel(meters: Int, offsetX: Dp) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(
             text = formatDistance(meters.toDouble()),
-            style = AppType.LabelS,
+            style = AppType.Label2,
             color = AppColors.TextTertiary,
             modifier = Modifier.layout { measurable, constraints ->
                 val placeable = measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
@@ -231,13 +231,13 @@ private fun MapPin(
             ) {
                 Text(
                     text = number.toString(),
-                    style = AppType.LabelBold,
+                    style = AppType.Label1Medium,
                     color = if (selected) AppColors.Accent else AppColors.OnAccent
                 )
             }
             Text(
                 text = label,
-                style = AppType.LabelS,
+                style = AppType.Label2,
                 color = when {
                     selected -> AppColors.OnAccent
                     shown == null -> AppColors.TextTertiary

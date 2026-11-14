@@ -117,7 +117,7 @@ fun ComplexDetailRoute(
 }
 
 /**
- * S-04 단지 상세. 시안(D-03 단지 카드, D-04 도착 카드)을 따라 위에서 아래로 머리글(이름 displayL, 유형·방향·거리, 주소),
+ * S-04 단지 상세. 시안(D-03 단지 카드, D-04 도착 카드)을 따라 위에서 아래로 머리글(이름 title1, 유형·방향·거리, 주소),
  * 가격 카드(평형 칩, 대표 가격, 공시가격), 최근 거래 표 카드, 자료 기준 카드이고, [저장]·[길 안내]는 아래에 고정한다.
  * 1:2 창에서는 목록 옆 칸에, 1:1:1 창에서는 창 전체로 열린다. 창이 낮으면 카드 부분만 스크롤한다.
  * 길 안내로 도착해서 열었으면([arrived]) 머리글 위에 "도착했어요" 띠를 둔다.
@@ -183,7 +183,7 @@ fun ComplexDetailScreen(
 }
 
 /**
- * 머리글: [‹ 뒤로]/[× 닫기], 단지 이름(displayL), 유형 칩 "아파트"와 방향·거리 줄, 주소(bodyS).
+ * 머리글: [‹ 뒤로]/[× 닫기], 단지 이름(title1), 유형 칩 "아파트"와 방향·거리 줄, 주소(body3).
  * 불러오는 중에는 버튼만 보인다.
  */
 @Composable
@@ -199,7 +199,7 @@ private fun DetailHeader(detail: ComplexDetail?, place: RelativePlace?, isSidePa
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceXs)) {
                 Text(
                     text = detail.name,
-                    style = AppType.DisplayL,
+                    style = AppType.Title1,
                     color = AppColors.TextPrimary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -213,7 +213,7 @@ private fun DetailHeader(detail: ComplexDetail?, place: RelativePlace?, isSidePa
                 }
                 Text(
                     text = detail.address,
-                    style = AppType.BodyS,
+                    style = AppType.Body3,
                     color = AppColors.TextTertiary,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -246,7 +246,7 @@ private fun DetailBody(
             DetailCard {
                 Text(
                     text = stringResource(R.string.detail_no_trades),
-                    style = AppType.BodyM,
+                    style = AppType.Body2,
                     color = AppColors.TextSecondary
                 )
             }
@@ -288,7 +288,11 @@ private fun AreaChips(areas: List<AreaPrice>, selected: AreaPrice, onSelect: (Do
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)
     ) {
-        Text(text = stringResource(R.string.detail_area_label), style = AppType.LabelL, color = AppColors.TextSecondary)
+        Text(
+            text = stringResource(R.string.detail_area_label),
+            style = AppType.Label1Medium,
+            color = AppColors.TextSecondary
+        )
         areas.forEach { area ->
             SelectChip(
                 text = formatArea(area.areaM2),
@@ -300,7 +304,7 @@ private fun AreaChips(areas: List<AreaPrice>, selected: AreaPrice, onSelect: (Do
 }
 
 /**
- * 가격 요약: "최근 3개월 평균"(labelL), "12억 3,000만"(displayL), "거래 4건 · 10월 31일 기준"(labelS),
+ * 가격 요약: "최근 3개월 평균"(label1Medium), "12억 3,000만"(title1), "거래 4건 · 10월 31일 기준"(label2),
  * [공시가격] 칩과 공시가격. 최근 3개월 거래가 없으면 마지막 거래 가격을 64% 글자로 쓰고 "마지막 거래 · 2026년 3월"을 붙인다.
  */
 @Composable
@@ -316,13 +320,13 @@ private fun PriceSummary(area: AreaPrice, periodDays: Int, asOf: LocalDate) {
         if (average != null) {
             Text(
                 text = stringResource(R.string.detail_average_label, months),
-                style = AppType.LabelL,
+                style = AppType.Label1Medium,
                 color = AppColors.TextSecondary
             )
-            Text(text = formatPrice(average), style = AppType.DisplayL, color = AppColors.TextPrimary)
+            Text(text = formatPrice(average), style = AppType.Title1, color = AppColors.TextPrimary)
             Text(
                 text = stringResource(R.string.detail_trade_meta, area.tradeCount, asOfText),
-                style = AppType.LabelS,
+                style = AppType.Label2,
                 color = AppColors.TextTertiary
             )
         } else if (lastTrade != null) {
@@ -333,13 +337,13 @@ private fun PriceSummary(area: AreaPrice, periodDays: Int, asOf: LocalDate) {
             )
             Text(
                 text = stringResource(R.string.detail_last_trade_label, month),
-                style = AppType.LabelL,
+                style = AppType.Label1Medium,
                 color = AppColors.TextSecondary
             )
-            Text(text = formatPrice(lastTrade.priceManwon), style = AppType.DisplayL, color = AppColors.TextTertiary)
+            Text(text = formatPrice(lastTrade.priceManwon), style = AppType.Title1, color = AppColors.TextTertiary)
             Text(
                 text = stringResource(R.string.detail_no_recent_meta, months, asOfText),
-                style = AppType.LabelS,
+                style = AppType.Label2,
                 color = AppColors.TextTertiary
             )
         }
@@ -347,7 +351,7 @@ private fun PriceSummary(area: AreaPrice, periodDays: Int, asOf: LocalDate) {
     }
 }
 
-/** [공시가격] 칩(공시가격 색)과 그 옆 가격(bodyL) */
+/** [공시가격] 칩(공시가격 색)과 그 옆 가격(body1) */
 @Composable
 private fun OfficialPrice(priceManwon: Int) {
     Row(
@@ -357,24 +361,24 @@ private fun OfficialPrice(priceManwon: Int) {
     ) {
         Text(
             text = stringResource(R.string.official_price_chip),
-            style = AppType.LabelBold,
+            style = AppType.Label1Medium,
             color = AppColors.OfficialPrice,
             modifier = Modifier
                 .clip(CircleShape)
                 .background(AppColors.OfficialPriceSoft)
                 .padding(horizontal = AppDimens.SpaceS, vertical = AppDimens.SpaceXs)
         )
-        Text(text = formatPrice(priceManwon), style = AppType.BodyL, color = AppColors.TextPrimary)
+        Text(text = formatPrice(priceManwon), style = AppType.Body1, color = AppColors.TextPrimary)
     }
 }
 
 /**
- * 최근 거래 표(최대 3건, 최신 순): 제목 "최근 거래"(titleS), 칸 이름 줄(labelS), 거래마다 계약일·층(bodyM)과
- * 거래금액(displayS, 오른쪽 정렬). 줄 사이에 2짜리 옅은 선을 긋는다(시안 D-03).
+ * 최근 거래 표(최대 3건, 최신 순): 제목 "최근 거래"(title2), 칸 이름 줄(label2), 거래마다 계약일·층(body2)과
+ * 거래금액(body2Bold, 오른쪽 정렬). 줄 사이에 2짜리 옅은 선을 긋는다(시안 D-03).
  */
 @Composable
 private fun RecentTrades(trades: List<Trade>, asOf: LocalDate) {
-    Text(text = stringResource(R.string.detail_recent_trades), style = AppType.TitleS, color = AppColors.TextPrimary)
+    Text(text = stringResource(R.string.detail_recent_trades), style = AppType.Title2, color = AppColors.TextPrimary)
     TradeRow(
         date = stringResource(R.string.detail_col_date),
         floor = stringResource(R.string.detail_col_floor),
@@ -394,7 +398,7 @@ private fun RecentTrades(trades: List<Trade>, asOf: LocalDate) {
 
 @Composable
 private fun TradeRow(date: String, floor: String, price: String, isHeader: Boolean) {
-    val textStyle = if (isHeader) AppType.LabelS else AppType.BodyM
+    val textStyle = if (isHeader) AppType.Label2 else AppType.Body2
     val textColor = if (isHeader) AppColors.TextTertiary else AppColors.TextSecondary
     Row(
         modifier = Modifier
@@ -406,7 +410,7 @@ private fun TradeRow(date: String, floor: String, price: String, isHeader: Boole
         Text(text = floor, style = textStyle, color = textColor, modifier = Modifier.weight(FLOOR_COLUMN_WEIGHT))
         Text(
             text = price,
-            style = if (isHeader) textStyle else AppType.DisplayS,
+            style = if (isHeader) textStyle else AppType.Body2Bold,
             color = if (isHeader) textColor else AppColors.TextPrimary,
             textAlign = TextAlign.End,
             modifier = Modifier.weight(PRICE_COLUMN_WEIGHT)
@@ -420,7 +424,7 @@ private fun TradeRow(date: String, floor: String, price: String, isHeader: Boole
  */
 @Composable
 private fun SourceNotes(asOf: LocalDate, showOfficialNote: Boolean) {
-    Text(text = stringResource(R.string.detail_source_title), style = AppType.TitleS, color = AppColors.TextPrimary)
+    Text(text = stringResource(R.string.detail_source_title), style = AppType.Title2, color = AppColors.TextPrimary)
     SourceLine(icon = R.drawable.ic_calendar, text = stringResource(R.string.detail_source_as_of, monthDay(asOf)))
     SourceLine(icon = R.drawable.ic_clock, text = stringResource(R.string.detail_source_delay))
     if (showOfficialNote) {
@@ -443,7 +447,7 @@ private fun SourceLine(@DrawableRes icon: Int, text: String, tint: Color = AppCo
                 .padding(top = SOURCE_ICON_NUDGE)
                 .size(AppDimens.IconL)
         )
-        Text(text = text, style = AppType.BodyM, color = AppColors.TextSecondary, modifier = Modifier.weight(1f))
+        Text(text = text, style = AppType.Body2, color = AppColors.TextSecondary, modifier = Modifier.weight(1f))
     }
 }
 
@@ -501,7 +505,7 @@ private fun ArrivedBand() {
             tint = AppColors.Accent,
             modifier = Modifier.size(AppDimens.IconL)
         )
-        Text(text = stringResource(R.string.detail_arrived), style = AppType.TitleS, color = AppColors.Accent)
+        Text(text = stringResource(R.string.detail_arrived), style = AppType.Title2, color = AppColors.Accent)
     }
 }
 

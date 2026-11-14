@@ -201,7 +201,7 @@ private fun RouteMessageBand(message: RouteMessage, modifier: Modifier = Modifie
                     RouteMessage.FAILED -> R.string.route_failed
                 }
             ),
-            style = AppType.BodyM,
+            style = AppType.Body2,
             color = AppColors.TextPrimary
         )
     }
@@ -270,7 +270,7 @@ private fun DetailPaneHint(window: WindowLayout) {
         IconBadge(icon = R.drawable.ic_app_logo, size = AppDimens.TouchMin * 2, filled = false)
         Text(
             text = stringResource(R.string.detail_pane_hint),
-            style = AppType.BodyM,
+            style = AppType.Body2,
             color = AppColors.TextTertiary,
             textAlign = TextAlign.Center
         )
@@ -397,12 +397,12 @@ private fun HeardBanner(name: String, window: WindowLayout, onOpen: () -> Unit, 
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = stringResource(R.string.banner_heard_label),
-                style = AppType.LabelL,
+                style = AppType.Label1Medium,
                 color = AppColors.TextTertiary
             )
             Text(
                 text = name,
-                style = AppType.TitleS,
+                style = AppType.Body2Bold,
                 color = AppColors.TextPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

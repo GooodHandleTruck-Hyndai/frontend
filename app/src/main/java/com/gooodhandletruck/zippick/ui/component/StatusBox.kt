@@ -38,9 +38,9 @@ fun StatusBox(
         verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceM)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceXs)) {
-            Text(text = message, style = AppType.BodyM, color = AppColors.TextPrimary)
+            Text(text = message, style = AppType.Body2, color = AppColors.TextPrimary)
             if (detail != null) {
-                Text(text = detail, style = AppType.BodyS, color = AppColors.TextSecondary)
+                Text(text = detail, style = AppType.Body3, color = AppColors.TextSecondary)
             }
         }
         if (actionLabel != null) {

@@ -45,7 +45,7 @@ fun DirectionLabel(place: RelativePlace, modifier: Modifier = Modifier) {
         )
         Text(
             text = stringResource(R.string.direction_chip, directionName, formatDistance(place.distanceMeters)),
-            style = AppType.LabelBold,
+            style = AppType.Label1Medium,
             color = AppColors.Accent
         )
     }

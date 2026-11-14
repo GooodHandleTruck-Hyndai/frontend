@@ -98,7 +98,7 @@ fun AlertsScreen(
                 icon = R.drawable.ic_chevron_left
             )
         }
-        Text(text = stringResource(R.string.screen_alerts), style = AppType.DisplayM, color = AppColors.TextPrimary)
+        Text(text = stringResource(R.string.screen_alerts), style = AppType.Title2, color = AppColors.TextPrimary)
         when (content) {
             AlertsContent.Loading -> LoadingCards(modifier = Modifier.weight(1f))
             AlertsContent.Failed -> StatusBox(
@@ -132,7 +132,7 @@ fun AlertsScreen(
 
 /**
  * 알림 한 장. 단지 카드(ComplexCard)와 같은 모양이다: 카드 바탕, 테두리, 모서리 24, 안쪽 여백 32·24,
- * 이름은 titleS, 오른쪽 끝에 상세가 열린다는 › 표시.
+ * 이름은 body2Bold, 오른쪽 끝에 상세가 열린다는 › 표시.
  */
 @Composable
 private fun AlertCard(alert: NewTradeAlert, selected: Boolean, onClick: () -> Unit) {
@@ -162,7 +162,7 @@ private fun AlertCard(alert: NewTradeAlert, selected: Boolean, onClick: () -> Un
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceXs)) {
             Text(
                 text = alert.name,
-                style = AppType.TitleS,
+                style = AppType.Body2Bold,
                 color = AppColors.TextPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -175,7 +175,7 @@ private fun AlertCard(alert: NewTradeAlert, selected: Boolean, onClick: () -> Un
                     alert.contractDate.monthValue,
                     alert.contractDate.dayOfMonth
                 ),
-                style = AppType.BodyS,
+                style = AppType.Body3,
                 color = if (alert.read) AppColors.TextTertiary else AppColors.TextSecondary
             )
         }
