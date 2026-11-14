@@ -192,7 +192,9 @@ private fun MapPin(
     onClick: () -> Unit
 ) {
     val average = card.complex.price?.avgPriceManwon
-    val label = average?.let(::formatPriceShort) ?: stringResource(R.string.map_no_average)
+    // 평균이 없으면 마지막 거래 가격. 그것도 없으면 "-"
+    val shown = average ?: card.complex.price?.lastTrade?.priceManwon
+    val label = shown?.let(::formatPriceShort) ?: stringResource(R.string.map_no_average)
     val description = stringResource(R.string.map_pin_description, number, card.complex.name, label)
 
     Box(
@@ -238,7 +240,7 @@ private fun MapPin(
                 style = AppType.LabelS,
                 color = when {
                     selected -> AppColors.OnAccent
-                    average == null -> AppColors.TextTertiary
+                    shown == null -> AppColors.TextTertiary
                     else -> AppColors.TextPrimary
                 }
             )

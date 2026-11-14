@@ -8,7 +8,9 @@ enum class SavedSort { SAVED, NEAREST, PRICE }
 /** S-05 화면 상태 */
 data class SavedUiState(
     val sort: SavedSort = SavedSort.SAVED,
-    val content: SavedContent = SavedContent.Loading
+    val content: SavedContent = SavedContent.Loading,
+    /** 안 읽은 새 거래 알림 수(S-10). 0이면 버튼에 숫자를 붙이지 않는다 */
+    val unreadAlerts: Int = 0
 )
 
 sealed interface SavedContent {

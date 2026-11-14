@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.gooodhandletruck.zippick.R
+import com.gooodhandletruck.zippick.ui.alerts.AlertsRoute
 import com.gooodhandletruck.zippick.ui.component.AppHeader
 import com.gooodhandletruck.zippick.ui.component.IconBadge
 import com.gooodhandletruck.zippick.ui.component.NavRail
@@ -249,7 +250,7 @@ private fun WidePanesContent(
                 }
             } else if (panes.list == Screen.Nearby) {
                 NearbyMapPane(window = window, onOpenComplex = { viewModel.open(Screen.ComplexDetail(it)) })
-            } else if (panes.list == Screen.Saved || panes.list == Screen.History) {
+            } else if (panes.list == Screen.Saved || panes.list == Screen.History || panes.list == Screen.Alerts) {
                 DetailPaneHint(window)
             }
         }
@@ -295,13 +296,13 @@ private fun NavState.widePanes(): WidePanes? {
 
 /** 1:2 창에서 오른쪽에 상세 칸을 두는 목록 화면 (화면 설계서 '레이아웃') */
 private val Screen.Parked.hasDetailPane: Boolean
-    get() = this == Screen.Nearby || this == Screen.Saved || this == Screen.History
+    get() = this == Screen.Nearby || this == Screen.Saved || this == Screen.History || this == Screen.Alerts
 
 /** 화면 상태를 기억할 이름. S-02는 첫 실행과 설정에서 따로 기억한다 */
 private val Screen.Parked.stateKey: String
     get() = if (this is Screen.AlertSetup && isOnboarding) "$id-onboarding" else id
 
-/** 정차 중 화면 7개와 각 화면의 이동 버튼을 Navigator에 잇는다. */
+/** 정차 중 화면 8개와 각 화면의 이동 버튼을 Navigator에 잇는다. */
 @Composable
 private fun ParkedScreen(
     screen: Screen.Parked,
@@ -354,7 +355,8 @@ private fun ParkedScreen(
             selectedComplexId = selectedComplexId,
             onOpenComplex = openComplex,
             onStartRoute = viewModel::startRoute,
-            onGoNearby = { viewModel.selectTab(Tab.NEARBY) }
+            onGoNearby = { viewModel.selectTab(Tab.NEARBY) },
+            onOpenAlerts = { viewModel.open(Screen.Alerts) }
         )
         Screen.History -> HistoryRoute(
             window = window,
@@ -365,6 +367,12 @@ private fun ParkedScreen(
             onSetAlert = openAlertSetup
         )
         Screen.Settings -> SettingsRoute(window = window, onEditAlert = openAlertSetup)
+        Screen.Alerts -> AlertsRoute(
+            window = window,
+            selectedComplexId = selectedComplexId,
+            onOpenComplex = openComplex,
+            onBack = onBack ?: viewModel::back
+        )
     }
 }
 

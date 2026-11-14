@@ -31,8 +31,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // TODO: 실제 서버 주소로 교체
-            buildConfigField("String", "API_BASE_URL", "\"https://api.example.com/\"")
+            // #10: 배포된 백엔드 서버 (AWS EC2, https, 1차 심사 기간 운영 — backend #57)
+            // 서버 주소가 바뀌면 이 줄만 수정. 디버그(위 10.0.2.2)는 내 PC 로컬 서버용
+            buildConfigField("String", "API_BASE_URL", "\"https://3-37-254-181.sslip.io/\"")
         }
     }
 
