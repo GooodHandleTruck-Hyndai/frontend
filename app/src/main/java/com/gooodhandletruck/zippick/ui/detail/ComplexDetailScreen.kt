@@ -44,6 +44,7 @@ import com.gooodhandletruck.zippick.data.RouteTarget
 import com.gooodhandletruck.zippick.data.model.AreaPrice
 import com.gooodhandletruck.zippick.data.model.ComplexDetail
 import com.gooodhandletruck.zippick.data.model.Trade
+import com.gooodhandletruck.zippick.data.model.hasCoordinate
 import com.gooodhandletruck.zippick.data.toRouteTarget
 import com.gooodhandletruck.zippick.ui.WindowLayout
 import com.gooodhandletruck.zippick.ui.component.DirectionLabel
@@ -62,6 +63,9 @@ import com.gooodhandletruck.zippick.ui.theme.AppType
 import java.time.LocalDate
 
 private const val DAYS_PER_MONTH = 30
+
+/** 서버가 층을 주지 않은 거래의 층 칸 */
+private const val NO_FLOOR = "-"
 
 // 최근 거래 표의 세 칸(계약일 · 층 · 거래금액) 너비 비율
 private const val DATE_COLUMN_WEIGHT = 1.5f
@@ -169,6 +173,7 @@ fun ComplexDetailScreen(
                 )
                 ActionButtons(
                     saved = state.saved,
+                    canRoute = content.detail.hasCoordinate,
                     onToggleSaved = onToggleSaved,
                     onStartRoute = { onStartRoute(content.detail.toRouteTarget()) }
                 )
@@ -381,7 +386,7 @@ private fun RecentTrades(trades: List<Trade>, asOf: LocalDate) {
         HorizontalDivider(thickness = 2.dp, color = AppColors.ButtonSecondary)
         TradeRow(
             date = tradeDate(trade.contractDate, asOf),
-            floor = stringResource(R.string.detail_floor, trade.floor),
+            floor = trade.floor?.let { stringResource(R.string.detail_floor, it) } ?: NO_FLOOR,
             price = formatPrice(trade.priceManwon),
             isHeader = false
         )
@@ -449,7 +454,7 @@ private fun SourceLine(@DrawableRes icon: Int, text: String, tint: Color = AppCo
  * 저장한 뒤에는 보조 버튼 모양에 강조색 꽉 찬 하트로 바꿔, 다시 누르라는 버튼이 아니라 지금 상태라는 것을 보인다.
  */
 @Composable
-private fun ActionButtons(saved: Boolean, onToggleSaved: () -> Unit, onStartRoute: () -> Unit) {
+private fun ActionButtons(saved: Boolean, canRoute: Boolean, onToggleSaved: () -> Unit, onStartRoute: () -> Unit) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceM)) {
         if (saved) {
             SecondaryButton(
@@ -471,6 +476,8 @@ private fun ActionButtons(saved: Boolean, onToggleSaved: () -> Unit, onStartRout
             text = stringResource(R.string.action_route),
             onClick = onStartRoute,
             modifier = Modifier.weight(1f),
+            // 좌표를 못 찾은 단지는 길 안내를 보낼 수 없다
+            enabled = canRoute,
             icon = R.drawable.ic_route
         )
     }

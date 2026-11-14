@@ -9,6 +9,7 @@ import com.gooodhandletruck.zippick.data.CarLocation
 import com.gooodhandletruck.zippick.data.ComplexNotFoundException
 import com.gooodhandletruck.zippick.data.LocationState
 import com.gooodhandletruck.zippick.data.model.defaultArea
+import com.gooodhandletruck.zippick.data.model.hasCoordinate
 import com.gooodhandletruck.zippick.ui.component.placeOf
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -135,6 +136,7 @@ class ComplexDetailViewModel(app: Application) : AndroidViewModel(app) {
     private fun ComplexDetailUiState.withPlace(): ComplexDetailUiState {
         val detail = (content as? DetailContent.Loaded)?.detail ?: return this
         val car = car ?: return this
+        if (!detail.hasCoordinate) return this // 좌표를 모르면 방향·거리를 숨긴다
         return copy(place = car.placeOf(detail.lat, detail.lon))
     }
 

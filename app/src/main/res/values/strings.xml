@@ -45,7 +45,7 @@
 
     <!-- S-03 약도 -->
     <string name="map_heading_up">위 = 차가 향한 쪽</string>
-    <string name="map_legend">번호 = 목록 순서 · 가격 = 대표 평형의 최근 3개월 평균</string>
+    <string name="map_legend">번호 = 목록 순서 · 가격 = 최근 3개월 평균, 없으면 마지막 거래</string>
     <string name="map_no_average">-</string>
     <string name="map_pin_description">%1$d번 %2$s, %3$s</string>
 
@@ -66,6 +66,8 @@
     <string name="card_meta">%1$s · 최근 %2$d개월 · %3$s 기준</string>
     <string name="card_meta_no_trade">%1$s · %2$s 기준</string>
     <string name="card_no_recent_trades">최근 %1$d개월 거래가 없어요</string>
+    <!-- 평균이 없고 마지막 거래만 있을 때(서버 주변 단지는 거래 1건만 준다). 월이 없으면 지금 시세로 오해할 수 있다 -->
+    <string name="card_meta_last_trade">%1$s · 마지막 거래 · %2$s</string>
     <string name="card_saved_mark">저장함</string>
     <string name="date_month_day">%1$d월 %2$d일</string>
     <string name="date_year_month">%1$d년 %2$d월</string>
@@ -145,6 +147,7 @@
     <!-- 주행 중 음성 문구(화면 설계서 S-09 '음성 문구'): 방향 → 이름 → 가격. 이름 뒤에는 조사 대신 쉼표 -->
     <string name="voice_average">%1$s, %2$s. 전용 %3$s, 최근 %4$d개월 평균 %5$s이에요.</string>
     <string name="voice_no_recent">%1$s, %2$s. 최근 %3$d개월 거래가 없어요.</string>
+    <string name="voice_last_trade">%1$s, %2$s. 전용 %3$s, %4$s에 %5$s에 거래됐어요.</string>
     <string name="voice_no_trades">%1$s, %2$s. 아직 거래 기록이 없어요.</string>
     <string name="voice_none_nearby">지금 근처에는 알려 드릴 단지가 없어요.</string>
     <string name="voice_location_unavailable">지금 위치를 확인하지 못했어요.</string>

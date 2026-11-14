@@ -8,6 +8,7 @@ import com.gooodhandletruck.zippick.ZippickApp
 import com.gooodhandletruck.zippick.data.CarLocation
 import com.gooodhandletruck.zippick.data.LocationState
 import com.gooodhandletruck.zippick.data.model.SavedComplex
+import com.gooodhandletruck.zippick.data.model.hasCoordinate
 import com.gooodhandletruck.zippick.ui.component.ComplexCardModel
 import com.gooodhandletruck.zippick.ui.component.placeOf
 import kotlinx.coroutines.CancellationException
@@ -98,7 +99,12 @@ class SavedViewModel(app: Application) : AndroidViewModel(app) {
         val items = items ?: return
         val car = car
         val cards = items.map { saved ->
-            ComplexCardModel(complex = saved.complex, place = car?.placeOf(saved.complex.lat, saved.complex.lon))
+            val complex = saved.complex
+            // 좌표를 모르는 단지는 방향·거리 칩을 숨긴다
+            ComplexCardModel(
+                complex = complex,
+                place = car?.takeIf { complex.hasCoordinate }?.placeOf(complex.lat, complex.lon)
+            )
         }
         _state.update { it.copy(content = SavedContent.Loaded(cards)) }
     }

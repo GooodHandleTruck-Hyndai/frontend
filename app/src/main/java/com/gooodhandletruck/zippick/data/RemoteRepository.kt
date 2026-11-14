@@ -21,6 +21,7 @@ import com.gooodhandletruck.zippick.data.remote.ServerException
 import com.gooodhandletruck.zippick.data.remote.TransactionDto
 import com.gooodhandletruck.zippick.data.remote.TransactionListDto
 import com.gooodhandletruck.zippick.data.remote.decode
+import com.gooodhandletruck.zippick.data.remote.detailTrades
 import com.gooodhandletruck.zippick.data.remote.reachesBefore
 import com.gooodhandletruck.zippick.data.remote.toDetail
 import com.gooodhandletruck.zippick.data.remote.toSummary
@@ -79,7 +80,7 @@ class RemoteRepository(context: Context, private val server: ServerClient) : Com
     override suspend fun detail(complexId: String): ComplexDetail {
         val buildingId = complexId.toBuildingId()
         val dto = getBuilding(buildingId)
-        val trades = dto.recentTransactions + moreTrades(buildingId, dto)
+        val trades = detailTrades(recent = dto.recentTransactions, more = moreTrades(buildingId, dto))
         return dto.toDetail(
             trades = trades,
             saved = complexId in savedIds(),

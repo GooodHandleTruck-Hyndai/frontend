@@ -5,10 +5,13 @@ import com.gooodhandletruck.zippick.data.AppJson
 import com.gooodhandletruck.zippick.data.AreaRange
 import com.gooodhandletruck.zippick.data.ComplexType
 import com.gooodhandletruck.zippick.data.PriceRange
+import com.gooodhandletruck.zippick.data.model.hasCoordinate
 import java.time.LocalDate
 import kotlinx.serialization.json.jsonObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /** 서버 응답 예시(Swagger)를 앱 데이터 클래스로 바꾸는 규칙 */
@@ -34,7 +37,55 @@ class ServerMappingTest {
         assertNull(first.price?.avgPriceManwon)
         assertEquals(59700, first.price?.lastTrade?.priceManwon)
         assertEquals(LocalDate.parse("2026-11-07"), first.price?.asOf)
+        // 서버가 층을 주지 않으니 0층이 아니라 '모름'이다
+        assertNull(first.price?.lastTrade?.floor)
         assertNull(response.buildings[1].toSummary(response.dataBaseDate, saved = false).price)
+    }
+
+    @Test
+    fun detailTradesDoNotCountRecentTradesTwice() {
+        val recent = listOf(trade("2026-10-01", 84.97, 100_000))
+        val more = listOf(trade("2026-10-01", 84.97, 100_000), trade("2026-09-01", 84.97, 110_000))
+
+        // 더보기를 불렀으면 최근 3건은 그 첫 쪽과 같은 거래라 버린다
+        assertEquals(more, detailTrades(recent, more))
+        // 더보기를 안 불렀으면 최근 3건만 쓴다
+        assertEquals(recent, detailTrades(recent, emptyList()))
+    }
+
+    @Test
+    fun detailWithoutCoordinateBlocksRoute() {
+        val dto = BuildingDetailDto(buildingId = 9, name = "좌표 없는 단지", type = "APT", lat = null, lon = null)
+        val today = LocalDate.parse("2026-11-10")
+
+        val unknown = dto.toDetail(emptyList(), saved = false, fallback = null, today = today)
+        assertFalse(unknown.hasCoordinate)
+
+        val fallback = NearbyBuildingDto(buildingId = 9, name = "좌표 없는 단지", type = "APT", lat = 37.54, lon = 126.94)
+            .toSummary(asOf = null, saved = false)
+        val known = dto.toDetail(emptyList(), saved = false, fallback = fallback, today = today)
+        assertTrue(known.hasCoordinate)
+        assertEquals(37.54, known.lat, 0.0)
+    }
+
+    @Test
+    fun tradeWithoutFloorKeepsFloorUnknown() {
+        val dto = BuildingDetailDto(buildingId = 21, name = "한화오벨리스크", type = "APT", lat = 37.5, lon = 126.9)
+        val noFloor = TransactionDto(
+            dealDate = LocalDate.parse("2026-10-01"),
+            areaM2 = 84.97,
+            floor = null,
+            price = 100_000
+        )
+
+        val detail = dto.toDetail(
+            listOf(noFloor),
+            saved = false,
+            fallback = null,
+            today = LocalDate.parse("2026-11-10")
+        )
+
+        assertNull(detail.areas.single().recentTrades.single().floor)
     }
 
     @Test
@@ -50,8 +101,6 @@ class ServerMappingTest {
         )
         val trades = listOf(
             trade("2026-10-01", 84.97, 100_000),
-            trade("2026-09-01", 84.97, 110_000),
-            // 상세와 더보기에 같이 온 거래
             trade("2026-09-01", 84.97, 110_000),
             // 90일 밖
             trade("2026-01-01", 84.97, 90_000),

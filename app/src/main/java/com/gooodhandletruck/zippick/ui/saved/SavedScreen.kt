@@ -23,6 +23,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gooodhandletruck.zippick.R
 import com.gooodhandletruck.zippick.data.RouteTarget
+import com.gooodhandletruck.zippick.data.model.hasCoordinate
 import com.gooodhandletruck.zippick.data.toRouteTarget
 import com.gooodhandletruck.zippick.ui.WindowLayout
 import com.gooodhandletruck.zippick.ui.component.ComplexCard
@@ -170,6 +171,7 @@ fun SavedScreen(
                                 SecondaryButton(
                                     text = stringResource(R.string.action_route),
                                     onClick = { onStartRoute(card.complex.toRouteTarget()) },
+                                    enabled = card.complex.hasCoordinate,
                                     height = AppDimens.TouchMin,
                                     horizontalPadding = AppDimens.SpaceS,
                                     icon = R.drawable.ic_route

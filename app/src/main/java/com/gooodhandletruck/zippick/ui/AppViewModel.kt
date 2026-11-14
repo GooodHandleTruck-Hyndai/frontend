@@ -27,6 +27,7 @@ import com.gooodhandletruck.zippick.ui.navigation.NavState
 import com.gooodhandletruck.zippick.ui.navigation.Navigator
 import com.gooodhandletruck.zippick.ui.navigation.Screen
 import com.gooodhandletruck.zippick.ui.navigation.Tab
+import java.time.LocalDate
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -333,8 +334,17 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         val direction = app.getString(place.direction.label)
         val price = complex.price
         val average = price?.avgPriceManwon
+        val lastTrade = price?.lastTrade
         return when {
             price == null -> app.getString(R.string.voice_no_trades, direction, complex.name)
+            average == null && lastTrade != null -> app.getString(
+                R.string.voice_last_trade,
+                direction,
+                complex.name,
+                formatAreaVoice(price.areaM2),
+                tradeMonthVoice(lastTrade.contractDate),
+                formatPriceVoice(lastTrade.priceManwon)
+            )
             average == null -> app.getString(
                 R.string.voice_no_recent,
                 direction,
@@ -351,6 +361,10 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
             )
         }
     }
+
+    /** 마지막 거래의 계약 월. 올해면 "11월", 아니면 "2025년 12월"(최대 1년 전 거래가 올 수 있다) */
+    private fun tradeMonthVoice(date: LocalDate): String =
+        if (date.year == LocalDate.now().year) "${date.monthValue}월" else "${date.year}년 ${date.monthValue}월"
 
     fun openHeardComplex() = navigator.openHeardComplex()
 
