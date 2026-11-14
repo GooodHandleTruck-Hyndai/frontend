@@ -1,6 +1,7 @@
 package com.gooodhandletruck.zippick.ui.component
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -18,15 +19,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.gooodhandletruck.zippick.ui.theme.AppColors
 import com.gooodhandletruck.zippick.ui.theme.AppDimens
 import com.gooodhandletruck.zippick.ui.theme.AppType
 
 /**
- * 주 버튼: 강조색 바탕 + 흰 글자. 한 화면에 하나만 둔다. [enabled]가 false면 회색으로 바뀌고 누를 수 없다.
- * [icon]을 주면 글자 왼쪽에 아이콘을 그린다(시안의 [♡ 저장]).
+ * 주 버튼(Figma BoxButton의 Brand): 강조색 바탕. 한 화면에 하나만 둔다. [enabled]가 false면 흐려지고 누를 수 없다.
+ * [icon]을 주면 글자 왼쪽에 아이콘을 그린다([♡ 저장]).
  */
 @Composable
 fun PrimaryButton(
@@ -50,8 +53,8 @@ fun PrimaryButton(
 }
 
 /**
- * 보조 버튼: #EDEEF2 바탕 + 검정 글자.
- * [horizontalPadding]을 줄이면 카드 안 [길 안내]처럼 76×76에 가까운 작은 버튼이 된다.
+ * 보조 버튼: 회색 바탕 + 기본 글자색.
+ * [height]를 [AppDimens.ButtonHeightM]으로 주면 머리글·카드 안에 넣는 Medium 버튼이 된다.
  * [enabled]가 false면 누를 수 없고 글자가 흐려진다(S-09 "저장했어요").
  * [iconTint]를 주면 아이콘만 그 색으로 칠한다(저장한 뒤 강조색 하트).
  */
@@ -61,7 +64,6 @@ fun SecondaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     height: Dp = AppDimens.ButtonHeight,
-    horizontalPadding: Dp = AppDimens.SpaceL,
     enabled: Boolean = true,
     @DrawableRes icon: Int? = null,
     iconTint: Color? = null
@@ -73,14 +75,40 @@ fun SecondaryButton(
         contentColor = AppColors.TextPrimary,
         modifier = modifier,
         height = height,
-        horizontalPadding = horizontalPadding,
         enabled = enabled,
         icon = icon,
         iconTint = iconTint
     )
 }
 
-/** 높이 96 이상이면 큰 글자(ButtonL)와 아이콘 32, 76짜리 작은 버튼이면 LabelBold와 아이콘 28을 쓴다 */
+/** Figma BoxButton의 크기별 규격. 주행 중 버튼(160)처럼 100보다 높은 버튼도 Large 규격을 쓴다 */
+private class ButtonSpec(
+    val radius: Dp,
+    val horizontalPadding: Dp,
+    val gap: Dp,
+    val minWidth: Dp,
+    val textStyle: TextStyle,
+    val iconSize: Dp
+)
+
+private val LargeSpec = ButtonSpec(
+    radius = AppDimens.ButtonRadiusL,
+    horizontalPadding = 40.dp,
+    gap = 16.dp,
+    minWidth = 140.dp,
+    textStyle = AppType.ButtonL,
+    iconSize = AppDimens.IconL
+)
+
+private val MediumSpec = ButtonSpec(
+    radius = AppDimens.ButtonRadiusM,
+    horizontalPadding = 32.dp,
+    gap = 12.dp,
+    minWidth = 120.dp,
+    textStyle = AppType.ButtonM,
+    iconSize = AppDimens.IconS
+)
+
 @Composable
 private fun AppButton(
     text: String,
@@ -89,30 +117,31 @@ private fun AppButton(
     contentColor: Color,
     modifier: Modifier,
     height: Dp,
-    horizontalPadding: Dp = AppDimens.SpaceL,
     enabled: Boolean = true,
     @DrawableRes icon: Int? = null,
     iconTint: Color? = null
 ) {
-    val large = height >= AppDimens.ButtonHeight
+    val spec = if (height >= AppDimens.ButtonHeight) LargeSpec else MediumSpec
     Button(
         onClick = onClick,
         modifier = modifier
             .height(height)
-            .widthIn(min = AppDimens.TouchMin),
+            .widthIn(min = spec.minWidth),
         enabled = enabled,
-        shape = RoundedCornerShape(AppDimens.ButtonRadius),
+        shape = RoundedCornerShape(spec.radius),
+        // 누를 수 없을 때(Figma State=Disabled): 바탕 5%, 테두리 10%, 글자 32%
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
             contentColor = contentColor,
-            disabledContainerColor = AppColors.ButtonSecondary,
-            disabledContentColor = AppColors.TextTertiary
+            disabledContainerColor = AppColors.TextPrimary.copy(alpha = 0.05f),
+            disabledContentColor = AppColors.TextPrimary.copy(alpha = 0.32f)
         ),
-        contentPadding = PaddingValues(horizontal = horizontalPadding)
+        border = if (enabled) null else BorderStroke(1.dp, AppColors.Outline),
+        contentPadding = PaddingValues(horizontal = spec.horizontalPadding)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceXs)
+            horizontalArrangement = Arrangement.spacedBy(spec.gap)
         ) {
             if (icon != null) {
                 Icon(
@@ -120,15 +149,11 @@ private fun AppButton(
                     contentDescription = null,
                     // 누를 수 없을 때는 글자처럼 흐리게 둔다
                     tint = iconTint?.takeIf { enabled } ?: LocalContentColor.current,
-                    modifier = Modifier.size(if (large) AppDimens.IconL else AppDimens.IconS)
+                    modifier = Modifier.size(spec.iconSize)
                 )
             }
-            // 버튼이 좁아 글자가 넘치면 말줄임 대신 두 줄로 쓴다(높이 96에 두 줄이 들어간다)
-            Text(
-                text = text,
-                style = if (large) AppType.ButtonL else AppType.LabelBold,
-                textAlign = TextAlign.Center
-            )
+            // 버튼이 좁아 글자가 넘치면 말줄임 대신 두 줄로 쓴다(높이 100에 두 줄이 들어간다)
+            Text(text = text, style = spec.textStyle, textAlign = TextAlign.Center)
         }
     }
 }

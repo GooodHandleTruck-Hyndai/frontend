@@ -31,7 +31,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // 공모전 심사용 공개 서버(백엔드가 운영). debug 빌드는 그대로 내 PC 로컬 서버를 본다
+            // #10: 배포된 백엔드 서버 (AWS EC2, https, 1차 심사 기간 운영 — backend #57)
+            // 서버 주소가 바뀌면 이 줄만 수정. 디버그(위 10.0.2.2)는 내 PC 로컬 서버용
             buildConfigField("String", "API_BASE_URL", "\"https://3-37-254-181.sslip.io/\"")
             // 심사·시연용 APK를 바로 설치할 수 있게 개발용 서명 키로 서명한다.
             // TODO: 앱마켓에 낼 때는 팀 정식 서명 키로 바꾼다

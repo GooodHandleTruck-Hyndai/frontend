@@ -25,7 +25,7 @@ private const val LOADING_CARD_COUNT = 3
 fun LoadingCards(modifier: Modifier = Modifier, message: String? = null) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)) {
         if (message != null) {
-            Text(text = message, style = AppType.BodyM, color = AppColors.TextSecondary)
+            Text(text = message, style = AppType.Body2, color = AppColors.TextSecondary)
         }
         repeat(LOADING_CARD_COUNT) {
             Box(

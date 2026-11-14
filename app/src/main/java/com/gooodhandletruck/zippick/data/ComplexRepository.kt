@@ -7,10 +7,10 @@ import com.gooodhandletruck.zippick.data.model.NearbyResponse
 import com.gooodhandletruck.zippick.data.model.SavedResponse
 
 /**
- * 단지 데이터를 주는 곳. 지금은 [FakeRepository](assets 목업)이고, 서버가 준비되면 RemoteRepository로 바꾼다.
+ * 단지 데이터를 주는 곳. 앱은 [RemoteRepository](백엔드)를 쓰고, [FakeRepository](assets 목업)는 서버 없이 화면을 볼 때 쓴다.
  * 경로는 백엔드 노션 'API 목록'을 따른다(2026-11-07 통일). 노션은 단지를 building이라 부르니 {buildingId}에 complexId를 넣는다.
  * 응답 형식은 노션에 아직 없어서 Claude Docs 'API 명세 초안 검토'의 P0 제안(목업과 같은 모양)을 쓴다. 응답 예시를 받으면 맞춘다.
- * 기기 등록(POST /api/v1/devices)과 X-Device-Id 헤더는 RemoteRepository 안에서 다룬다. 화면은 몰라도 된다.
+ * 기기 등록(POST /api/v1/devices)과 X-Anonymous-Id 헤더는 remote/ServerClient가 다룬다. 화면은 몰라도 된다.
  * TODO: building 하나가 단지 하나인지(동 하나가 아닌지) 백엔드에 확인한다
  */
 interface ComplexRepository {

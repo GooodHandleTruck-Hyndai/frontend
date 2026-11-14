@@ -112,7 +112,7 @@ fun NearbyMap(
 
         Text(
             text = stringResource(R.string.map_heading_up),
-            style = AppType.LabelS,
+            style = AppType.Label2,
             color = AppColors.TextTertiary,
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -120,7 +120,7 @@ fun NearbyMap(
         )
         Text(
             text = stringResource(R.string.map_legend),
-            style = AppType.LabelS,
+            style = AppType.Label2,
             color = AppColors.TextTertiary,
             modifier = Modifier
                 .align(Alignment.BottomStart)
@@ -133,12 +133,15 @@ fun NearbyMap(
 @Composable
 private fun MapBackground(rings: List<Int>, dpPerMeter: Float) {
     val density = LocalDensity.current
+    // 그리기 블록 안에서는 테마 색을 읽을 수 없어 먼저 담아 둔다
+    val ringColor = AppColors.Outline
+    val carColor = AppColors.TextPrimary
     Canvas(modifier = Modifier.fillMaxSize()) {
         val middle = Offset(size.width / 2, size.height / 2)
         val stroke = Stroke(width = with(density) { 1.dp.toPx() })
         rings.forEach { meters ->
             drawCircle(
-                color = AppColors.Outline,
+                color = ringColor,
                 radius = with(density) { (meters * dpPerMeter).dp.toPx() },
                 center = middle,
                 style = stroke
@@ -152,7 +155,7 @@ private fun MapBackground(rings: List<Int>, dpPerMeter: Float) {
             lineTo(middle.x - half * 0.8f, middle.y + half)
             close()
         }
-        drawPath(arrow, color = AppColors.TextPrimary)
+        drawPath(arrow, color = carColor)
     }
 }
 
@@ -162,7 +165,7 @@ private fun RingLabel(meters: Int, offsetX: Dp) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(
             text = formatDistance(meters.toDouble()),
-            style = AppType.LabelS,
+            style = AppType.Label2,
             color = AppColors.TextTertiary,
             modifier = Modifier.layout { measurable, constraints ->
                 val placeable = measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
@@ -189,7 +192,9 @@ private fun MapPin(
     onClick: () -> Unit
 ) {
     val average = card.complex.price?.avgPriceManwon
-    val label = average?.let(::formatPriceShort) ?: stringResource(R.string.map_no_average)
+    // 평균이 없으면 마지막 거래 가격. 그것도 없으면 "-"
+    val shown = average ?: card.complex.price?.lastTrade?.priceManwon
+    val label = shown?.let(::formatPriceShort) ?: stringResource(R.string.map_no_average)
     val description = stringResource(R.string.map_pin_description, number, card.complex.name, label)
 
     Box(
@@ -226,16 +231,16 @@ private fun MapPin(
             ) {
                 Text(
                     text = number.toString(),
-                    style = AppType.LabelBold,
+                    style = AppType.Label1Medium,
                     color = if (selected) AppColors.Accent else AppColors.OnAccent
                 )
             }
             Text(
                 text = label,
-                style = AppType.LabelS,
+                style = AppType.Label2,
                 color = when {
                     selected -> AppColors.OnAccent
-                    average == null -> AppColors.TextTertiary
+                    shown == null -> AppColors.TextTertiary
                     else -> AppColors.TextPrimary
                 }
             )

@@ -98,7 +98,7 @@ fun HistoryScreen(
             } else {
                 stringResource(R.string.screen_history)
             },
-            style = AppType.DisplayM,
+            style = AppType.Title2,
             color = AppColors.TextPrimary
         )
         when (content) {

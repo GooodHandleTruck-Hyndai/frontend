@@ -3,6 +3,7 @@ package com.gooodhandletruck.zippick.ui.saved
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -12,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
@@ -21,6 +23,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gooodhandletruck.zippick.R
 import com.gooodhandletruck.zippick.data.RouteTarget
+import com.gooodhandletruck.zippick.data.model.hasCoordinate
 import com.gooodhandletruck.zippick.data.toRouteTarget
 import com.gooodhandletruck.zippick.ui.WindowLayout
 import com.gooodhandletruck.zippick.ui.component.ComplexCard
@@ -47,7 +50,8 @@ fun SavedRoute(
     selectedComplexId: String?,
     onOpenComplex: (String) -> Unit,
     onStartRoute: (RouteTarget) -> Unit,
-    onGoNearby: () -> Unit
+    onGoNearby: () -> Unit,
+    onOpenAlerts: () -> Unit
 ) {
     val viewModel: SavedViewModel = viewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -65,6 +69,7 @@ fun SavedRoute(
         onOpenComplex = onOpenComplex,
         onStartRoute = onStartRoute,
         onGoNearby = onGoNearby,
+        onOpenAlerts = onOpenAlerts,
         onSelectSort = viewModel::selectSort,
         onRetry = viewModel::retry
     )
@@ -85,6 +90,7 @@ fun SavedScreen(
     onOpenComplex: (String) -> Unit,
     onStartRoute: (RouteTarget) -> Unit,
     onGoNearby: () -> Unit,
+    onOpenAlerts: () -> Unit,
     onSelectSort: (SavedSort) -> Unit,
     onRetry: () -> Unit
 ) {
@@ -100,16 +106,32 @@ fun SavedScreen(
             ),
         verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceM)
     ) {
-        Text(
-            // 빈 목록이면 "· 0곳" 없이 제목만 쓴다
-            text = if (content is SavedContent.Loaded && content.cards.isNotEmpty()) {
-                stringResource(R.string.saved_header_count, content.cards.size)
-            } else {
-                stringResource(R.string.screen_saved)
-            },
-            style = AppType.DisplayM,
-            color = AppColors.TextPrimary
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)
+        ) {
+            Text(
+                // 빈 목록이면 "· 0곳" 없이 제목만 쓴다
+                text = if (content is SavedContent.Loaded && content.cards.isNotEmpty()) {
+                    stringResource(R.string.saved_header_count, content.cards.size)
+                } else {
+                    stringResource(R.string.screen_saved)
+                },
+                style = AppType.Title2,
+                color = AppColors.TextPrimary,
+                modifier = Modifier.weight(1f)
+            )
+            // S-10 새 거래 알림. 안 읽은 알림이 있으면 수를 붙인다
+            SecondaryButton(
+                text = if (state.unreadAlerts > 0) {
+                    stringResource(R.string.action_open_alerts_count, state.unreadAlerts)
+                } else {
+                    stringResource(R.string.action_open_alerts)
+                },
+                onClick = onOpenAlerts,
+                height = AppDimens.ButtonHeightM
+            )
+        }
         if (content is SavedContent.Loaded && content.cards.size > 1) {
             SortChip(
                 selected = state.sort,
@@ -148,8 +170,8 @@ fun SavedScreen(
                                 SecondaryButton(
                                     text = stringResource(R.string.action_route),
                                     onClick = { onStartRoute(card.complex.toRouteTarget()) },
-                                    height = AppDimens.TouchMin,
-                                    horizontalPadding = AppDimens.SpaceS,
+                                    enabled = card.complex.hasCoordinate,
+                                    height = AppDimens.ButtonHeightM,
                                     icon = R.drawable.ic_route
                                 )
                             }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 앱 아이콘. Figma 디자인 시스템 Branding > Logo > Hyundai(200×200) 그대로: 흰 둥근 네모 안에 Positive 심볼 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M54,2H146A52,52 0 0 1 198,54V146A52,52 0 0 1 146,198H54A52,52 0 0 1 2,146V54A52,52 0 0 1 54,2Z"
+        android:strokeColor="#FFF7F8FA"
+        android:strokeWidth="4" />
+    <group
+        android:scaleX="0.52222"
+        android:scaleY="0.52222"
+        android:translateX="44.64"
+        android:translateY="37.33">
+        <path
+            android:fillColor="#FF0DC9BF"
+            android:pathData="M134.571 157.348C136.712 157.348 138.449 159.086 138.449 161.229V236.12C138.449 238.263 136.712 240 134.571 240H94.626C73.2078 240 55.8449 222.627 55.8449 201.196V161.229C55.8449 159.086 57.5812 157.348 59.723 157.348H134.571Z" />
+        <path
+            android:fillColor="#FF0DC9BF"
+            android:pathData="M206.898 0C208.611 0 210 1.38984 210 3.10428V72.6805C210 74.395 208.611 75.7848 206.898 75.7848H121.514C108.722 75.7848 96.7531 82.0964 89.5226 92.6547L55.1726 142.814C54.0158 144.503 52.1007 145.513 50.054 145.513H3.87812C1.73629 145.513 3.48363e-08 143.776 0 141.633V71.2581C0 69.1151 1.73629 67.3778 3.87812 67.3778H59.9158C78.1429 67.3778 93.9102 55.6739 97.8024 39.2553L111.335 3.02622C112.015 1.20631 113.752 1.6828e-05 115.694 0H206.898Z" />
+    </group>
+</vector>

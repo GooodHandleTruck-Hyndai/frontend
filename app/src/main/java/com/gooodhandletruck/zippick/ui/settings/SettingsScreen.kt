@@ -93,7 +93,7 @@ fun SettingsScreen(
             ),
         verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceM)
     ) {
-        Text(text = stringResource(R.string.screen_settings), style = AppType.DisplayM, color = AppColors.TextPrimary)
+        Text(text = stringResource(R.string.screen_settings), style = AppType.Title2, color = AppColors.TextPrimary)
 
         // 줄 전체를 눌러도 스위치가 바뀐다(누를 곳이 76 이상)
         SettingsCard(
@@ -106,7 +106,7 @@ fun SettingsScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = stringResource(R.string.settings_alerts),
-                    style = AppType.BodyL,
+                    style = AppType.Body1,
                     color = AppColors.TextPrimary,
                     modifier = Modifier.weight(1f)
                 )
@@ -121,13 +121,13 @@ fun SettingsScreen(
         SettingsCard(modifier = Modifier.clickable(role = Role.Button, onClick = onEditAlert)) {
             Text(
                 text = stringResource(R.string.settings_conditions),
-                style = AppType.BodyL,
+                style = AppType.Body1,
                 color = AppColors.TextPrimary
             )
             Text(
                 text = alertSettings.conditions?.let { conditionsSummary(it) }
                     ?: stringResource(R.string.settings_conditions_none),
-                style = AppType.BodyS,
+                style = AppType.Body3,
                 color = AppColors.TextSecondary
             )
         }
@@ -135,7 +135,7 @@ fun SettingsScreen(
         SettingsCard {
             Text(
                 text = stringResource(R.string.settings_default_radius),
-                style = AppType.BodyL,
+                style = AppType.Body1,
                 color = AppColors.TextPrimary
             )
             Row(
@@ -155,24 +155,24 @@ fun SettingsScreen(
         SettingsCard {
             Text(
                 text = stringResource(R.string.settings_app_info),
-                style = AppType.BodyL,
+                style = AppType.Body1,
                 color = AppColors.TextPrimary
             )
             Text(
                 text = stringResource(R.string.settings_version, BuildConfig.VERSION_NAME),
-                style = AppType.BodyS,
+                style = AppType.Body3,
                 color = AppColors.TextSecondary
             )
             Text(
                 text = stringResource(R.string.settings_demo_data),
-                style = AppType.BodyS,
+                style = AppType.Body3,
                 color = AppColors.TextSecondary
             )
         }
     }
 }
 
-/** 설정 한 칸: 카드 모양(흰 바탕, 테두리, 모서리 28) 안에 줄을 쌓는다 */
+/** 설정 한 칸: 카드 모양(카드 바탕, 테두리, 모서리 24) 안에 줄을 쌓는다 */
 @Composable
 private fun SettingsCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     val shape = RoundedCornerShape(AppDimens.CardRadius)

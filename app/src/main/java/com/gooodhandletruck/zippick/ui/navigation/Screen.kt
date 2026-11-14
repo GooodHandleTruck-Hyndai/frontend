@@ -1,7 +1,7 @@
 package com.gooodhandletruck.zippick.ui.navigation
 
 /**
- * 앱의 화면 9개. id는 화면 설계서의 화면 번호다.
+ * 앱의 화면 10개. id는 화면 설계서의 화면 번호다.
  * 정차 중 화면(S-01~S-07)은 백스택에 쌓이고, 주행 중 화면(S-08·S-09)은 백스택 위를 덮기만 한다.
  */
 sealed class Screen(val id: String) {
@@ -32,6 +32,9 @@ sealed class Screen(val id: String) {
 
     /** 설정 */
     data object Settings : Parked("S-07")
+
+    /** 새 거래 알림: 저장한 단지(S-05)의 [새 거래 알림]에서 연다. 화면 설계서에는 아직 없다 */
+    data object Alerts : Parked("S-10")
 
     /** 주행 중 대기: 말할 단지가 없을 때 */
     data object DrivingIdle : Driving("S-08")

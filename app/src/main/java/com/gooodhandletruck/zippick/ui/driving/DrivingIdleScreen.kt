@@ -18,7 +18,7 @@ import com.gooodhandletruck.zippick.ui.theme.AppDimens
 import com.gooodhandletruck.zippick.ui.theme.AppType
 
 /**
- * S-08 주행 중 대기. 가운데 아이콘과 상태 한 줄(bodyL), 큰 버튼 [주변 단지 듣기](높이 160).
+ * S-08 주행 중 대기. 가운데 아이콘과 상태 한 줄(body1), 큰 버튼 [주변 단지 듣기](높이 160).
  * 버튼을 누르면 차 앞쪽 180도 안에서 가장 가까운 단지를 말하고 S-09로 간다.
  * 상태 문구는 자동 알림이 켜져 있으면 "단지를 지나면 소리로 알려 드릴게요", 꺼져 있으면 "정차하면 주변 단지 가격을 보여 드려요"다.
  * 아이콘은 알림이 켜져 있으면 소리, 아니면 앱 로고의 건물이다(움직이지 않는다).
@@ -55,7 +55,7 @@ fun DrivingIdleScreen(window: WindowLayout, onboardingDone: Boolean, alertsOn: B
                     else -> R.string.driving_status_alerts_off
                 }
             ),
-            style = AppType.BodyL,
+            style = AppType.Body1,
             color = AppColors.TextPrimary,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
