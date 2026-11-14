@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,7 +26,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -127,6 +130,10 @@ fun AlertsScreen(
     }
 }
 
+/**
+ * 알림 한 장. 단지 카드(ComplexCard)와 같은 모양이다: 카드 바탕, 테두리, 모서리 24, 안쪽 여백 32·24,
+ * 이름은 titleS, 오른쪽 끝에 상세가 열린다는 › 표시.
+ */
 @Composable
 private fun AlertCard(alert: NewTradeAlert, selected: Boolean, onClick: () -> Unit) {
     val shape = RoundedCornerShape(AppDimens.CardRadius)
@@ -141,8 +148,8 @@ private fun AlertCard(alert: NewTradeAlert, selected: Boolean, onClick: () -> Un
                 color = if (selected) AppColors.Accent else AppColors.Outline,
                 shape = shape
             )
-            .clickable(onClick = onClick)
-            .padding(AppDimens.SpaceM),
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(horizontal = AppDimens.SpaceL, vertical = AppDimens.SpaceM),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)
     ) {
@@ -155,7 +162,7 @@ private fun AlertCard(alert: NewTradeAlert, selected: Boolean, onClick: () -> Un
         Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceXs)) {
             Text(
                 text = alert.name,
-                style = AppType.BodyL,
+                style = AppType.TitleS,
                 color = AppColors.TextPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -172,5 +179,11 @@ private fun AlertCard(alert: NewTradeAlert, selected: Boolean, onClick: () -> Un
                 color = if (alert.read) AppColors.TextTertiary else AppColors.TextSecondary
             )
         }
+        Icon(
+            painter = painterResource(R.drawable.ic_chevron_right),
+            contentDescription = null,
+            tint = AppColors.TextTertiary,
+            modifier = Modifier.size(AppDimens.IconL)
+        )
     }
 }
