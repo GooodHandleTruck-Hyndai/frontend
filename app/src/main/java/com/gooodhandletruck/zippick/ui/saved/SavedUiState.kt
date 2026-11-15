@@ -1,16 +1,15 @@
 package com.gooodhandletruck.zippick.ui.saved
 
+import com.gooodhandletruck.zippick.data.ComplexType
 import com.gooodhandletruck.zippick.ui.component.ComplexCardModel
 
-/** S-05 정렬(화면 설계서 S-05 '정렬·필터'). 기본은 저장한 순(최근에 저장한 것부터)이다 */
-enum class SavedSort { SAVED, NEAREST, PRICE }
-
-/** S-05 화면 상태 */
+/**
+ * S-05 화면 상태(Figma 시안 저장_01).
+ * @property type 위 유형 칩(아파트·오피스텔·원룸)에서 고른 것. 하나만 고르고, 처음에는 아파트다
+ */
 data class SavedUiState(
-    val sort: SavedSort = SavedSort.SAVED,
-    val content: SavedContent = SavedContent.Loading,
-    /** 안 읽은 새 거래 알림 수(S-10). 0이면 버튼에 숫자를 붙이지 않는다 */
-    val unreadAlerts: Int = 0
+    val type: ComplexType = ComplexType.APT,
+    val content: SavedContent = SavedContent.Loading
 )
 
 sealed interface SavedContent {

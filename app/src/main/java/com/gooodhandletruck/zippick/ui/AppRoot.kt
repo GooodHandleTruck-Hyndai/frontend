@@ -173,7 +173,14 @@ private fun ParkedPanes(
         ParkedScreen(screen, window, viewModel, selectedComplexId = null, onBack = onBack)
     } else {
         stateHolder.SaveableStateProvider(screen.stateKey) {
-            ParkedScreen(screen, window, viewModel, selectedComplexId = null, onBack = onBack)
+            if (screen == Screen.Saved) {
+                // S-05는 머리글 아래 둥근 판 위에 그린다(Figma 시안 저장_01)
+                Box(modifier = Modifier.contentPanel()) {
+                    ParkedScreen(screen, window, viewModel, selectedComplexId = null, onBack = onBack)
+                }
+            } else {
+                ParkedScreen(screen, window, viewModel, selectedComplexId = null, onBack = onBack)
+            }
         }
     }
 }
@@ -231,7 +238,9 @@ private fun WidePanesContent(
         NearbyWithDetailPanel(panes.detail, window, viewModel, stateHolder, locationGranted)
         return
     }
-    Row(modifier = Modifier.fillMaxSize()) {
+    // S-05는 목록과 상세 칸을 머리글 아래 둥근 판 하나 위에 놓는다(Figma 시안 저장_01)
+    val onPanel = panes.list == Screen.Saved
+    Row(modifier = if (onPanel) Modifier.contentPanel() else Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
                 .width(AppDimens.ListPaneWidth + window.contentPadding * 2)
@@ -249,16 +258,18 @@ private fun WidePanesContent(
         ) {
             val detail = panes.detail
             if (detail != null) {
-                // 다른 단지를 열면 스크롤을 맨 위로 되돌린다
-                key(detail.complexId) {
-                    ComplexDetailRoute(
-                        screen = detail,
-                        window = window,
-                        isSidePane = true,
-                        locationGranted = locationGranted,
-                        onClose = viewModel::back,
-                        onStartRoute = viewModel::startRoute
-                    )
+                Box(modifier = if (onPanel) Modifier.detailCard() else Modifier.fillMaxSize()) {
+                    // 다른 단지를 열면 스크롤을 맨 위로 되돌린다
+                    key(detail.complexId) {
+                        ComplexDetailRoute(
+                            screen = detail,
+                            window = window,
+                            isSidePane = true,
+                            locationGranted = locationGranted,
+                            onClose = viewModel::back,
+                            onStartRoute = viewModel::startRoute
+                        )
+                    }
                 }
             } else if (panes.list == Screen.Saved || panes.list == Screen.History || panes.list == Screen.Alerts) {
                 DetailPaneHint(window)
@@ -295,7 +306,7 @@ private fun NearbyWithDetailPanel(
                         bottom = AppDimens.PanelInset + AppDimens.SpaceS
                     )
                     .clip(RoundedCornerShape(AppDimens.CardRadius))
-                    .background(AppColors.Surface)
+                    .background(AppColors.Background)
                     .padding(start = AppDimens.SpaceM)
             ) {
                 // 다른 단지를 열면 스크롤을 맨 위로 되돌린다
@@ -313,6 +324,23 @@ private fun NearbyWithDetailPanel(
         }
     }
 }
+
+/** 머리글 아래 둥근 판(Figma 시안): 오른쪽·아래를 띄우고 모서리를 둥글게 깎아 판 색을 칠한다. S-03은 화면이 직접 그린다 */
+@Composable
+private fun Modifier.contentPanel(): Modifier = this
+    .fillMaxSize()
+    .padding(end = AppDimens.PanelInset, bottom = AppDimens.PanelInset)
+    .clip(RoundedCornerShape(AppDimens.PanelRadius))
+    .background(AppColors.Panel)
+
+/** 둥근 판 위 오른쪽 상세 칸: 판 안쪽으로 띄운 카드 위에 S-04를 그린다(Figma 시안 저장_01) */
+@Composable
+private fun Modifier.detailCard(): Modifier = this
+    .fillMaxSize()
+    .padding(AppDimens.SpaceS)
+    .clip(RoundedCornerShape(AppDimens.CardRadius))
+    .background(AppColors.Background)
+    .padding(start = AppDimens.SpaceM)
 
 /** 1:2 창 S-03 지도 위 상세 패널 너비. 시안 캡처에서 대략 잰 값이다. TODO: Dev Mode 값과 다르면 고친다 */
 private val NEARBY_DETAIL_PANEL_WIDTH = 720.dp
@@ -414,9 +442,7 @@ private fun ParkedScreen(
             locationGranted = locationGranted,
             selectedComplexId = selectedComplexId,
             onOpenComplex = openComplex,
-            onStartRoute = viewModel::startRoute,
-            onGoNearby = { viewModel.selectTab(Tab.NEARBY) },
-            onOpenAlerts = { viewModel.open(Screen.Alerts) }
+            onGoNearby = { viewModel.selectTab(Tab.NEARBY) }
         )
         Screen.History -> HistoryRoute(
             window = window,
