@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.gooodhandletruck.zippick.ZippickApp
 import com.gooodhandletruck.zippick.data.CarLocation
+import com.gooodhandletruck.zippick.data.ComplexType
 import com.gooodhandletruck.zippick.data.LocationState
 import com.gooodhandletruck.zippick.data.model.SavedComplex
 import com.gooodhandletruck.zippick.data.model.hasCoordinate
@@ -28,7 +29,6 @@ class SavedViewModel(app: Application) : AndroidViewModel(app) {
     private val container = (app as ZippickApp).container
     private val repository = container.complexRepository
     private val locationRepository = container.locationRepository
-    private val alertInbox = container.alertInboxRepository
 
     private val _state = MutableStateFlow(SavedUiState())
     val state: StateFlow<SavedUiState> = _state.asStateFlow()
@@ -38,14 +38,12 @@ class SavedViewModel(app: Application) : AndroidViewModel(app) {
     private var car: CarLocation? = null
 
     private var loadJob: Job? = null
-    private var alertsJob: Job? = null
 
     /**
      * 화면에 들어올 때와 1:2 창에서 상세를 닫을 때 부른다. 보던 목록이 있으면 둔 채 새로 받아 온다.
      * 상세에서 저장을 취소한 단지는 이때 목록에서 빠진다.
      */
     fun refresh() {
-        refreshUnreadAlerts()
         loadJob?.cancel()
         loadJob = viewModelScope.launch {
             try {
@@ -61,23 +59,10 @@ class SavedViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /** [새 거래 알림] 버튼의 숫자. 못 받으면 숫자 없이 둔다 */
-    private fun refreshUnreadAlerts() {
-        alertsJob?.cancel()
-        alertsJob = viewModelScope.launch {
-            try {
-                val unread = alertInbox.alerts().count { !it.read }
-                _state.update { it.copy(unreadAlerts = unread) }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                Log.w(TAG, "새 거래 알림 수를 받지 못했어요", e)
-            }
-        }
+    /** 유형 칩. 받은 목록 안에서 거르고 서버는 다시 부르지 않는다. 고를 수 없는 유형(원룸)은 무시한다 */
+    fun selectType(type: ComplexType) {
+        if (type.available) _state.update { it.copy(type = type) }
     }
-
-    /** 정렬 칩. 받은 목록 안에서 순서만 바꾼다 */
-    fun selectSort(sort: SavedSort) = _state.update { it.copy(sort = sort) }
 
     /** [다시 시도] */
     fun retry() {

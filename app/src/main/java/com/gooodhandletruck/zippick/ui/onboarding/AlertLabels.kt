@@ -13,20 +13,18 @@ import com.gooodhandletruck.zippick.ui.format.formatPrice
  * 알림 조건 칩과 요약 문구. S-02 칩과 S-07 '알림 조건' 요약이 같이 쓴다.
  */
 
-/** 유형 이름. 아직 고를 수 없는 유형은 "오피스텔 · 준비 중"이다 */
+/** 유형 이름("아파트"·"오피스텔"·"원룸") */
 @Composable
-fun typeLabel(type: ComplexType): String {
-    val name = stringResource(
-        when (type) {
-            ComplexType.APT -> R.string.type_apartment
-            ComplexType.OFFICETEL -> R.string.type_officetel
-            ComplexType.ONE_ROOM -> R.string.type_one_room
-        }
-    )
-    return if (type.available) name else stringResource(R.string.chip_coming_soon, name)
-}
+fun typeLabel(type: ComplexType): String = stringResource(
+    // 시안(플로우_14)은 오피스텔·원룸에 "준비 중"을 붙이지 않는다. 고를 수 없는 칩은 누를 수 없게만 둔다
+    when (type) {
+        ComplexType.APT -> R.string.type_apartment
+        ComplexType.OFFICETEL -> R.string.type_officetel
+        ComplexType.ONE_ROOM -> R.string.type_one_room
+    }
+)
 
-/** "5억 이하" · "5억~10억" · "15억 넘게". 가격 숫자는 formatPrice로만 만든다 */
+/** "5억 이하" · "5억~10억" · "15억 이상". 가격 숫자는 formatPrice로만 만든다 */
 @Composable
 fun priceRangeLabel(range: PriceRange): String {
     val min = range.minManwon
@@ -38,7 +36,7 @@ fun priceRangeLabel(range: PriceRange): String {
     }
 }
 
-/** "60㎡ 이하" · "60~85㎡" · "85㎡ 넘게" */
+/** "60㎡ 이하" · "60~85㎡" · "85㎡ 이상" */
 @Composable
 fun areaRangeLabel(range: AreaRange): String {
     val min = range.minM2

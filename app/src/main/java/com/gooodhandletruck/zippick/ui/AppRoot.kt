@@ -18,12 +18,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -44,7 +46,6 @@ import com.gooodhandletruck.zippick.ui.history.HistoryRoute
 import com.gooodhandletruck.zippick.ui.navigation.NavState
 import com.gooodhandletruck.zippick.ui.navigation.Screen
 import com.gooodhandletruck.zippick.ui.navigation.Tab
-import com.gooodhandletruck.zippick.ui.nearby.NearbyMapPane
 import com.gooodhandletruck.zippick.ui.nearby.NearbyRoute
 import com.gooodhandletruck.zippick.ui.onboarding.AlertSetupRoute
 import com.gooodhandletruck.zippick.ui.onboarding.WelcomeScreen
@@ -113,11 +114,18 @@ private fun ParkedContent(nav: NavState, window: WindowLayout, viewModel: AppVie
     val stateHolder = rememberSaveableStateHolder()
     // 첫 실행(S-01·S-02) 중에는 탭을 숨긴다
     val tab = nav.selectedTab
+    val hasUnreadAlerts by viewModel.hasUnreadAlerts.collectAsStateWithLifecycle()
+    // 정차 중 화면이 바뀔 때마다(S-10에서 돌아올 때 포함) 안 읽은 알림을 다시 확인한다
+    LaunchedEffect(nav.backStack.last()) { viewModel.refreshUnreadAlerts() }
     Column(modifier = Modifier.fillMaxSize()) {
         AppHeader(
-            // 탭이 있으면 로고를 탭 가운데에, 없으면 본문 왼쪽 여백에 맞춘다
-            startPadding = if (tab != null) (AppDimens.RailWidth - AppDimens.LogoSize) / 2 else window.contentPadding,
-            endPadding = window.contentPadding
+            hasUnreadAlerts = hasUnreadAlerts,
+            // 첫 실행(S-01·S-02) 중에는 알림 아이콘을 두지 않는다
+            onOpenAlerts = if (tab != null) {
+                { viewModel.open(Screen.Alerts) }
+            } else {
+                null
+            }
         )
         Row(modifier = Modifier.weight(1f)) {
             tab?.let { NavRail(selected = it, onSelect = viewModel::selectTab) }
@@ -165,7 +173,14 @@ private fun ParkedPanes(
         ParkedScreen(screen, window, viewModel, selectedComplexId = null, onBack = onBack)
     } else {
         stateHolder.SaveableStateProvider(screen.stateKey) {
-            ParkedScreen(screen, window, viewModel, selectedComplexId = null, onBack = onBack)
+            if (screen == Screen.Saved) {
+                // S-05는 머리글 아래 둥근 판 위에 그린다(Figma 시안 저장_01)
+                Box(modifier = Modifier.contentPanel()) {
+                    ParkedScreen(screen, window, viewModel, selectedComplexId = null, onBack = onBack)
+                }
+            } else {
+                ParkedScreen(screen, window, viewModel, selectedComplexId = null, onBack = onBack)
+            }
         }
     }
 }
@@ -219,7 +234,13 @@ private fun WidePanesContent(
     stateHolder: SaveableStateHolder
 ) {
     val locationGranted by viewModel.locationGranted.collectAsStateWithLifecycle()
-    Row(modifier = Modifier.fillMaxSize()) {
+    if (panes.list == Screen.Nearby) {
+        NearbyWithDetailPanel(panes.detail, window, viewModel, stateHolder, locationGranted)
+        return
+    }
+    // S-05는 목록과 상세 칸을 머리글 아래 둥근 판 하나 위에 놓는다(Figma 시안 저장_01)
+    val onPanel = panes.list == Screen.Saved
+    Row(modifier = if (onPanel) Modifier.contentPanel() else Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
                 .width(AppDimens.ListPaneWidth + window.contentPadding * 2)
@@ -237,6 +258,57 @@ private fun WidePanesContent(
         ) {
             val detail = panes.detail
             if (detail != null) {
+                Box(modifier = if (onPanel) Modifier.detailCard() else Modifier.fillMaxSize()) {
+                    // 다른 단지를 열면 스크롤을 맨 위로 되돌린다
+                    key(detail.complexId) {
+                        ComplexDetailRoute(
+                            screen = detail,
+                            window = window,
+                            isSidePane = true,
+                            locationGranted = locationGranted,
+                            onClose = viewModel::back,
+                            onStartRoute = viewModel::startRoute
+                        )
+                    }
+                }
+            } else if (panes.list == Screen.Saved || panes.list == Screen.History || panes.list == Screen.Alerts) {
+                DetailPaneHint(window)
+            }
+        }
+    }
+}
+
+/**
+ * 1:2 창의 S-03(Figma 시안): 지도와 목록 패널이 창 전체를 쓰고, 단지를 고르면 지도 위 오른쪽에 상세 패널을 띄운다.
+ * 상세를 열어도 S-03은 같은 자리에 그대로 있어 목록 스크롤 위치와 고른 칩이 바뀌지 않는다.
+ */
+@Composable
+private fun NearbyWithDetailPanel(
+    detail: Screen.ComplexDetail?,
+    window: WindowLayout,
+    viewModel: AppViewModel,
+    stateHolder: SaveableStateHolder,
+    locationGranted: Boolean
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        stateHolder.SaveableStateProvider(Screen.Nearby.stateKey) {
+            ParkedScreen(Screen.Nearby, window, viewModel, selectedComplexId = detail?.complexId, onBack = null)
+        }
+        if (detail != null) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .fillMaxHeight()
+                    .width(NEARBY_DETAIL_PANEL_WIDTH)
+                    .padding(
+                        end = AppDimens.PanelInset + AppDimens.SpaceS,
+                        top = AppDimens.SpaceS,
+                        bottom = AppDimens.PanelInset + AppDimens.SpaceS
+                    )
+                    .clip(RoundedCornerShape(AppDimens.CardRadius))
+                    .background(AppColors.Background)
+                    .padding(start = AppDimens.SpaceM)
+            ) {
                 // 다른 단지를 열면 스크롤을 맨 위로 되돌린다
                 key(detail.complexId) {
                     ComplexDetailRoute(
@@ -248,14 +320,30 @@ private fun WidePanesContent(
                         onStartRoute = viewModel::startRoute
                     )
                 }
-            } else if (panes.list == Screen.Nearby) {
-                NearbyMapPane(window = window, onOpenComplex = { viewModel.open(Screen.ComplexDetail(it)) })
-            } else if (panes.list == Screen.Saved || panes.list == Screen.History || panes.list == Screen.Alerts) {
-                DetailPaneHint(window)
             }
         }
     }
 }
+
+/** 머리글 아래 둥근 판(Figma 시안): 오른쪽·아래를 띄우고 모서리를 둥글게 깎아 판 색을 칠한다. S-03은 화면이 직접 그린다 */
+@Composable
+private fun Modifier.contentPanel(): Modifier = this
+    .fillMaxSize()
+    .padding(end = AppDimens.PanelInset, bottom = AppDimens.PanelInset)
+    .clip(RoundedCornerShape(AppDimens.PanelRadius))
+    .background(AppColors.Panel)
+
+/** 둥근 판 위 오른쪽 상세 칸: 판 안쪽으로 띄운 카드 위에 S-04를 그린다(Figma 시안 저장_01) */
+@Composable
+private fun Modifier.detailCard(): Modifier = this
+    .fillMaxSize()
+    .padding(AppDimens.SpaceS)
+    .clip(RoundedCornerShape(AppDimens.CardRadius))
+    .background(AppColors.Background)
+    .padding(start = AppDimens.SpaceM)
+
+/** 1:2 창 S-03 지도 위 상세 패널 너비. 시안 캡처에서 대략 잰 값이다. TODO: Dev Mode 값과 다르면 고친다 */
+private val NEARBY_DETAIL_PANEL_WIDTH = 720.dp
 
 /** 1:2 창에서 S-05·S-06 목록 옆 칸이 비어 있을 때의 안내: 옅은 강조색 동그라미 안 건물 그림과 한 줄 */
 @Composable
@@ -354,9 +442,7 @@ private fun ParkedScreen(
             locationGranted = locationGranted,
             selectedComplexId = selectedComplexId,
             onOpenComplex = openComplex,
-            onStartRoute = viewModel::startRoute,
-            onGoNearby = { viewModel.selectTab(Tab.NEARBY) },
-            onOpenAlerts = { viewModel.open(Screen.Alerts) }
+            onGoNearby = { viewModel.selectTab(Tab.NEARBY) }
         )
         Screen.History -> HistoryRoute(
             window = window,

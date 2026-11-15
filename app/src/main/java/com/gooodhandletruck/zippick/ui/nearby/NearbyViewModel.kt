@@ -5,8 +5,11 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.gooodhandletruck.zippick.ZippickApp
+import com.gooodhandletruck.zippick.data.AreaRange
 import com.gooodhandletruck.zippick.data.CarLocation
+import com.gooodhandletruck.zippick.data.ComplexType
 import com.gooodhandletruck.zippick.data.LocationState
+import com.gooodhandletruck.zippick.data.PriceRange
 import com.gooodhandletruck.zippick.data.movedFrom
 import com.gooodhandletruck.zippick.ui.component.toCardModel
 import kotlinx.coroutines.CancellationException
@@ -36,11 +39,17 @@ class NearbyViewModel(app: Application) : AndroidViewModel(app) {
 
     private var loadJob: Job? = null
 
+    /** S-07 '주변 범위 기본값'. '필터' [초기화]가 반경을 여기로 돌린다 */
+    private var defaultRadius = NearbyRadius.KM1
+
     init {
         // S-07 '주변 범위 기본값'이 처음 범위이고, 설정에서 바꾸면 S-03 범위도 바로 바뀐다
         viewModelScope.launch {
             rangeStore.defaultRadiusMeters.collect { meters ->
-                NearbyRadius.entries.firstOrNull { it.meters == meters }?.let(::selectRadius)
+                NearbyRadius.entries.firstOrNull { it.meters == meters }?.let { radius ->
+                    defaultRadius = radius
+                    selectRadius(radius)
+                }
             }
         }
     }
@@ -63,6 +72,30 @@ class NearbyViewModel(app: Application) : AndroidViewModel(app) {
 
     /** 정렬 칩. 받은 목록 안에서 순서만 바꾸고 서버는 다시 부르지 않는다 */
     fun selectSort(sort: NearbySort) = _state.update { it.copy(sort = sort) }
+
+    /** '종류' 펼침의 한 줄. 받은 목록 안에서 거르고 서버는 다시 부르지 않는다. 마지막 하나는 끌 수 없다 */
+    fun toggleType(type: ComplexType) {
+        if (!type.available) return
+        _state.update {
+            val types = it.types.toggled(type)
+            if (types.isEmpty()) it else it.copy(types = types)
+        }
+    }
+
+    /** '필터' 가격대 칩. 받은 목록 안에서 거르고 서버는 다시 부르지 않는다 */
+    fun togglePrice(range: PriceRange) = _state.update { it.copy(prices = it.prices.toggled(range)) }
+
+    /** '필터' 면적 칩. 받은 목록 안에서 거르고 서버는 다시 부르지 않는다 */
+    fun toggleArea(range: AreaRange) = _state.update { it.copy(areas = it.areas.toggled(range)) }
+
+    /** '필터' [초기화]. 가격대·면적을 비우고 반경을 S-07 기본값으로 돌린다. '종류'는 그대로 둔다 */
+    fun resetFilters() {
+        _state.update { it.copy(prices = emptySet(), areas = emptySet()) }
+        selectRadius(defaultRadius)
+    }
+
+    /** '단지 N곳' 칩. 지도 위 목록 패널을 접거나 편다 */
+    fun toggleList() = _state.update { it.copy(listExpanded = !it.listExpanded) }
 
     /** [다시 시도]. 위치를 못 받았으면 위치를, 가격을 못 받았으면 목록을 다시 부른다 */
     fun retry() {
@@ -106,6 +139,8 @@ class NearbyViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun showContent(content: NearbyContent) = _state.update { it.copy(content = content) }
+
+    private fun <T> Set<T>.toggled(item: T): Set<T> = if (item in this) this - item else this + item
 
     private companion object {
         const val TAG = "Nearby"

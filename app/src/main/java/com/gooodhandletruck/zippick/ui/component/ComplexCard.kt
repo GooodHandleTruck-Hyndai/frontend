@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -55,6 +56,8 @@ fun ComplexSummary.toCardModel(car: CarLocation) = ComplexCardModel(complex = th
  * 최근 거래가 없으면 가격 자리에 "최근 3개월 거래가 없어요"를 쓴다 (화면 설계서 S-03 '상태별 문구').
  * 1:2 창에서 오른쪽 칸에 상세를 연 카드는 [selected]로 강조색 테두리(3)를 두른다.
  * [showSavedMark]면 저장한 단지에 "저장함" 칩을 붙인다(S-06).
+ * [showTypeTag]면 이름 앞에 유형 태그("아파트")를 붙이고, 고른 카드는 옅은 강조색 바탕이다(Figma 시안 S-03 목록 패널).
+ * [flat]이면 바탕과 테두리 없이 목록 줄처럼 그리고, 고른 카드만 옅은 강조색 바탕을 칠한다(Figma 시안 저장_01).
  * 오른쪽 끝에는 [trailing] 버튼(S-05 [길 안내])을 두고, 없으면 상세가 열린다는 › 표시를 둔다.
  */
 @Composable
@@ -64,22 +67,33 @@ fun ComplexCard(
     modifier: Modifier = Modifier,
     selected: Boolean = false,
     showSavedMark: Boolean = false,
+    showTypeTag: Boolean = false,
+    flat: Boolean = false,
     leading: (@Composable () -> Unit)? = null,
     trailing: (@Composable () -> Unit)? = null
 ) {
-    val shape = RoundedCornerShape(AppDimens.CardRadius)
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(shape)
-            .background(AppColors.Surface)
+    val shape = RoundedCornerShape(if (flat) AppDimens.ChipRadius else AppDimens.CardRadius)
+    val frame = if (flat) {
+        Modifier.background(if (selected) AppColors.AccentSoft else Color.Transparent)
+    } else {
+        Modifier
+            .background(if (selected && showTypeTag) AppColors.AccentSoft else AppColors.Surface)
             .border(
                 width = if (selected) AppDimens.SelectedBorder else 1.dp,
                 color = if (selected) AppColors.Accent else AppColors.Outline,
                 shape = shape
             )
+    }
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .then(frame)
             .clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = AppDimens.SpaceL, vertical = AppDimens.SpaceM),
+            .padding(
+                horizontal = if (flat) AppDimens.SpaceS else AppDimens.SpaceL,
+                vertical = if (flat) AppDimens.SpaceS else AppDimens.SpaceM
+            ),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceM)
     ) {
@@ -88,13 +102,20 @@ fun ComplexCard(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceXs)
         ) {
-            Text(
-                text = model.complex.name,
-                style = AppType.Body2Bold,
-                color = AppColors.TextPrimary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceXs)
+            ) {
+                if (showTypeTag) typeTagLabel(model.complex.type)?.let { TypeTag(text = it) }
+                Text(
+                    text = model.complex.name,
+                    style = AppType.Body2Bold,
+                    color = AppColors.TextPrimary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false)
+                )
+            }
             val savedMark = showSavedMark && model.complex.saved
             if (model.place != null || savedMark) {
                 Row(
@@ -113,11 +134,33 @@ fun ComplexCard(
             Icon(
                 painter = painterResource(R.drawable.ic_chevron_right),
                 contentDescription = null,
-                tint = AppColors.TextTertiary,
+                tint = if (flat) AppColors.TextSecondary else AppColors.TextTertiary,
                 modifier = Modifier.size(AppDimens.IconL)
             )
         }
     }
+}
+
+/** 이름 앞 유형 태그("아파트"·"오피스텔"): 강조색 테두리 안에 강조색 글자(label2). Figma 시안 저장_01 */
+@Composable
+private fun TypeTag(text: String) {
+    val shape = RoundedCornerShape(AppDimens.ButtonRadiusM)
+    Text(
+        text = text,
+        style = AppType.Label2,
+        color = AppColors.Accent,
+        maxLines = 1,
+        modifier = Modifier
+            .border(1.dp, AppColors.Accent, shape)
+            .padding(horizontal = AppDimens.SpaceXs)
+    )
+}
+
+@Composable
+private fun typeTagLabel(type: String): String? = when (type) {
+    "APT" -> stringResource(R.string.type_apartment)
+    "OFFICETEL" -> stringResource(R.string.type_officetel)
+    else -> null
 }
 
 /** 가격(title2)과 그 아래 "84㎡ · 최근 3개월 · 10월 31일 기준"(label2) */

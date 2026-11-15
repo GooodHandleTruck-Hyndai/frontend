@@ -57,6 +57,7 @@ fun PrimaryButton(
  * [height]를 [AppDimens.ButtonHeightM]으로 주면 머리글·카드 안에 넣는 Medium 버튼이 된다.
  * [enabled]가 false면 누를 수 없고 글자가 흐려진다(S-09 "저장했어요").
  * [iconTint]를 주면 아이콘만 그 색으로 칠한다(저장한 뒤 강조색 하트).
+ * [containerColor]로 바탕만 바꿀 수 있다(S-02 [나중에 할게요]는 창 배경색).
  */
 @Composable
 fun SecondaryButton(
@@ -66,12 +67,13 @@ fun SecondaryButton(
     height: Dp = AppDimens.ButtonHeight,
     enabled: Boolean = true,
     @DrawableRes icon: Int? = null,
-    iconTint: Color? = null
+    iconTint: Color? = null,
+    containerColor: Color = AppColors.ButtonSecondary
 ) {
     AppButton(
         text = text,
         onClick = onClick,
-        containerColor = AppColors.ButtonSecondary,
+        containerColor = containerColor,
         contentColor = AppColors.TextPrimary,
         modifier = modifier,
         height = height,

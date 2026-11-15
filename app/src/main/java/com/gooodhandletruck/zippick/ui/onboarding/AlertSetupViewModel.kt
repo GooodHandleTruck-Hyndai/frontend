@@ -14,17 +14,18 @@ import kotlinx.coroutines.flow.update
 
 /**
  * S-02 알림 조건. 고르는 동안은 [draft]에만 두고, [이 조건으로 알림 받기]·[저장]을 눌러야 저장한다.
- * 화면을 열 때마다 [startEditing]으로 저장한 조건(없으면 모두 고른 상태)에서 시작한다.
+ * 화면을 열 때마다 [startEditing]으로 저장한 조건에서 시작한다. 저장한 조건이 없으면 아무것도 고르지 않은 상태다(Figma 시안).
+ * 항목마다 하나 이상 골라야 [이 조건으로 알림 받기]·[저장]을 누를 수 있다.
  */
 class AlertSetupViewModel(app: Application) : AndroidViewModel(app) {
 
     private val store = (app as ZippickApp).container.alertSettingsRepository
 
-    private val _draft = MutableStateFlow(AlertConditions())
+    private val _draft = MutableStateFlow(NOTHING_SELECTED)
     val draft: StateFlow<AlertConditions> = _draft.asStateFlow()
 
     fun startEditing() {
-        _draft.value = store.settings.value.conditions ?: AlertConditions()
+        _draft.value = store.settings.value.conditions ?: NOTHING_SELECTED
     }
 
     fun toggleType(type: ComplexType) = _draft.update { it.copy(types = it.types.toggled(type)) }
@@ -43,4 +44,9 @@ class AlertSetupViewModel(app: Application) : AndroidViewModel(app) {
     fun later() = store.setEnabled(false)
 
     private fun <T> Set<T>.toggled(value: T): Set<T> = if (value in this) this - value else this + value
+
+    private companion object {
+        /** 처음 여는 S-02: 유형·가격대·면적 모두 고르지 않은 상태 */
+        val NOTHING_SELECTED = AlertConditions(types = emptySet(), prices = emptySet(), areas = emptySet())
+    }
 }

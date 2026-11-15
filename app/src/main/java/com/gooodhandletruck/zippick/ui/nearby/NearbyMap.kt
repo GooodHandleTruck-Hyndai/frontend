@@ -64,6 +64,8 @@ private val PIN_GAP = 4.dp
  * 번호는 [cards] 순서이고 목록 카드의 번호 배지와 같다(시안 D-02). 그래서 목록과 같은 정렬로 넘긴다.
  * 핀을 누르면 S-04가 열리고, 목록에서 고른 단지([selectedComplexId])는 핀이 강조색이다.
  * 최근 3개월 평균이 없는 단지는 핀에 "-"를 흐리게 쓴다.
+ * [framed]가 false면 카드 테두리 없이 칸을 꽉 채우는 배경 지도로 그린다(Figma 시안 S-03: 지도 위에 목록 패널을 띄운다).
+ * 이때 왼쪽 위는 목록 패널이 덮으므로 "위 = 차가 향한 쪽"은 오른쪽 위에 두고, 아래 범례는 요약 알약이 대신해 뺀다.
  */
 @Composable
 fun NearbyMap(
@@ -72,14 +74,19 @@ fun NearbyMap(
     radius: NearbyRadius,
     selectedComplexId: String?,
     onOpenComplex: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    framed: Boolean = true
 ) {
     val shape = RoundedCornerShape(AppDimens.CardRadius)
     BoxWithConstraints(
-        modifier = modifier
-            .clip(shape)
-            .background(AppColors.Background)
-            .border(1.dp, AppColors.Outline, shape)
+        modifier = if (framed) {
+            modifier
+                .clip(shape)
+                .background(AppColors.Background)
+                .border(1.dp, AppColors.Outline, shape)
+        } else {
+            modifier
+        }
     ) {
         // 화면 가운데에서 짧은 쪽 끝까지가 고른 범위의 EXTENT_FACTOR배다
         val halfSpan = min(maxWidth, maxHeight) / 2 - AppDimens.SpaceM
@@ -115,17 +122,19 @@ fun NearbyMap(
             style = AppType.Label2,
             color = AppColors.TextTertiary,
             modifier = Modifier
-                .align(Alignment.TopStart)
+                .align(if (framed) Alignment.TopStart else Alignment.TopEnd)
                 .padding(AppDimens.SpaceM)
         )
-        Text(
-            text = stringResource(R.string.map_legend),
-            style = AppType.Label2,
-            color = AppColors.TextTertiary,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(AppDimens.SpaceM)
-        )
+        if (framed) {
+            Text(
+                text = stringResource(R.string.map_legend),
+                style = AppType.Label2,
+                color = AppColors.TextTertiary,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(AppDimens.SpaceM)
+            )
+        }
     }
 }
 

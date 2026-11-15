@@ -53,8 +53,10 @@ fun TagChip(text: String, modifier: Modifier = Modifier, filled: Boolean = true)
 }
 
 /**
- * 여러 개를 함께 고를 수 있는 칩(label1Medium, 76×76 이상). 고른 칩은 강조색이고, [enabled]가 false면 흐리게 두고 누를 수 없다.
- * S-02 알림 조건이 쓴다.
+ * 여러 개를 함께 고를 수 있는 알약 칩(label1Medium). S-02 알림 조건과 S-03 필터 펼침이 쓴다(Figma 시안 플로우_14·S-03).
+ * 고른 칩은 밝은 바탕에 어두운 글자, 고르지 않은 칩은 회색 바탕이다.
+ * [enabled]가 false면 고르지 않은 칩처럼 보이되 글자를 조금 흐리게 두고 누를 수 없다(오피스텔·원룸).
+ * 시안의 칩 높이는 64지만, 누를 수 있는 것은 76 이상이라는 규칙(CLAUDE.md)에 따라 76으로 둔다.
  */
 @Composable
 fun ToggleChip(
@@ -68,18 +70,18 @@ fun ToggleChip(
         modifier = modifier
             .heightIn(min = AppDimens.TouchMin)
             .widthIn(min = AppDimens.TouchMin)
-            .clip(RoundedCornerShape(AppDimens.ChipRadius))
-            .background(if (checked && enabled) AppColors.Accent else AppColors.ButtonSecondary)
+            .clip(CircleShape)
+            .background(if (checked && enabled) AppColors.ChipSelected else AppColors.ButtonSecondary)
             .toggleable(value = checked, enabled = enabled, role = Role.Checkbox, onValueChange = onCheckedChange)
-            .padding(horizontal = AppDimens.SpaceM),
+            .padding(horizontal = AppDimens.SpaceL),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
             style = AppType.Label1Medium,
             color = when {
-                !enabled -> AppColors.TextTertiary
-                checked -> AppColors.OnAccent
+                !enabled -> AppColors.TextSecondary
+                checked -> AppColors.OnChipSelected
                 else -> AppColors.TextPrimary
             }
         )

@@ -227,6 +227,7 @@ private fun DetailHeader(detail: ComplexDetail?, place: RelativePlace?, isSidePa
 @Composable
 private fun complexTypeName(type: String): String? = when (type) {
     "APT" -> stringResource(R.string.type_apartment)
+    "OFFICETEL" -> stringResource(R.string.type_officetel)
     else -> null
 }
 

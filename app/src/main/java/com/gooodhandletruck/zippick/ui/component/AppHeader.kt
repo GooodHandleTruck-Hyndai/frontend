@@ -2,16 +2,17 @@ package com.gooodhandletruck.zippick.ui.component
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,43 +20,83 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.gooodhandletruck.zippick.R
 import com.gooodhandletruck.zippick.ui.theme.AppColors
 import com.gooodhandletruck.zippick.ui.theme.AppDimens
-import com.gooodhandletruck.zippick.ui.theme.AppType
 
 private const val LOGO_ICON_RATIO = 0.6f
 
+// 안 읽은 알림 점: 80×80 알림 아이콘에서 종의 오른쪽 위 어깨에 둔다(Figma 시안)
+private val ALERT_DOT_SIZE = 12.dp
+private val ALERT_DOT_OFFSET_X = 46.dp
+private val ALERT_DOT_OFFSET_Y = 19.dp
+
 /**
- * 정차 중 화면 맨 위 머리글(높이 96): 앱 로고, 앱 이름(title2), 오른쪽 끝 상태 알약 "정차 중" (시안 머리글).
- * 왼쪽 탭이 보이면 [startPadding]으로 로고를 탭 가운데에 맞춘다. 주행 중 화면(S-08·S-09)에는 두지 않는다.
+ * 정차 중 화면 맨 위 머리글. 왼쪽에 로고(심볼 + 집픽), 오른쪽 끝에 알림 아이콘을 둔다(Figma 시안 플로우_13·14).
+ * 여백은 시안대로 좌우 32, 위 20이다. 창 크기와 왼쪽 탭이 있는지와 상관없이 같다.
+ * 알림 아이콘을 누르면 S-10 새 거래 알림이 열리고, 안 읽은 알림이 있으면 빨간 점을 찍는다.
+ * [onOpenAlerts]가 null이면(첫 실행 S-01·S-02) 알림 아이콘을 두지 않는다.
+ * 주행 중 화면(S-08·S-09)에는 두지 않는다.
  */
 @Composable
-fun AppHeader(startPadding: Dp, endPadding: Dp, modifier: Modifier = Modifier) {
+fun AppHeader(modifier: Modifier = Modifier, hasUnreadAlerts: Boolean = false, onOpenAlerts: (() -> Unit)? = null) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(AppDimens.HeaderHeight)
-            .padding(start = startPadding, end = endPadding),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)
+            .padding(
+                start = AppDimens.HeaderPaddingHorizontal,
+                end = AppDimens.HeaderPaddingHorizontal,
+                top = AppDimens.HeaderPaddingTop
+            ),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        AppLogo()
-        Text(
-            text = stringResource(R.string.brand_name),
-            style = AppType.Title2,
-            color = AppColors.TextPrimary,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+        Icon(
+            painter = painterResource(R.drawable.ic_logo),
+            contentDescription = stringResource(R.string.brand_name),
+            tint = AppColors.TextPrimary,
             modifier = Modifier
-                .weight(1f)
+                .size(width = AppDimens.HeaderLogoWidth, height = AppDimens.HeaderLogoHeight)
                 .semantics { heading() }
         )
-        StatusPill(text = stringResource(R.string.status_parked))
+        Spacer(modifier = Modifier.weight(1f))
+        if (onOpenAlerts != null) {
+            AlertsButton(hasUnread = hasUnreadAlerts, onClick = onOpenAlerts)
+        }
+    }
+}
+
+/** 머리글 오른쪽 알림 아이콘(80×80). 안 읽은 알림이 있으면 종 오른쪽 위에 빨간 점을 찍는다 */
+@Composable
+private fun AlertsButton(hasUnread: Boolean, onClick: () -> Unit) {
+    val description = stringResource(if (hasUnread) R.string.cd_alerts_unread else R.string.cd_alerts)
+    Box(
+        modifier = Modifier
+            .size(AppDimens.HeaderIconButton)
+            .clip(CircleShape)
+            .clickable(role = Role.Button, onClick = onClick)
+            .semantics { contentDescription = description }
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.ic_notice),
+            contentDescription = null,
+            tint = AppColors.TextSecondary,
+            modifier = Modifier.fillMaxSize()
+        )
+        if (hasUnread) {
+            Box(
+                modifier = Modifier
+                    .offset(x = ALERT_DOT_OFFSET_X, y = ALERT_DOT_OFFSET_Y)
+                    .size(ALERT_DOT_SIZE)
+                    .clip(CircleShape)
+                    .background(AppColors.AlertDot)
+            )
+        }
     }
 }
 
@@ -67,21 +108,6 @@ fun AppLogo(modifier: Modifier = Modifier, size: Dp = AppDimens.LogoSize) {
         contentDescription = null,
         tint = AppColors.Accent,
         modifier = modifier.size(size)
-    )
-}
-
-/** 지금 상태를 알리는 알약(label1Medium): "정차 중". 누를 수 없다 */
-@Composable
-fun StatusPill(text: String, modifier: Modifier = Modifier) {
-    Text(
-        text = text,
-        style = AppType.Label1Medium,
-        color = AppColors.TextSecondary,
-        maxLines = 1,
-        modifier = modifier
-            .clip(CircleShape)
-            .background(AppColors.ButtonSecondary)
-            .padding(horizontal = AppDimens.SpaceM, vertical = AppDimens.SpaceXs)
     )
 }
 

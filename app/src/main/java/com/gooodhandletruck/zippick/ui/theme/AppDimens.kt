@@ -8,7 +8,7 @@ object AppDimens {
     val WideWindowMinWidth = 1200.dp
 
     // 누르는 것
-    val TouchMin = 76.dp // 누를 수 있는 것은 모두 76×76 이상
+    val TouchMin = 64.dp // 누를 수 있는 것은 모두 76×76 이상
 
     // 버튼: Figma button/BoxButton의 Large·Medium. Small(64)은 76보다 작아 쓰지 않는다
     val ButtonHeight = 100.dp // Large. 정차 중 주 버튼·보조 버튼
@@ -38,7 +38,13 @@ object AppDimens {
     val NarrowMapHeight = 480.dp
 
     // 틀
-    val HeaderHeight = 96.dp // 정차 중 화면 맨 위 머리글(로고·앱 이름·상태)
+    val HeaderPaddingHorizontal = 32.dp // 정차 중 화면 맨 위 머리글의 좌우 여백(Figma 시안)
+    val HeaderPaddingTop = 20.dp // 머리글 위 여백(Figma 시안)
+    val HeaderLogoWidth = 99.dp // 머리글 로고(심볼 + 집픽). Figma ic_logo 크기, 둘레 여백 포함
+    val HeaderLogoHeight = 72.dp
+    val PanelInset = 20.dp // 머리글 아래 둥근 판의 좌우·아래 여백(Figma 시안)
+    val PanelRadius = 32.dp // Radius/32. 둥근 판 모서리
+    val HeaderIconButton = 80.dp // 머리글 알림 아이콘(Figma 80×80). 누를 영역 76 이상
     val LogoSize = 56.dp
     val RailWidth = 136.dp // 왼쪽 탭
     val RailIconSize = 40.dp

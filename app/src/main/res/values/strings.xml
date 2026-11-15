@@ -5,6 +5,9 @@
     <string name="brand_name">집픽</string>
     <!-- 머리글 오른쪽 상태 알약 -->
     <string name="status_parked">정차 중</string>
+    <!-- 머리글 알림 아이콘을 읽어 줄 때(TalkBack) -->
+    <string name="cd_alerts">새 거래 알림</string>
+    <string name="cd_alerts_unread">새 거래 알림, 안 읽은 알림 있음</string>
 
     <!-- 왼쪽 탭 -->
     <string name="tab_nearby">주변</string>
@@ -14,11 +17,13 @@
 
     <!-- 목록·설정 화면의 제목 (S-01·S-02는 질문, S-04는 단지 이름을 제목으로 쓴다) -->
     <string name="screen_nearby">주변 단지</string>
-    <string name="screen_saved">저장한 단지</string>
+    <string name="screen_saved">저장한 매물</string>
     <string name="screen_history">오늘 들은 단지</string>
     <string name="screen_settings">설정</string>
 
     <!-- S-01 시작하기 -->
+    <!-- 첫 실행 단계 배지 "1 / 2" -->
+    <string name="onboarding_step">%1$d / %2$d</string>
     <string name="welcome_title">지나가는 아파트, 얼마인지 알려 드려요</string>
     <string name="welcome_body_driving">주행 중에는 소리로 알려 드려요</string>
     <string name="welcome_body_parked">정차하면 주변 단지 가격을 화면으로 보여 드려요</string>
@@ -40,8 +45,19 @@
     <string name="sort_nearest">가까운 순</string>
     <string name="sort_price_low">가격 낮은 순</string>
     <string name="sort_price_high">가격 높은 순</string>
-    <string name="sort_saved">저장한 순</string>
-    <string name="sort_price">가격 순</string>
+    <string name="sort_recent_trade">최근 거래 순</string>
+    <!-- S-03 지도 위 칩과 목록 패널(Figma 시안) -->
+    <string name="nearby_list_chip">단지 %1$d곳</string>
+    <string name="nearby_filter_chip">필터</string>
+    <string name="nearby_filter_count">필터 %1$d</string>
+    <string name="filter_reset">초기화</string>
+    <string name="filter_reset_action">필터 초기화</string>
+    <string name="filter_price">가격대</string>
+    <string name="filter_area">면적</string>
+    <string name="filter_radius">반경</string>
+    <string name="nearby_filter_empty">고른 조건에 맞는 단지가 없어요</string>
+    <string name="nearby_total">총 %1$d개 단지</string>
+    <string name="nearby_summary_pill">단지 %1$d곳 · 내 위치 %2$s 안</string>
 
     <!-- S-03 약도 -->
     <string name="map_heading_up">위 = 차가 향한 쪽</string>
@@ -50,8 +66,8 @@
     <string name="map_pin_description">%1$d번 %2$s, %3$s</string>
 
     <!-- S-05 저장한 단지 -->
-    <string name="saved_header_count">저장한 단지 · %1$d곳</string>
     <string name="saved_empty">아직 저장한 단지가 없어요</string>
+    <string name="saved_type_empty">저장한 %1$s 매물이 없어요</string>
     <string name="saved_empty_detail">주행 중에 들은 단지도 \'저장\'을 누르면 여기에 모여요</string>
 
     <!-- S-06 오늘 들은 단지 -->
@@ -119,13 +135,12 @@
     <string name="alert_section_area">전용면적</string>
     <string name="type_officetel">오피스텔</string>
     <string name="type_one_room">원룸</string>
-    <string name="chip_coming_soon">%1$s · 준비 중</string>
     <string name="range_up_to">%1$s 이하</string>
     <string name="range_between">%1$s~%2$s</string>
-    <string name="range_over">%1$s 넘게</string>
+    <string name="range_over">%1$s 이상</string>
     <string name="area_up_to">%1$d㎡ 이하</string>
     <string name="area_between">%1$d~%2$d㎡</string>
-    <string name="area_over">%1$d㎡ 넘게</string>
+    <string name="area_over">%1$d㎡ 이상</string>
 
     <!-- S-07 설정 -->
     <string name="settings_alerts">주행 중 음성 알림</string>
@@ -180,6 +195,4 @@
     <string name="alerts_empty">최근 7일 동안 새 거래 알림이 없어요.</string>
     <string name="alerts_empty_detail">저장한 단지나 알림 조건에 맞는 단지에 새 거래가 신고되면 여기에 알려 드려요.</string>
     <string name="alerts_deal">%1$s · %2$s · %3$d월 %4$d일 계약</string>
-    <string name="action_open_alerts">새 거래 알림</string>
-    <string name="action_open_alerts_count">새 거래 알림 %1$d</string>
 </resources>
