@@ -21,10 +21,9 @@ fun List<ComplexCardModel>.sortedByPriceDescending(): List<ComplexCardModel> =
     sortedWith(compareByDescending<ComplexCardModel, Int?>(nullsFirst()) { it.complex.sortPriceManwon })
 
 /** 최근 거래 순(마지막 거래 계약일이 늦은 것부터). 거래 기록이 없는 단지는 맨 뒤 */
-fun List<ComplexCardModel>.sortedByRecentTrade(): List<ComplexCardModel> =
-    sortedWith(
-        compareByDescending<ComplexCardModel, LocalDate?>(nullsFirst()) { it.complex.price?.lastTrade?.contractDate }
-    )
+fun List<ComplexCardModel>.sortedByRecentTrade(): List<ComplexCardModel> = sortedWith(
+    compareByDescending<ComplexCardModel, LocalDate?>(nullsFirst()) { it.complex.price?.lastTrade?.contractDate }
+)
 
 /** 가까운 순. 차 위치를 아직 몰라 거리가 없는 카드는 맨 뒤 */
 fun List<ComplexCardModel>.sortedByDistance(): List<ComplexCardModel> =

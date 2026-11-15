@@ -45,11 +45,7 @@ private val ALERT_DOT_OFFSET_Y = 19.dp
  * 주행 중 화면(S-08·S-09)에는 두지 않는다.
  */
 @Composable
-fun AppHeader(
-    modifier: Modifier = Modifier,
-    hasUnreadAlerts: Boolean = false,
-    onOpenAlerts: (() -> Unit)? = null
-) {
+fun AppHeader(modifier: Modifier = Modifier, hasUnreadAlerts: Boolean = false, onOpenAlerts: (() -> Unit)? = null) {
     Row(
         modifier = modifier
             .fillMaxWidth()
