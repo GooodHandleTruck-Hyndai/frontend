@@ -5,6 +5,9 @@
     <string name="brand_name">집픽</string>
     <!-- 머리글 오른쪽 상태 알약 -->
     <string name="status_parked">정차 중</string>
+    <!-- 머리글 알림 아이콘을 읽어 줄 때(TalkBack) -->
+    <string name="cd_alerts">새 거래 알림</string>
+    <string name="cd_alerts_unread">새 거래 알림, 안 읽은 알림 있음</string>
 
     <!-- 왼쪽 탭 -->
     <string name="tab_nearby">주변</string>
@@ -19,6 +22,8 @@
     <string name="screen_settings">설정</string>
 
     <!-- S-01 시작하기 -->
+    <!-- 첫 실행 단계 배지 "1 / 2" -->
+    <string name="onboarding_step">%1$d / %2$d</string>
     <string name="welcome_title">지나가는 아파트, 얼마인지 알려 드려요</string>
     <string name="welcome_body_driving">주행 중에는 소리로 알려 드려요</string>
     <string name="welcome_body_parked">정차하면 주변 단지 가격을 화면으로 보여 드려요</string>
@@ -119,7 +124,6 @@
     <string name="alert_section_area">전용면적</string>
     <string name="type_officetel">오피스텔</string>
     <string name="type_one_room">원룸</string>
-    <string name="chip_coming_soon">%1$s · 준비 중</string>
     <string name="range_up_to">%1$s 이하</string>
     <string name="range_between">%1$s~%2$s</string>
     <string name="range_over">%1$s 넘게</string>

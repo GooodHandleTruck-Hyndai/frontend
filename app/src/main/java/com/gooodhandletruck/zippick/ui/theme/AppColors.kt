@@ -30,7 +30,14 @@ data class AppPalette(
     // Surface/Brand/default
     val accentSoft: Color,
     // Figma에 시맨틱 토큰이 아직 없다. 아래 값 주석을 본다
-    val officialPrice: Color
+    val officialPrice: Color,
+    // 머리글 알림 아이콘의 안 읽은 알림 점. Figma 시안(플로우_13·14)의 빨간 점
+    val alertDot: Color,
+    // 머리글 아래 내용을 담는 둥근 판(Figma 시안 플로우_13·14)
+    val panel: Color,
+    // 고른 알약 칩 바탕과 글자(S-02)
+    val chipSelected: Color,
+    val onChipSelected: Color
 )
 
 /** Light 모드. 지금 앱은 쓰지 않지만 Figma 값과 맞춰 둔다. */
@@ -53,7 +60,13 @@ val LightPalette = AppPalette(
     // Teal/100
     accentSoft = Color(0xFFE1F5F3),
     // TODO: 디자이너에게 공시가격 색 토큰을 받는다. 지금은 바꾸기 전 값이다
-    officialPrice = Color(0xFFB45309)
+    officialPrice = Color(0xFFB45309),
+    // TODO: 디자이너에게 알림 점 색 토큰 이름을 받는다. 지금은 시안 캡처에서 본 빨강이다
+    alertDot = Color(0xFFFF4D4F),
+    // TODO: 디자이너에게 판·고른 칩 색 토큰을 받는다. Light는 지금 앱이 쓰지 않아 Dark를 뒤집은 임시 값이다
+    panel = Color(0xFFF7F8FA),
+    chipSelected = Color(0xFF131417),
+    onChipSelected = Color(0xFFFFFFFF)
 )
 
 /** Dark 모드. GUI를 모두 다크로 만들기로 해서 앱은 이 묶음만 쓴다. */
@@ -76,7 +89,13 @@ val DarkPalette = AppPalette(
     // Teal/900
     accentSoft = Color(0xFF063E3B),
     // TODO: 디자이너에게 공시가격 색 토큰을 받는다. 지금은 프리미티브 Orange/400이다
-    officialPrice = Color(0xFFFFA927)
+    officialPrice = Color(0xFFFFA927),
+    // TODO: 디자이너에게 알림 점 색 토큰 이름을 받는다. 지금은 시안 캡처에서 본 빨강이다
+    alertDot = Color(0xFFFF4D4F),
+    // TODO: 디자이너에게 판·고른 칩 색 토큰 이름을 받는다. 지금은 시안 캡처에서 본 색이다
+    panel = Color(0xFF131417),
+    chipSelected = Color(0xFFE6E7EB),
+    onChipSelected = Color(0xFF131417)
 )
 
 /** [AppTheme]이 고른 색 묶음을 화면에 내려 준다. */
@@ -151,6 +170,26 @@ object AppColors {
     val AccentLine: Color
         @Composable @ReadOnlyComposable
         get() = palette.accent.copy(alpha = 0.4f)
+
+    /** 머리글 아래 내용을 담는 둥근 판 */
+    val Panel: Color
+        @Composable @ReadOnlyComposable
+        get() = palette.panel
+
+    /** 고른 알약 칩 바탕(S-02) */
+    val ChipSelected: Color
+        @Composable @ReadOnlyComposable
+        get() = palette.chipSelected
+
+    /** 고른 알약 칩 글자(S-02) */
+    val OnChipSelected: Color
+        @Composable @ReadOnlyComposable
+        get() = palette.onChipSelected
+
+    /** 머리글 알림 아이콘의 안 읽은 알림 점 */
+    val AlertDot: Color
+        @Composable @ReadOnlyComposable
+        get() = palette.alertDot
 
     /** 공시가격 칩 바탕 */
     val OfficialPriceSoft: Color

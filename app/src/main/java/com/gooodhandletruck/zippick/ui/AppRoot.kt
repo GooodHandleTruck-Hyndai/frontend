@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.saveable.SaveableStateHolder
@@ -113,11 +114,18 @@ private fun ParkedContent(nav: NavState, window: WindowLayout, viewModel: AppVie
     val stateHolder = rememberSaveableStateHolder()
     // 첫 실행(S-01·S-02) 중에는 탭을 숨긴다
     val tab = nav.selectedTab
+    val hasUnreadAlerts by viewModel.hasUnreadAlerts.collectAsStateWithLifecycle()
+    // 정차 중 화면이 바뀔 때마다(S-10에서 돌아올 때 포함) 안 읽은 알림을 다시 확인한다
+    LaunchedEffect(nav.backStack.last()) { viewModel.refreshUnreadAlerts() }
     Column(modifier = Modifier.fillMaxSize()) {
         AppHeader(
-            // 탭이 있으면 로고를 탭 가운데에, 없으면 본문 왼쪽 여백에 맞춘다
-            startPadding = if (tab != null) (AppDimens.RailWidth - AppDimens.LogoSize) / 2 else window.contentPadding,
-            endPadding = window.contentPadding
+            hasUnreadAlerts = hasUnreadAlerts,
+            // 첫 실행(S-01·S-02) 중에는 알림 아이콘을 두지 않는다
+            onOpenAlerts = if (tab != null) {
+                { viewModel.open(Screen.Alerts) }
+            } else {
+                null
+            }
         )
         Row(modifier = Modifier.weight(1f)) {
             tab?.let { NavRail(selected = it, onSelect = viewModel::selectTab) }

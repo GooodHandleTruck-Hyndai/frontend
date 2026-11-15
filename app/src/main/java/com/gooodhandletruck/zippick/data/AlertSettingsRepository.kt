@@ -10,16 +10,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.serialization.Serializable
 
-/** 알림 조건의 단지 유형. 오피스텔·원룸은 데이터가 준비될 때까지 고를 수 없다(화면 설계서 S-02) */
+/** 알림 조건의 단지 유형. 원룸은 서버 데이터가 준비될 때까지 고를 수 없다(Figma 시안 플로우_14에서 disabled) */
 @Serializable
 enum class ComplexType(val available: Boolean) {
     APT(available = true),
-    OFFICETEL(available = false),
+    OFFICETEL(available = true),
     ONE_ROOM(available = false);
 
     companion object {
-        /** 서버의 type 값. 오피스텔·원룸 값은 아직 정해지지 않았다 */
-        fun of(type: String): ComplexType? = if (type == "APT") APT else null
+        /** 서버의 type 값("APT"·"OFFICETEL"). 원룸 값은 아직 정해지지 않았다 */
+        fun of(type: String): ComplexType? = when (type) {
+            "APT" -> APT
+            "OFFICETEL" -> OFFICETEL
+            else -> null
+        }
     }
 }
 

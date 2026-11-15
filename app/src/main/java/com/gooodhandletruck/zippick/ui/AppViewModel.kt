@@ -69,6 +69,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     private val speech = container.speechRepository
     private val navigation = container.navigationRepository
     private val announcedStore = container.announcedStore
+    private val alertInbox = container.alertInboxRepository
     private val onboardingStore = OnboardingStore(app)
     private val drivingState = DrivingStateRepository(app)
     private val navigator = Navigator(viewModelScope, onboardingDone = onboardingStore.isDone)
@@ -96,6 +97,13 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     val spoken: StateFlow<SpokenComplex?> = _spoken.asStateFlow()
 
     private var listenJob: Job? = null
+
+    private val _hasUnreadAlerts = MutableStateFlow(false)
+
+    /** 안 읽은 새 거래 알림이 있는지. 머리글 알림 아이콘의 빨간 점이 쓴다 */
+    val hasUnreadAlerts: StateFlow<Boolean> = _hasUnreadAlerts.asStateFlow()
+
+    private var unreadAlertsJob: Job? = null
 
     /** 근접 알림을 건 단지. 들어갔다는 이벤트가 오면 여기서 이름·가격을 찾는다 */
     private var geofenceTargets: Map<String, ComplexSummary> = emptyMap()
@@ -365,6 +373,24 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     /** 마지막 거래의 계약 월. 올해면 "11월", 아니면 "2025년 12월"(최대 1년 전 거래가 올 수 있다) */
     private fun tradeMonthVoice(date: LocalDate): String =
         if (date.year == LocalDate.now().year) "${date.monthValue}월" else "${date.year}년 ${date.monthValue}월"
+
+    /**
+     * 안 읽은 새 거래 알림이 있는지 서버에 다시 묻는다. 정차 중 화면이 바뀔 때마다 부른다(주행 중에는 부르지 않는다).
+     * 못 받으면 점을 그대로 둔다.
+     */
+    fun refreshUnreadAlerts() {
+        if (nav.value.isDriving) return
+        unreadAlertsJob?.cancel()
+        unreadAlertsJob = viewModelScope.launch {
+            try {
+                _hasUnreadAlerts.value = alertInbox.alerts().any { !it.read }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w(TAG, "안 읽은 알림을 확인하지 못했어요", e)
+            }
+        }
+    }
 
     fun openHeardComplex() = navigator.openHeardComplex()
 
