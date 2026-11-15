@@ -1,100 +1,125 @@
-# 집픽 (Zippick): 플레오스 커넥트 차량 앱
+# 집픽 (Zippick)
 
-> GooodHandleTruck · 주행 중 운전자를 돕는 차량용 서비스
+> 지나가는 아파트 단지의 최근 실거래가를 주행 중에는 음성으로, 정차 중에는 화면으로 알려 주는 Pleos Connect 차량 앱
 
-Kotlin과 Jetpack Compose로 만든 플레오스 커넥트(Android Automotive) 앱이에요.
-화면 9개(S-01~S-09)가 모두 실제 화면이에요. 단지 데이터는 서버가 준비될 때까지 목업(가상 단지)을 쓰고, 위치·근접 알림·길 안내·음성은 플레오스 SDK를 실제로 불러요. S-03 약도는 지도 타일 없이 앱이 직접 그려요.
-화면 구성과 이동 규칙은 [화면 설계서](https://claude.ai/artifact/UgMDDBgkDfK7rZVFKAaoQt)에 있어요.
+팀 GooodHandleTruck · 패키지 `com.gooodhandletruck.zippick` · 버전 0.1.0
 
-- 협업 규칙(브랜치, 커밋, PR): [CONTRIBUTING.md](CONTRIBUTING.md)
-- 패키지: `com.gooodhandletruck.zippick`
+## 📦 APK
 
----
+| 항목 | 내용 |
+|---|---|
+| 파일 위치 | [`apk/GooodHandleTruck_Zippick_release.apk`](apk/GooodHandleTruck_Zippick_release.apk) |
+| 빌드 종류 | release (바로 설치할 수 있게 개발용 키로 서명) |
+| 연결 서버 | 공모전 심사용 공개 서버 `https://3-37-254-181.sslip.io` (1차 심사 결과 발표일 11/23까지 운영) |
 
-## 개발 환경 세팅
+## ✨ 주요 기능
 
-### 1. Android Studio 설치
-https://developer.android.com/studio 에서 최신 버전을 설치하세요.
-첫 실행 마법사에서는 **Standard** 를 고르면 돼요.
+- **주행 중 (S-08·S-09)**: 알림 조건(유형·가격대·면적)에 맞는 단지 반경 300m에 들어가면 "오른쪽, ○○단지. 전용 84제곱미터, 최근 3개월 평균 12억 3,000만 원이에요."처럼 소리로 알려 줘요. [주변 단지 듣기]로 차 앞쪽에서 가장 가까운 단지를 바로 들을 수도 있어요. 화면에는 단지 이름과 큰 버튼 두 개([다시 듣기], [저장])만 보여요.
+- **정차 중**: 주변 단지 목록과 약도(S-03), 평형별 가격과 최근 거래(S-04), 저장한 단지(S-05), 오늘 들은 단지(S-06), 저장한 단지의 새 거래 알림(S-10)을 화면으로 보여 줘요.
+- **길 안내**: 단지를 기본 내비의 목적지로 보내고, 도착하면 그 단지 상세를 열어요.
+- 실거래 데이터는 백엔드가 국토교통부 실거래가 자료를 모아 제공해요.
 
-> VS Code 단축키가 익숙하면 Settings → Keymap 에서 **VS Code** 를 고르세요.
+## ▶️ 실행 방법
 
-### 2. 플레오스 에뮬레이터 설치
-1. **Tools → SDK Manager** → **SDK Update Sites** 탭에서 **+** 를 눌러요.
-   - Name: `Pleos Connect System Image`
-   - URL
-     - Windows / Linux: `https://nexus-playground.pleos.ai/repository/raw-releases/connect-avd/2.x/crp-sys-img.xml`
-     - Mac (Apple Silicon): `https://nexus-playground.pleos.ai/repository/raw-releases/connect-avd/2.x/crp-arm64-sys-img.xml`
-2. **SDK Platforms** 탭 → 오른쪽 아래 **Show Package Details** 를 체크 → **Android 14.0 (API 34) › Pleos Connect** 를 체크하고 Apply 를 눌러요.
-3. Android Studio 를 재시작해요.
+### A. APK로 실행하기
 
-### 3. 가상 차량(AVD) 만들기
-1. **Shift 두 번** → `Device Manager` 를 검색해서 열어요.
-2. **+ → Create Virtual Device** → **Automotive** → **Pleos Connect v2.1.0** 을 골라요.
-3. 시스템 이미지는 **API 34 Pleos Connect**, Default boot 는 **Cold**, RAM 은 **4 GB** 로 설정해요.
+1. Pleos Connect 에뮬레이터를 켜요. 아래 '개발 환경'의 에뮬레이터 설치 방법을 보세요.
+2. APK를 설치해요.
+   ```bash
+   adb install -r apk/GooodHandleTruck_Zippick_release.apk
+   ```
+3. 에뮬레이터 위치를 **서울 마포구 도화동**으로 옮겨요. 경도를 먼저 써요.
+   ```bash
+   adb emu geo fix 126.9455 37.5404
+   ```
+   Extended controls(⋯) → Location에서 위도 `37.5404`, 경도 `126.9455`를 넣어도 같아요.
+4. 앱 목록에서 **집픽**을 열고 [위치 권한 허용하고 시작하기] → 알림 조건 고르기 → 주변 단지 순으로 진행해요.
 
-### 4. 프로젝트 받고 실행하기
+### B. 소스로 빌드하기
+
 ```bash
-git clone https://github.com/GooodHandleTruck/<저장소이름>.git
+git clone https://github.com/GooodHandleTruck-Hyndai/frontend.git
 ```
-1. Android Studio → **Open** → 클론한 폴더를 선택하고, Gradle Sync 가 끝날 때까지 기다려요.
-2. 기기 목록에서 플레오스 AVD 를 고르고 ▶ **Run** 을 눌러요.
-3. 첫 화면(S-01 시작하기)에서 [위치 권한 허용하고 시작하기]를 누르면 위치 권한 창이 떠요. 허용하든 거부하든 S-02 알림 조건을 거쳐 S-03 주변 단지로 가고, 그다음부터는 S-03에서 시작해요.
-   - 첫 실행부터 다시 보려면 `adb shell pm clear --user 10 com.gooodhandletruck.zippick` 을 실행해요. 플레오스 에뮬레이터에서는 앱이 사용자 10으로 돌아요.
-   - S-03은 차 위치(플레오스 FusedLocation)를 받아 `app/src/main/assets/mock/complexes_nearby.json` 의 가상 단지를 보여 줘요. 가상 단지는 강남역 둘레에 있으니 `adb emu geo fix 127.0276 37.4979` 로 에뮬레이터 위치를 옮겨요(경도가 먼저). 50m 넘게 옮기면 목록을 다시 불러와요.
-   - 에뮬레이터는 차 방향(heading)을 늘 0(북쪽)으로 줘요. 그래서 방향 칩은 차가 북쪽을 본다고 보고 나와요.
-   - S-03 약도는 차가 향한 쪽이 위이고, 단지마다 가격 말풍선("12.3억")이 떠요. 1:2 창에서는 목록 옆 칸, 1:1:1 창에서는 목록 맨 위에 있어요. 말풍선을 눌러도 S-04가 열려요.
-   - S-03은 범위 칩 옆 정렬 칩으로 가까운 순·가격 낮은 순·가격 높은 순을, S-05는 저장한 순·가까운 순·가격 순을 고를 수 있어요.
-   - S-03 카드를 누르면 S-04 단지 상세가 열려요. 1:2 창에서는 목록 옆 칸에 열리고([닫기]), 1:1:1 창에서는 창 전체를 덮어요([뒤로]). 상세는 `app/src/main/assets/mock/complex_details.json` 을 읽어요.
-   - S-04의 [길 안내]와 S-05 카드의 [길 안내]는 기본 내비(플레오스 NaviHelper)에 단지를 목적지로 보내요. 1:2 창에서는 내비가 이 앱 칸을 덮으니, 내비에서 [안내 종료]를 누르고 아래 독의 앱 아이콘을 누르면 돌아와요.
-   - 도착하면 그 단지의 S-04가 '도착했어요' 띠와 함께 열려요. 내비 도착 이벤트가 오지 않아도 목적지 200m 안에서 정차하면 도착으로 봐요(근접 알림).
-   - S-04에서 [저장]한 단지는 저장 탭(S-05)에 최근에 저장한 것부터 모여요. 서버를 붙이기 전까지는 이 기기에 기억해서 앱을 다시 켜도 남고, `pm clear` 로 앱 데이터를 지우면 사라져요.
-   - 1:1:1 창은 앱 창 오른쪽 끝의 ⋮ 손잡이를 왼쪽으로 끌면 나와요(앱 창 841×1210dp). 손잡이를 화면 끝까지 끌어 되돌리면 시스템 화면이 앱 아이콘 가림막에 멈출 수 있어요. 그때는 오른쪽 끝 손잡이를 왼쪽으로 조금(100px쯤)만 끌었다 놓으면 1:2 창으로 돌아와요.
-   - 에뮬레이터를 오래 켜 두면 플레오스 위치 서비스가 멈춰서 "지금 위치를 확인하지 못했어요"가 뜨거나 옛 위치(미국)가 나올 수 있어요. 그때는 `adb shell am force-stop --user 10 ai.pleos.playground.service.location.fused` 로 위치 서비스를 다시 띄우고, 앱도 다시 실행해요.
-4. 에뮬레이터의 **⋯ (Extended controls) → Car data** 에서 기어를 D로 바꾸면 주행 화면(S-08)이 덮고, P로 돌리면 보던 화면으로 돌아와요.
-   - 디버그 빌드에서는 `adb shell am start --user 10 -n com.gooodhandletruck.zippick/.MainActivity --ez debug_driving true` 로도 주행을 흉내 낼 수 있어요. 정차는 `false` 이고, 앱을 다시 켜면 차의 실제 값으로 돌아가요.
-   - S-08의 [주변 단지 듣기]를 누르면 차 앞쪽 180도 안에서 가장 가까운 단지를 소리로 말하고(플레오스 TextToSpeech) S-09로 바뀌어요. 정차하면 맨 위에 '방금 들은 단지' 띠가 뜨고, 기록 탭(S-06)에 오늘 들은 단지가 남아요.
-   - 알림 조건(S-02)을 정하고 알림을 켜 두면, 주행 중에 조건에 맞는 단지 반경 300m로 들어갈 때 저절로 말해요. 같은 단지는 하루에 한 번, 알림 사이는 1분 이상이에요. 에뮬레이터에서는 단지에서 멀리 둔 채 주행을 시작한 뒤 `adb emu geo fix 127.0339 37.4976` (늘푸른 4단지 앞)으로 옮겨 보세요.
-5. 단위 테스트(가격 표기, 거리·방향 계산, 다시 불러오는 기준, 화면 쌓기 규칙, 목업 JSON)는 `./gradlew test` 로 돌려요.
+
+1. Android Studio → **Open** → 클론한 폴더를 열고 Gradle Sync가 끝날 때까지 기다려요.
+2. release APK: `./gradlew assembleRelease` → `app/build/outputs/apk/release/app-release.apk`
+3. debug 빌드(▶ Run)는 내 PC의 로컬 백엔드(`http://10.0.2.2:8080`)를 봐요. 공개 서버로 확인하려면 release로 빌드해요.
+4. 단위 테스트: `./gradlew test` · 코드 스타일 검사: `./gradlew ktlintCheck`
+
+## 🧪 테스트 환경 및 필요한 설정
+
+| 항목 | 내용 |
+|---|---|
+| 서버 | release APK는 공개 서버에 바로 연결돼요. 따로 띄울 서버는 없어요 |
+| 데이터 범위 | 지금은 **서울 마포구** 실거래 데이터만 있어요. 다른 위치에서는 "단지가 없어요"가 나와요 |
+| 위치 권한 | 첫 화면에서 허용해요. 거부하면 주변 단지를 볼 수 없어요 |
+| 차 방향 | 에뮬레이터는 차 방향(heading)을 늘 북쪽(0도)으로 줘요. 방향 칩은 차가 북쪽을 본다고 보고 나와요 |
+
+**주행·정차 바꾸기**
+- Extended controls(⋯) → **Car data**에서 기어를 **D**로 바꾸면 주행 화면(S-08)이 덮고, **P**로 돌리면 보던 화면으로 돌아와요.
+- 명령으로 바꿀 수도 있어요. 정차는 `off`예요.
+  ```bash
+  adb shell cmd hmg_car_service --service drivingstate driving_regulation on
+  ```
+
+**주행 중 자동 알림 확인**
+1. 정차 중에 알림 조건(S-02)을 정하고, 설정(S-07)에서 주행 중 음성 알림을 켜요.
+2. 단지에서 떨어진 곳에서 주행을 시작해요.
+3. `adb emu geo fix`로 단지 가까이 옮기면 소리로 알려 줘요. 같은 단지는 하루에 한 번만 알려 줘요.
+
+**문제가 생기면**
+- "지금 위치를 확인하지 못했어요"가 뜨거나 옛 위치가 나오면 Pleos 위치 서비스를 다시 띄우고, 앱도 다시 실행해요.
+  ```bash
+  adb shell am force-stop --user 10 ai.pleos.playground.service.location.fused
+  ```
+- 첫 실행부터 다시 보려면 앱 데이터를 지워요. Pleos 에뮬레이터에서는 앱이 사용자 10으로 돌아요.
+  ```bash
+  adb shell pm clear --user 10 com.gooodhandletruck.zippick
+  ```
+
+## 🖥️ 개발 환경
+
+| 항목 | 내용 |
+|---|---|
+| 에뮬레이터 | **Pleos Connect v2.1.0** (Android 14, API 34 · Pleos Connect 시스템 이미지) |
+| 화면 규격 | Connect-S 17". 앱 창은 1:2 분할 **1700×1184dp**(가로), 1:1:1 분할 **840×1184dp**(세로) 두 크기를 모두 지원해요 |
+| AVD 설정 | Automotive → Pleos Connect v2.1.0 · RAM 4GB · Default boot Cold |
+| 개발 도구 | Android Studio, JDK 17, Kotlin 2.1.0, Android Gradle Plugin 8.7.3 |
+| SDK 버전 | minSdk 28 · compileSdk / targetSdk 34 |
+| Pleos SDK | NaviHelper 3.0.5 (길 안내·도착) · FusedLocation 1.1.3 (위치·근접 알림) · TextToSpeech 3.3.1 (음성 안내) |
+| 주요 라이브러리 | Jetpack Compose, kotlinx.serialization, OkHttp |
+
+**에뮬레이터 설치**
+1. Android Studio → **Tools → SDK Manager → SDK Update Sites**에서 **+**를 누르고 아래를 추가해요.
+   - Name: `Pleos Connect System Image`
+   - Windows / Linux: `https://nexus-playground.pleos.ai/repository/raw-releases/connect-avd/2.x/crp-sys-img.xml`
+   - Mac (Apple Silicon): `https://nexus-playground.pleos.ai/repository/raw-releases/connect-avd/2.x/crp-arm64-sys-img.xml`
+2. **SDK Platforms** 탭 → **Show Package Details** 체크 → **Android 14.0 (API 34) › Pleos Connect**를 설치해요.
+3. **Device Manager → + → Create Virtual Device → Automotive → Pleos Connect v2.1.0**으로 AVD를 만들어요.
 
 ## 📁 폴더 구조
 
 ```
+apk/                             제출용 release APK
 app/src/main/java/com/gooodhandletruck/zippick/
-├── MainActivity.kt              앱 진입점 (Activity 하나)
-├── ZippickApp.kt                Application. 저장소를 담은 AppContainer를 들고 있음
-├── ui/
-│   ├── AppRoot.kt               창 크기 판단, 주행·정차에 따라 화면 그리기, 1:2 창의 목록+상세 두 칸
-│   ├── AppViewModel.kt          화면 이동·주행 상태
-│   ├── navigation/              Screen(화면 9개), Navigator(이동 규칙)
-│   ├── component/               왼쪽 탭, 버튼, 칩, 단지 카드·사진 자리, 방향·거리 칩, 상태 상자, 불러오는 중 카드, 위치 권한 요청
-│   ├── format/                  가격·거리·면적·방향 표기 (가격 문자열은 여기서만 만듦)
-│   ├── onboarding/ nearby/ detail/ saved/ history/ settings/ driving/   화면별 파일 (nearby/·detail/에 ViewModel)
-│   └── theme/                   색·글자·간격 (화면 설계서 공통 규격)
+├── ui/                          화면(S-01~S-10)과 공통 부품, 색·글자·간격(theme)
+│   ├── nearby/ detail/ saved/ history/ alerts/ settings/ onboarding/ driving/
+│   ├── navigation/              화면 목록과 이동 규칙
+│   └── format/                  가격·거리·면적·방향 표기
 └── data/
-    ├── model/                   서버 응답과 같은 모양의 데이터 클래스 (kotlinx.serialization)
-    ├── ComplexRepository.kt     단지 데이터 창구. 지금은 FakeRepository, 나중에 RemoteRepository
-    ├── FakeRepository.kt        assets/mock/ 목업 JSON을 읽어 서버처럼 답함
-    ├── AppContainer.kt          저장소를 한 번만 만들어 나눠 줌 (DI 프레임워크 없이)
-    ├── AppJson.kt               JSON 읽기 설정
-    ├── Geo.kt                   두 좌표 사이 거리·방위각
-    ├── CarLocation.kt           차 위치·향한 쪽, 목록을 다시 불러올 만큼 움직였는지
-    ├── LocationRepository.kt    차 위치 받기와 근접 알림 (플레오스 FusedLocation)
-    ├── NavigationRepository.kt  길 안내 보내기와 도착 (플레오스 NaviHelper)
-    ├── SpeechRepository.kt      주행 중 음성 안내와 오디오 포커스 (플레오스 TextToSpeech)
-    ├── AlertSettingsRepository.kt 주행 중 자동 알림 조건과 켜기·끄기 (이 기기에 저장)
-    ├── NearbyRangeStore.kt      주변 범위 기본값 (S-07)
-    ├── AnnouncedStore.kt        오늘 소리로 알린 단지 (하루에 한 번만 자동 알림)
-    ├── DrivingStateRepository.kt 주행 중인지 (AAOS UX 제한)
-    ├── OnboardingStore.kt       첫 실행을 끝냈는지
-    ├── LocationPermission.kt    위치 권한(FUSED_LOCATION)이 있는지
-    ├── CarDataRepository.kt     속도/기어 구독 (표준 AAOS API, 지금은 안 씀)
-    └── ApiClient.kt             서버 API
-app/src/main/assets/mock/        가상 단지 목업 JSON (Claude Docs 'API 명세 초안 검토'의 P0 형식)
+    ├── remote/                  서버 통신(기기 등록·헤더), 응답 모양, 앱 데이터로 바꾸기
+    ├── RemoteRepository.kt      주변 단지·상세·저장 (서버)
+    ├── InterestConditionSync.kt 알림 조건을 서버 관심 조건으로 보내기
+    ├── AlertInboxRepository.kt  새 거래 알림
+    ├── LocationRepository.kt    차 위치와 근접 알림 (Pleos FusedLocation)
+    ├── NavigationRepository.kt  길 안내와 도착 (Pleos NaviHelper)
+    ├── SpeechRepository.kt      음성 안내 (Pleos TextToSpeech)
+    └── FakeRepository.kt        서버 없이 화면을 볼 때 쓰는 목업
 app/src/test/                    단위 테스트
 ```
 
-## 📚 참고 문서
-- [플레오스 개발 시작하기](https://document.pleos.ai/en/docs/pleos-only/getting-started)
-- [앱 디자인 가이드 (주행 안전)](https://document.pleos.ai/en/docs/pleos-only/vehicle-app-planning-guide/intro)
-- [Vehicle SDK 튜토리얼](https://document.pleos.ai/en/docs/pleos-only/tutorial/vehicle-sdk)
+## 🔗 참고
+
+- 백엔드 저장소: https://github.com/GooodHandleTruck-Hyndai/backend
+- 협업 규칙(브랜치, 커밋, PR): [CONTRIBUTING.md](CONTRIBUTING.md)
+- [Pleos 개발 시작하기](https://document.pleos.ai/en/docs/pleos-only/getting-started) · [앱 디자인 가이드 (주행 안전)](https://document.pleos.ai/en/docs/pleos-only/vehicle-app-planning-guide/intro)
