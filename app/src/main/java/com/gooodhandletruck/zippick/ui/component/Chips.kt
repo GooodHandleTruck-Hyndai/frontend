@@ -53,7 +53,7 @@ fun TagChip(text: String, modifier: Modifier = Modifier, filled: Boolean = true)
 }
 
 /**
- * 여러 개를 함께 고를 수 있는 알약 칩(label1Medium). S-02 알림 조건이 쓴다(Figma 시안 플로우_14).
+ * 여러 개를 함께 고를 수 있는 알약 칩(label1Medium). S-02 알림 조건과 S-03 필터 펼침이 쓴다(Figma 시안 플로우_14·S-03).
  * 고른 칩은 밝은 바탕에 어두운 글자, 고르지 않은 칩은 회색 바탕이다.
  * [enabled]가 false면 고르지 않은 칩처럼 보이되 글자를 조금 흐리게 두고 누를 수 없다(오피스텔·원룸).
  * 시안의 칩 높이는 64지만, 누를 수 있는 것은 76 이상이라는 규칙(CLAUDE.md)에 따라 76으로 둔다.

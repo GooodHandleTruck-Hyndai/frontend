@@ -55,6 +55,7 @@ fun ComplexSummary.toCardModel(car: CarLocation) = ComplexCardModel(complex = th
  * 최근 거래가 없으면 가격 자리에 "최근 3개월 거래가 없어요"를 쓴다 (화면 설계서 S-03 '상태별 문구').
  * 1:2 창에서 오른쪽 칸에 상세를 연 카드는 [selected]로 강조색 테두리(3)를 두른다.
  * [showSavedMark]면 저장한 단지에 "저장함" 칩을 붙인다(S-06).
+ * [showTypeTag]면 이름 앞에 유형 태그("아파트")를 붙이고, 고른 카드는 옅은 강조색 바탕이다(Figma 시안 S-03 목록 패널).
  * 오른쪽 끝에는 [trailing] 버튼(S-05 [길 안내])을 두고, 없으면 상세가 열린다는 › 표시를 둔다.
  */
 @Composable
@@ -64,6 +65,7 @@ fun ComplexCard(
     modifier: Modifier = Modifier,
     selected: Boolean = false,
     showSavedMark: Boolean = false,
+    showTypeTag: Boolean = false,
     leading: (@Composable () -> Unit)? = null,
     trailing: (@Composable () -> Unit)? = null
 ) {
@@ -72,7 +74,7 @@ fun ComplexCard(
         modifier = modifier
             .fillMaxWidth()
             .clip(shape)
-            .background(AppColors.Surface)
+            .background(if (selected && showTypeTag) AppColors.AccentSoft else AppColors.Surface)
             .border(
                 width = if (selected) AppDimens.SelectedBorder else 1.dp,
                 color = if (selected) AppColors.Accent else AppColors.Outline,
@@ -88,13 +90,20 @@ fun ComplexCard(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceXs)
         ) {
-            Text(
-                text = model.complex.name,
-                style = AppType.Body2Bold,
-                color = AppColors.TextPrimary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceXs)
+            ) {
+                if (showTypeTag) typeTagLabel(model.complex.type)?.let { TypeTag(text = it) }
+                Text(
+                    text = model.complex.name,
+                    style = AppType.Body2Bold,
+                    color = AppColors.TextPrimary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false)
+                )
+            }
             val savedMark = showSavedMark && model.complex.saved
             if (model.place != null || savedMark) {
                 Row(
@@ -118,6 +127,28 @@ fun ComplexCard(
             )
         }
     }
+}
+
+/** 이름 앞 유형 태그("아파트"·"오피스텔"): 옅은 강조색 바탕에 강조색 글자(label2) */
+@Composable
+private fun TypeTag(text: String) {
+    Text(
+        text = text,
+        style = AppType.Label2,
+        color = AppColors.Accent,
+        maxLines = 1,
+        modifier = Modifier
+            .clip(RoundedCornerShape(AppDimens.ButtonRadiusM))
+            .background(AppColors.AccentSoft)
+            .padding(horizontal = AppDimens.SpaceXs)
+    )
+}
+
+@Composable
+private fun typeTagLabel(type: String): String? = when (type) {
+    "APT" -> stringResource(R.string.type_apartment)
+    "OFFICETEL" -> stringResource(R.string.type_officetel)
+    else -> null
 }
 
 /** 가격(title2)과 그 아래 "84㎡ · 최근 3개월 · 10월 31일 기준"(label2) */

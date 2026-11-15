@@ -47,6 +47,19 @@
     <string name="sort_price_high">가격 높은 순</string>
     <string name="sort_saved">저장한 순</string>
     <string name="sort_price">가격 순</string>
+    <string name="sort_recent_trade">최근 거래 순</string>
+    <!-- S-03 지도 위 칩과 목록 패널(Figma 시안) -->
+    <string name="nearby_list_chip">단지 %1$d곳</string>
+    <string name="nearby_filter_chip">필터</string>
+    <string name="nearby_filter_count">필터 %1$d</string>
+    <string name="filter_reset">초기화</string>
+    <string name="filter_reset_action">필터 초기화</string>
+    <string name="filter_price">가격대</string>
+    <string name="filter_area">면적</string>
+    <string name="filter_radius">반경</string>
+    <string name="nearby_filter_empty">고른 조건에 맞는 단지가 없어요</string>
+    <string name="nearby_total">총 %1$d개 단지</string>
+    <string name="nearby_summary_pill">단지 %1$d곳 · 내 위치 %2$s 안</string>
 
     <!-- S-03 약도 -->
     <string name="map_heading_up">위 = 차가 향한 쪽</string>
@@ -126,10 +139,10 @@
     <string name="type_one_room">원룸</string>
     <string name="range_up_to">%1$s 이하</string>
     <string name="range_between">%1$s~%2$s</string>
-    <string name="range_over">%1$s 넘게</string>
+    <string name="range_over">%1$s 이상</string>
     <string name="area_up_to">%1$d㎡ 이하</string>
     <string name="area_between">%1$d~%2$d㎡</string>
-    <string name="area_over">%1$d㎡ 넘게</string>
+    <string name="area_over">%1$d㎡ 이상</string>
 
     <!-- S-07 설정 -->
     <string name="settings_alerts">주행 중 음성 알림</string>

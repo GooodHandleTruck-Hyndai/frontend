@@ -33,7 +33,7 @@ class AlertConditionsTest {
     @Test
     fun defaultChoosesEverythingAvailable() {
         val conditions = AlertConditions()
-        assertEquals(setOf(ComplexType.APT), conditions.types)
+        assertEquals(setOf(ComplexType.APT, ComplexType.OFFICETEL), conditions.types)
         assertTrue(conditions.isComplete)
         assertTrue(conditions.matches(byId.getValue("c-1001")))
     }

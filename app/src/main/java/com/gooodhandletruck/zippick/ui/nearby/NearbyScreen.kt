@@ -1,52 +1,75 @@
 package com.gooodhandletruck.zippick.ui.nearby
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.onPlaced
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gooodhandletruck.zippick.R
+import com.gooodhandletruck.zippick.data.AreaRange
+import com.gooodhandletruck.zippick.data.ComplexType
+import com.gooodhandletruck.zippick.data.PriceRange
 import com.gooodhandletruck.zippick.ui.WindowLayout
 import com.gooodhandletruck.zippick.ui.component.ComplexCard
 import com.gooodhandletruck.zippick.ui.component.ComplexCardModel
 import com.gooodhandletruck.zippick.ui.component.LoadingCards
-import com.gooodhandletruck.zippick.ui.component.NumberBadge
-import com.gooodhandletruck.zippick.ui.component.SelectChip
 import com.gooodhandletruck.zippick.ui.component.SortChip
 import com.gooodhandletruck.zippick.ui.component.StatusBox
 import com.gooodhandletruck.zippick.ui.component.rememberLocationPermissionRequest
 import com.gooodhandletruck.zippick.ui.component.rememberSortedListState
 import com.gooodhandletruck.zippick.ui.component.sortedByDistance
 import com.gooodhandletruck.zippick.ui.component.sortedByPriceAscending
-import com.gooodhandletruck.zippick.ui.component.sortedByPriceDescending
+import com.gooodhandletruck.zippick.ui.component.sortedByRecentTrade
 import com.gooodhandletruck.zippick.ui.format.formatDistance
 import com.gooodhandletruck.zippick.ui.theme.AppColors
 import com.gooodhandletruck.zippick.ui.theme.AppDimens
 import com.gooodhandletruck.zippick.ui.theme.AppType
+import kotlin.math.roundToInt
+
+// Figma 시안 S-03의 크기. 시안 캡처가 작아 대략 잰 값이다. TODO: Dev Mode 값과 다르면 여기만 고친다
+private val LIST_PANEL_WIDTH = 688.dp // 지도 위 목록 패널 너비. 좁은 창에서는 판 너비에 맞춘다
+private val SUMMARY_PILL_HEIGHT = 56.dp // 아래 가운데 요약 알약 높이
+private val LIST_BOTTOM_SPACE = 104.dp // 목록 패널 아래를 요약 알약 자리만큼 비운다
 
 /**
  * S-03을 ViewModel에 잇는다. 위치 권한이 있고 이 화면이 앞에 보이는 동안만 차 위치를 따라간다.
  * 다른 탭·주행 화면(S-08)으로 바뀌거나 앱이 뒤로 가면 따라가기를 멈춘다.
- * 1:2 창에서는 오른쪽 칸에 상세를 연 단지([selectedComplexId])의 카드를 강조한다.
+ * 1:2 창에서는 오른쪽에 상세를 연 단지([selectedComplexId])의 카드와 지도 핀을 강조한다.
  */
 @Composable
 fun NearbyRoute(
@@ -70,49 +93,41 @@ fun NearbyRoute(
         state = state,
         locationGranted = locationGranted,
         selectedComplexId = selectedComplexId,
-        onRequestLocationPermission = requestPermission,
-        onSelectRadius = viewModel::selectRadius,
-        onSelectSort = viewModel::selectSort,
-        onRetry = viewModel::retry,
-        onOpenComplex = onOpenComplex
+        actions = NearbyActions(
+            onRequestLocationPermission = requestPermission,
+            onSelectRadius = viewModel::selectRadius,
+            onToggleType = viewModel::toggleType,
+            onTogglePrice = viewModel::togglePrice,
+            onToggleArea = viewModel::toggleArea,
+            onResetFilters = viewModel::resetFilters,
+            onSelectSort = viewModel::selectSort,
+            onToggleList = viewModel::toggleList,
+            onRetry = viewModel::retry,
+            onOpenComplex = onOpenComplex
+        )
     )
 }
 
-/**
- * 1:2 창에서 S-03 목록 옆 칸의 약도. 목록을 불러온 뒤에만 그리고, 카드나 핀을 누르면 이 자리에 S-04가 열린다.
- * 핀 번호는 왼쪽 목록의 번호와 같도록 목록과 같은 정렬로 매긴다.
- */
-@Composable
-fun NearbyMapPane(window: WindowLayout, onOpenComplex: (String) -> Unit) {
-    val viewModel: NearbyViewModel = viewModel()
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val content = state.content as? NearbyContent.Loaded ?: return
-    if (content.cards.isEmpty()) return
-    NearbyMap(
-        center = content.center,
-        cards = content.cards.sortedBy(state.sort),
-        radius = state.radius,
-        selectedComplexId = null,
-        onOpenComplex = onOpenComplex,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(
-                end = window.contentPadding,
-                top = AppDimens.ContentPaddingTop,
-                bottom = AppDimens.ContentPaddingVertical
-            )
-    )
-}
+/** S-03에서 누를 수 있는 것들. 인자가 많아 한데 묶는다 */
+class NearbyActions(
+    val onRequestLocationPermission: () -> Unit,
+    val onSelectRadius: (NearbyRadius) -> Unit,
+    val onToggleType: (ComplexType) -> Unit,
+    val onTogglePrice: (PriceRange) -> Unit,
+    val onToggleArea: (AreaRange) -> Unit,
+    val onResetFilters: () -> Unit,
+    val onSelectSort: (NearbySort) -> Unit,
+    val onToggleList: () -> Unit,
+    val onRetry: () -> Unit,
+    val onOpenComplex: (String) -> Unit
+)
 
 /**
- * S-03 주변 단지. 정차 중 홈이다. 머리글, 범위 칩(500m·1km·3km), 단지 카드 최대 10개를 보여 준다.
- * 1:2 창에서는 왼쪽 640에 목록을 두고 오른쪽 칸에 약도를 둔다(카드를 누르면 약도 자리에 단지 상세가 열린다).
- * 1:1:1 창에서는 목록 맨 위에 약도(높이 480)를 둔다.
- * 카드 왼쪽 번호 배지와 약도 핀 번호는 같은 단지끼리 같다(시안 D-02). 정렬을 바꾸면 번호도 다시 매긴다.
- * 위치 권한이 없으면 목록 대신 상태 상자의 [위치 권한 허용]으로 권한 창을 다시 띄운다.
- * 위치를 받지 못하면 "지금 위치를 확인하지 못했어요 · [다시 시도]"를 보여 준다.
- * TODO: "허용하지 않고 다시 묻지 않음"을 고른 뒤에는 창이 뜨지 않아 버튼이 아무 일도 하지 않는다.
- *  그때 보여 줄 문구는 화면 설계서 '정할 것' 11번에서 정한다.
+ * S-03 주변 단지(Figma 시안). 머리글 아래 둥근 판 전체에 약도를 깔고, 그 위 왼쪽에 칩 줄과 목록 패널을 띄운다.
+ * - 칩 줄: [단지 N곳 ⌄](목록 패널 접기·펴기) · [아파트, 오피스텔 ⌄](종류 펼침) · [필터 N ⌄](가격대·면적·반경 펼침)
+ * - 목록 패널: "총 N개 단지"와 정렬 칩(가까운 순·가격 낮은 순·최근 거래 순), 단지 카드
+ * - 아래 가운데: "단지 N곳 · 내 위치 1km 안" 요약 알약
+ * 카드나 핀을 누르면 S-04가 열린다. 1:2 창에서는 오른쪽에 상세 패널이 뜨고(AppRoot), 1:1:1 창에서는 창을 덮는다.
  */
 @Composable
 fun NearbyScreen(
@@ -120,161 +135,235 @@ fun NearbyScreen(
     state: NearbyUiState,
     locationGranted: Boolean,
     selectedComplexId: String?,
-    onRequestLocationPermission: () -> Unit,
-    onSelectRadius: (NearbyRadius) -> Unit,
-    onSelectSort: (NearbySort) -> Unit,
-    onRetry: () -> Unit,
-    onOpenComplex: (String) -> Unit
+    actions: NearbyActions
 ) {
-    Column(
+    val content = state.content
+    val received = (content as? NearbyContent.Loaded)?.cards
+    val cards = received?.filteredBy(state)?.sortedBy(state.sort)
+    var openMenu by remember { mutableStateOf(MapMenu.NONE) }
+    var panelX by remember { mutableIntStateOf(0) }
+    val chipX = remember { mutableStateMapOf<MapMenu, Int>() }
+    var chipRowHeight by remember { mutableIntStateOf(0) }
+    val belowChips = with(LocalDensity.current) { chipRowHeight.toDp() } + AppDimens.SpaceS * 2
+    Box(
         modifier = Modifier
-            .fillMaxHeight()
-            .widthIn(max = AppDimens.ListPaneWidth + window.contentPadding * 2)
-            .padding(
-                start = window.contentPadding,
-                end = window.contentPadding,
-                top = AppDimens.ContentPaddingTop
-            ),
-        verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceM)
+            .fillMaxSize()
+            .padding(end = AppDimens.PanelInset, bottom = AppDimens.PanelInset)
+            .clip(RoundedCornerShape(AppDimens.PanelRadius))
+            .background(AppColors.Panel)
+            .onPlaced { panelX = it.positionInRoot().x.roundToInt() }
     ) {
-        NearbyHeader(
-            radius = state.radius,
-            totalCount = (state.content as? NearbyContent.Loaded)?.totalCount,
-            showRange = locationGranted
-        )
-        if (locationGranted) {
-            Row(horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)) {
-                RangeChips(selected = state.radius, onSelect = onSelectRadius)
-                SortChip(
-                    selected = state.sort,
-                    options = NearbySort.entries,
-                    label = { sortLabel(it) },
-                    onSelect = onSelectSort
-                )
-            }
-            NearbyContentArea(
-                state = state,
-                showMap = !window.isWide,
+        if (content is NearbyContent.Loaded && cards != null) {
+            NearbyMap(
+                center = content.center,
+                cards = cards,
+                radius = state.radius,
                 selectedComplexId = selectedComplexId,
-                onSelectRadius = onSelectRadius,
-                onRetry = onRetry,
-                onOpenComplex = onOpenComplex,
-                modifier = Modifier.weight(1f)
+                onOpenComplex = actions.onOpenComplex,
+                modifier = Modifier.fillMaxSize(),
+                framed = false
             )
-        } else {
+        }
+        if (!locationGranted) {
             StatusBox(
                 message = stringResource(R.string.status_location_denied),
                 actionLabel = stringResource(R.string.action_allow_location),
-                onAction = onRequestLocationPermission
+                onAction = actions.onRequestLocationPermission,
+                modifier = Modifier
+                    .widthIn(max = LIST_PANEL_WIDTH)
+                    .padding(AppDimens.SpaceS)
+            )
+            return@Box
+        }
+        if (state.listExpanded) {
+            ListPanel(
+                state = state,
+                received = received,
+                cards = cards,
+                selectedComplexId = selectedComplexId,
+                actions = actions,
+                modifier = Modifier
+                    .widthIn(max = LIST_PANEL_WIDTH + AppDimens.SpaceS * 2)
+                    .padding(
+                        start = AppDimens.SpaceS,
+                        end = AppDimens.SpaceS,
+                        top = belowChips,
+                        bottom = if (cards != null) LIST_BOTTOM_SPACE else AppDimens.SpaceS
+                    )
             )
         }
-    }
-}
-
-/** "주변 단지"(title2)와 "내 위치에서 1km 안 · 12곳"(body2) */
-@Composable
-private fun NearbyHeader(radius: NearbyRadius, totalCount: Int?, showRange: Boolean) {
-    Column(verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceXs)) {
-        Text(text = stringResource(R.string.screen_nearby), style = AppType.Title2, color = AppColors.TextPrimary)
-        if (showRange) {
-            val range = if (totalCount != null) {
-                stringResource(R.string.nearby_header_count, radius.label, totalCount)
-            } else {
-                stringResource(R.string.nearby_header_range, radius.label)
+        if (cards != null) {
+            SummaryPill(
+                text = stringResource(R.string.nearby_summary_pill, cards.size, state.radius.label),
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = AppDimens.SpaceM)
+            )
+        }
+        if (openMenu != MapMenu.NONE) {
+            // 펼침 바깥(칩 줄은 빼고)을 누르면 닫는다. 지도 핀도 이때는 눌리지 않는다
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = { openMenu = MapMenu.NONE }
+                    )
+            )
+        }
+        Row(
+            modifier = Modifier
+                .padding(AppDimens.SpaceS)
+                .onSizeChanged { chipRowHeight = it.height },
+            horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)
+        ) {
+            if (cards != null) {
+                MapChip(
+                    text = stringResource(R.string.nearby_list_chip, cards.size),
+                    expanded = state.listExpanded,
+                    icon = R.drawable.ic_building,
+                    onClick = {
+                        openMenu = MapMenu.NONE
+                        actions.onToggleList()
+                    }
+                )
             }
-            Text(text = range, style = AppType.Body2, color = AppColors.TextTertiary)
+            MapMenu.entries.filter { it != MapMenu.NONE }.forEach { menu ->
+                MapChip(
+                    text = when (menu) {
+                        MapMenu.TYPE -> typesChipText(state.types)
+                        else -> stringResource(R.string.nearby_filter_count, state.filterCount)
+                    },
+                    expanded = openMenu == menu,
+                    icon = if (menu == MapMenu.FILTER) R.drawable.ic_filter else null,
+                    onClick = { openMenu = if (openMenu == menu) MapMenu.NONE else menu },
+                    modifier = Modifier.onPlaced { chipX[menu] = it.positionInRoot().x.roundToInt() }
+                )
+            }
+        }
+        val anchorX = (chipX[openMenu] ?: 0) - panelX
+        // 칩 줄 바로 아래(8dp 띄움)에 펼친다
+        val menuModifier = Modifier.dropdownBelow(
+            top = belowChips - AppDimens.SpaceXs,
+            anchorX = anchorX,
+            margin = AppDimens.SpaceS
+        )
+        when (openMenu) {
+            MapMenu.TYPE -> TypeMenu(types = state.types, onToggleType = actions.onToggleType, modifier = menuModifier)
+            MapMenu.FILTER -> FilterPopover(
+                state = state,
+                onTogglePrice = actions.onTogglePrice,
+                onToggleArea = actions.onToggleArea,
+                onSelectRadius = actions.onSelectRadius,
+                onReset = actions.onResetFilters,
+                modifier = menuModifier
+            )
+            MapMenu.NONE -> Unit
         }
     }
 }
 
-/** 범위 칩 500m · 1km · 3km. 하나만 고를 수 있고, 고른 칩은 강조색이다 */
+/** 목록 패널: "총 N개 단지"와 정렬 칩, 그 아래 단지 카드. 불러오는 중·빈 목록·오류도 이 패널 안에 쓴다 */
 @Composable
-private fun RangeChips(selected: NearbyRadius, onSelect: (NearbyRadius) -> Unit) {
-    Row(
-        modifier = Modifier.selectableGroup(),
-        horizontalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)
-    ) {
-        NearbyRadius.entries.forEach { radius ->
-            SelectChip(text = radius.label, selected = radius == selected, onClick = { onSelect(radius) })
-        }
-    }
-}
-
-/** 불러오는 중·오류·빈 목록·단지 카드 목록 가운데 하나를 그린다 (화면 설계서 S-03 '상태별 문구') */
-@Composable
-private fun NearbyContentArea(
+private fun ListPanel(
     state: NearbyUiState,
-    showMap: Boolean,
+    received: List<ComplexCardModel>?,
+    cards: List<ComplexCardModel>?,
     selectedComplexId: String?,
-    onSelectRadius: (NearbyRadius) -> Unit,
-    onRetry: () -> Unit,
-    onOpenComplex: (String) -> Unit,
+    actions: NearbyActions,
     modifier: Modifier = Modifier
 ) {
-    when (val content = state.content) {
-        NearbyContent.Idle, NearbyContent.Loading -> LoadingCards(
-            modifier = modifier,
-            message = stringResource(R.string.nearby_loading)
-        )
-        NearbyContent.LocationFailed -> StatusBox(
-            message = stringResource(R.string.status_location_unavailable),
-            actionLabel = stringResource(R.string.action_retry),
-            onAction = onRetry
-        )
-        NearbyContent.Failed -> StatusBox(
-            message = stringResource(R.string.status_load_failed),
-            actionLabel = stringResource(R.string.action_retry),
-            onAction = onRetry
-        )
-        is NearbyContent.Loaded -> if (content.cards.isEmpty()) {
-            val wider = state.radius.wider
-            StatusBox(
-                message = stringResource(R.string.nearby_empty, state.radius.label),
-                actionLabel = wider?.let { stringResource(R.string.action_widen_range, it.label) },
-                onAction = { wider?.let(onSelectRadius) }
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(AppDimens.CardRadius))
+            .background(AppColors.Surface)
+            .padding(AppDimens.SpaceS),
+        verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceS)
+    ) {
+        when (state.content) {
+            NearbyContent.Idle, NearbyContent.Loading -> LoadingCards(message = stringResource(R.string.nearby_loading))
+            NearbyContent.LocationFailed -> StatusBox(
+                message = stringResource(R.string.status_location_unavailable),
+                actionLabel = stringResource(R.string.action_retry),
+                onAction = actions.onRetry
             )
-        } else {
-            val cards = content.cards.sortedBy(state.sort)
-            LazyColumn(
-                modifier = modifier,
-                state = rememberSortedListState(state.sort.name),
-                verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceS),
-                contentPadding = PaddingValues(bottom = AppDimens.ContentPaddingVertical)
-            ) {
-                if (showMap) {
-                    item(key = MAP_ITEM_KEY) {
-                        NearbyMap(
-                            center = content.center,
-                            cards = cards,
-                            radius = state.radius,
-                            selectedComplexId = selectedComplexId,
-                            onOpenComplex = onOpenComplex,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(AppDimens.NarrowMapHeight)
+            NearbyContent.Failed -> StatusBox(
+                message = stringResource(R.string.status_load_failed),
+                actionLabel = stringResource(R.string.action_retry),
+                onAction = actions.onRetry
+            )
+            is NearbyContent.Loaded -> if (cards.isNullOrEmpty() && !received.isNullOrEmpty()) {
+                // 받은 단지는 있는데 '종류'·'필터'로 모두 걸렀다
+                StatusBox(
+                    message = stringResource(R.string.nearby_filter_empty),
+                    actionLabel = stringResource(R.string.filter_reset_action),
+                    onAction = actions.onResetFilters
+                )
+            } else if (cards.isNullOrEmpty()) {
+                val wider = state.radius.wider
+                StatusBox(
+                    message = stringResource(R.string.nearby_empty, state.radius.label),
+                    actionLabel = wider?.let { stringResource(R.string.action_widen_range, it.label) },
+                    onAction = { wider?.let(actions.onSelectRadius) }
+                )
+            } else {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(R.string.nearby_total, cards.size),
+                        style = AppType.Label1Medium,
+                        color = AppColors.TextSecondary,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = AppDimens.SpaceXs)
+                    )
+                    SortChip(
+                        selected = state.sort,
+                        options = NearbySort.entries,
+                        label = { sortLabel(it) },
+                        onSelect = actions.onSelectSort,
+                        background = AppColors.Surface
+                    )
+                }
+                LazyColumn(
+                    state = rememberSortedListState(state.listKey),
+                    verticalArrangement = Arrangement.spacedBy(AppDimens.SpaceS),
+                    contentPadding = PaddingValues(bottom = AppDimens.SpaceXs)
+                ) {
+                    items(cards, key = { it.complex.complexId }) { card ->
+                        ComplexCard(
+                            model = card,
+                            onClick = { actions.onOpenComplex(card.complex.complexId) },
+                            selected = card.complex.complexId == selectedComplexId,
+                            showTypeTag = true
                         )
                     }
                 }
-                itemsIndexed(cards, key = { _, card -> card.complex.complexId }) { index, card ->
-                    val selected = card.complex.complexId == selectedComplexId
-                    ComplexCard(
-                        model = card,
-                        onClick = { onOpenComplex(card.complex.complexId) },
-                        selected = selected,
-                        leading = { NumberBadge(number = index + 1, filled = selected) }
-                    )
-                }
             }
         }
     }
 }
 
-private const val MAP_ITEM_KEY = "map"
+/** 아래 가운데 요약 알약 "단지 9곳 · 내 위치 1km 안"(label1Medium). 누를 수 없다 */
+@Composable
+private fun SummaryPill(text: String, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .heightIn(min = SUMMARY_PILL_HEIGHT)
+            .clip(CircleShape)
+            .background(AppColors.Surface)
+            .padding(horizontal = AppDimens.SpaceM),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = text, style = AppType.Label1Medium, color = AppColors.TextPrimary)
+    }
+}
 
 private fun List<ComplexCardModel>.sortedBy(sort: NearbySort): List<ComplexCardModel> = when (sort) {
     NearbySort.NEAREST -> sortedByDistance()
     NearbySort.PRICE_LOW -> sortedByPriceAscending()
-    NearbySort.PRICE_HIGH -> sortedByPriceDescending()
+    NearbySort.RECENT_TRADE -> sortedByRecentTrade()
 }
 
 @Composable
@@ -282,10 +371,9 @@ private fun sortLabel(sort: NearbySort): String = stringResource(
     when (sort) {
         NearbySort.NEAREST -> R.string.sort_nearest
         NearbySort.PRICE_LOW -> R.string.sort_price_low
-        NearbySort.PRICE_HIGH -> R.string.sort_price_high
+        NearbySort.RECENT_TRADE -> R.string.sort_recent_trade
     }
 )
 
-/** 범위 이름: "500m", "1km", "3km" */
 private val NearbyRadius.label: String
     get() = formatDistance(meters.toDouble())

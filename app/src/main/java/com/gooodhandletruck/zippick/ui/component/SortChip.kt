@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import com.gooodhandletruck.zippick.R
@@ -49,6 +50,7 @@ fun rememberSortedListState(sortKey: String): LazyListState {
 /**
  * 정렬 칩(S-03·S-05): 지금 정렬 이름("가까운 순 ▾")을 보여 주고, 누르면 고를 수 있는 정렬을 칩 아래에 펼친다.
  * 펼친 목록은 창을 덮지 않는 작은 메뉴이고, 줄마다 누를 곳이 76 이상이다. 정차 화면에서만 쓴다.
+ * [background]는 칩 바탕색이다.
  */
 @Composable
 fun <T> SortChip(
@@ -56,7 +58,8 @@ fun <T> SortChip(
     options: List<T>,
     label: @Composable (T) -> String,
     onSelect: (T) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    background: Color = AppColors.ButtonSecondary
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box(modifier = modifier) {
@@ -65,7 +68,7 @@ fun <T> SortChip(
                 .heightIn(min = AppDimens.TouchMin)
                 .widthIn(min = AppDimens.TouchMin)
                 .clip(RoundedCornerShape(AppDimens.ChipRadius))
-                .background(AppColors.ButtonSecondary)
+                .background(background)
                 .clickable(role = Role.DropdownList) { expanded = true }
                 .padding(horizontal = AppDimens.SpaceM),
             contentAlignment = Alignment.Center

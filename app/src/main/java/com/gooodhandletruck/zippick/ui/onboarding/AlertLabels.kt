@@ -24,7 +24,7 @@ fun typeLabel(type: ComplexType): String = stringResource(
     }
 )
 
-/** "5억 이하" · "5억~10억" · "15억 넘게". 가격 숫자는 formatPrice로만 만든다 */
+/** "5억 이하" · "5억~10억" · "15억 이상". 가격 숫자는 formatPrice로만 만든다 */
 @Composable
 fun priceRangeLabel(range: PriceRange): String {
     val min = range.minManwon
@@ -36,7 +36,7 @@ fun priceRangeLabel(range: PriceRange): String {
     }
 }
 
-/** "60㎡ 이하" · "60~85㎡" · "85㎡ 넘게" */
+/** "60㎡ 이하" · "60~85㎡" · "85㎡ 이상" */
 @Composable
 fun areaRangeLabel(range: AreaRange): String {
     val min = range.minM2
